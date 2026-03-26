@@ -1,62 +1,130 @@
-# camera.py (调整显示布局，为鼠标提示留出空间)
+# camera.py
 import cv2
 import time
+import numpy as np
 from datetime import datetime
+import threading
+from config import Config
 
 
-class MacCameraPreview:
-    """Mac 摄像头预览 - 显示FPS和时间"""
+class CameraManager:
+    """摄像头管理器 - 支持树莓派Picamera2和USB摄像头"""
 
-    def __init__(self, camera_id=0, width=640, height=480):
-        """初始化摄像头"""
-        print("=" * 50)
-        print("📹 Mac 摄像头实时预览")
-        print("=" * 50)
+    def __init__(self, camera_type=None):
+        self.camera_type = camera_type or Config.CAMERA_TYPE
+        self.width = Config.CAMERA_RESOLUTION[0]
+        self.height = Config.CAMERA_RESOLUTION[1]
+        self.fps_target = Config.CAMERA_FPS
 
-        # 打开摄像头
-        self.cap = cv2.VideoCapture(camera_id)
+        self.cap = None
+        self.picam2 = None
+        self.frame = None
+        self.running = False
+        self.frame_lock = threading.Lock()
 
-        if not self.cap.isOpened():
-            for i in range(1, 5):
-                print(f"尝试摄像头 ID {i}...")
-                self.cap = cv2.VideoCapture(i)
-                if self.cap.isOpened():
-                    print(f"✅ 找到摄像头 ID {i}")
-                    break
-
-            if not self.cap.isOpened():
-                raise Exception(f"❌ 无法打开任何摄像头！")
-
-        # 设置分辨率
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-
-        # 获取实际分辨率
-        self.actual_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        self.actual_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-        print(f"\n✅ 摄像头初始化成功")
-        print(f"   - 分辨率: {self.actual_width} x {self.actual_height}")
-
-        # FPS计算变量
+        # FPS计算
         self.prev_frame_time = 0
         self.fps = 0
 
-        print("\n▶️ 摄像头已就绪")
+        self._init_camera()
+
+    def _init_camera(self):
+        """初始化摄像头"""
+        print("=" * 50)
+        print("📹 摄像头初始化")
         print("=" * 50)
 
-    def get_frame(self):
-        """获取一帧画面"""
-        if self.cap is None:
-            return None
+        if self.camera_type == "picamera2":
+            self._init_picamera2()
+        else:
+            self._init_usb_camera()
 
-        ret, frame = self.cap.read()
-        if ret:
-            return frame
+    def _init_picamera2(self):
+        """初始化树莓派Picamera2摄像头"""
+        try:
+            from picamera2 import Picamera2
+            import libcamera
+
+            self.picam2 = Picamera2()
+
+            # 配置摄像头
+            config = self.picam2.create_preview_configuration(
+                main={"size": (self.width, self.height), "format": "RGB888"},
+                controls={"FrameRate": self.fps_target}
+            )
+            self.picam2.configure(config)
+
+            # 启动摄像头
+            self.picam2.start()
+            time.sleep(2)  # 等待摄像头稳定
+
+            print(f"✅ Picamera2初始化成功")
+            print(f"   - 分辨率: {self.width} x {self.height}")
+            print(f"   - 帧率: {self.fps_target} FPS")
+
+            # 启动采集线程
+            self.running = True
+            self.capture_thread = threading.Thread(target=self._picamera2_capture_loop)
+            self.capture_thread.start()
+
+        except Exception as e:
+            print(f"❌ Picamera2初始化失败: {e}")
+            print("   尝试使用USB摄像头...")
+            self.camera_type = "usb"
+            self._init_usb_camera()
+
+    def _init_usb_camera(self):
+        """初始化USB摄像头"""
+        self.cap = cv2.VideoCapture(0)
+
+        if not self.cap.isOpened():
+            raise Exception("无法打开USB摄像头！")
+
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
+        self.cap.set(cv2.CAP_PROP_FPS, self.fps_target)
+
+        actual_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        actual_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+        print(f"✅ USB摄像头初始化成功")
+        print(f"   - 分辨率: {actual_width} x {actual_height}")
+
+        self.running = True
+        self.capture_thread = threading.Thread(target=self._usb_camera_capture_loop)
+        self.capture_thread.start()
+
+    def _picamera2_capture_loop(self):
+        """Picamera2采集循环"""
+        while self.running:
+            try:
+                # 捕获图像 (RGB格式)
+                frame_rgb = self.picam2.capture_array()
+                # 转换为BGR供OpenCV使用
+                frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
+
+                with self.frame_lock:
+                    self.frame = frame_bgr
+            except Exception as e:
+                print(f"采集错误: {e}")
+
+    def _usb_camera_capture_loop(self):
+        """USB摄像头采集循环"""
+        while self.running:
+            ret, frame = self.cap.read()
+            if ret:
+                with self.frame_lock:
+                    self.frame = frame
+
+    def get_frame(self):
+        """获取最新帧"""
+        with self.frame_lock:
+            if self.frame is not None:
+                return self.frame.copy()
         return None
 
     def calculate_fps(self):
-        """计算实时FPS"""
+        """计算FPS"""
         curr_time = time.time()
         if self.prev_frame_time != 0:
             time_diff = curr_time - self.prev_frame_time
@@ -65,7 +133,7 @@ class MacCameraPreview:
         return self.fps
 
     def draw_info(self, frame, extra_info=None):
-        """在画面上绘制FPS和时间"""
+        """在画面上绘制信息"""
         if frame is None:
             return None
 
@@ -75,19 +143,18 @@ class MacCameraPreview:
         current_fps = self.calculate_fps()
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # 创建半透明黑色背景条 (顶部 - 增加高度为80)
+        # 创建半透明背景
         overlay = frame.copy()
-        cv2.rectangle(overlay, (0, 0), (w, 80), (0, 0, 0), -1)
-        alpha = 0.6
-        frame = cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0)
+        cv2.rectangle(overlay, (0, 0), (w, 90), (0, 0, 0), -1)
+        frame = cv2.addWeighted(overlay, 0.6, frame, 0.4, 0)
 
         # 显示FPS
         cv2.putText(frame, f"FPS: {current_fps:.1f}", (10, 25),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
         # 显示分辨率
-        cv2.putText(frame, f"{w}x{h}", (100, 25),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
+        cv2.putText(frame, f"{w}x{h}", (120, 25),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
 
         # 显示时间
         time_size = cv2.getTextSize(current_time, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
@@ -96,24 +163,34 @@ class MacCameraPreview:
 
         # 显示额外信息
         if extra_info:
-            cv2.putText(frame, extra_info, (10, 55),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+            # 分行显示
+            lines = extra_info.split('\n')
+            for i, line in enumerate(lines):
+                cv2.putText(frame, line, (10, 55 + i * 25),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
 
         # 图像中心十字线
         center_x, center_y = w // 2, h // 2
         cv2.line(frame, (center_x - 20, center_y), (center_x + 20, center_y), (0, 255, 0), 1)
         cv2.line(frame, (center_x, center_y - 20), (center_x, center_y + 20), (0, 255, 0), 1)
-        cv2.circle(frame, (center_x, center_y), 3, (0, 0, 255), -1)
+        cv2.circle(frame, (center_x, center_y), 4, (0, 0, 255), -1)
 
-        # 底部退出提示
-        cv2.putText(frame, "Mouse: hover to highlight | click to select | 'c' clear | 'q' quit",
-                    (10, h - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150, 150, 150), 1)
+        # 底部提示
+        cv2.putText(frame, "Hover: highlight | Click: track | c: clear | +/-: threshold | q: quit",
+                    (10, h - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (150, 150, 150), 1)
 
         return frame
 
     def release(self):
-        """释放摄像头资源"""
-        if hasattr(self, 'cap') and self.cap is not None:
+        """释放资源"""
+        self.running = False
+        if self.capture_thread:
+            self.capture_thread.join(timeout=1)
+
+        if self.picam2:
+            self.picam2.stop()
+        if self.cap:
             self.cap.release()
+
         cv2.destroyAllWindows()
         print("✅ 摄像头已关闭")
