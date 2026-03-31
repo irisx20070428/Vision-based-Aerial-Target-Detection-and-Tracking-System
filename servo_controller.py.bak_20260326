@@ -1,3 +1,4 @@
+# servo_controller.py
 import RPi.GPIO as GPIO
 import time
 import threading
@@ -88,7 +89,7 @@ class ServoController:
             pan_diff = self.target_pan - self.current_pan
             tilt_diff = self.target_tilt - self.current_tilt
 
-            # 计算移动步长（带速度限制）
+            # 计算移动步长（带加速度）
             max_move = Config.MAX_ANGLE_SPEED * dt
 
             # 限制移动速度
