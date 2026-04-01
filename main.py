@@ -41,6 +41,14 @@ class PersonTrackingSystem:
 
         self._init_modules()
 
+        # 性能监控
+        self.performance = {
+            'detect_time': [],
+            'track_time': [],
+            'fps': []
+        }
+        self.last_perf_time = time.time()
+
     def _init_modules(self):
         """初始化所有模块"""
         try:
@@ -118,6 +126,7 @@ class PersonTrackingSystem:
 
         last_servo_update = time.time()
         last_analysis_time = 0
+
 
         try:
             while self.running:

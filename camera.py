@@ -1,4 +1,3 @@
-# camera.py
 import cv2
 import time
 import numpy as np
@@ -25,6 +24,10 @@ class CameraManager:
         # FPS计算
         self.prev_frame_time = 0
         self.fps = 0
+
+        # 帧率控制
+        self.frame_interval = 1.0 / self.fps_target
+        self.last_frame_time = 0
 
         self._init_camera()
 
@@ -65,6 +68,7 @@ class CameraManager:
             # 启动采集线程
             self.running = True
             self.capture_thread = threading.Thread(target=self._picamera2_capture_loop)
+            self.capture_thread.daemon = True
             self.capture_thread.start()
 
         except Exception as e:
@@ -92,6 +96,7 @@ class CameraManager:
 
         self.running = True
         self.capture_thread = threading.Thread(target=self._usb_camera_capture_loop)
+        self.capture_thread.daemon = True
         self.capture_thread.start()
 
     def _picamera2_capture_loop(self):
@@ -107,6 +112,7 @@ class CameraManager:
                     self.frame = frame_bgr
             except Exception as e:
                 print(f"采集错误: {e}")
+                time.sleep(0.01)
 
     def _usb_camera_capture_loop(self):
         """USB摄像头采集循环"""
@@ -115,11 +121,24 @@ class CameraManager:
             if ret:
                 with self.frame_lock:
                     self.frame = frame
+            else:
+                time.sleep(0.01)
 
     def get_frame(self):
-        """获取最新帧"""
+        """获取最新帧 - 带帧率控制"""
+        current_time = time.time()
+
+        # 限制帧率
+        if current_time - self.last_frame_time < self.frame_interval:
+            time.sleep(0.001)  # 短暂休眠
+            with self.frame_lock:
+                if self.frame is not None:
+                    return self.frame.copy()
+            return None
+
         with self.frame_lock:
             if self.frame is not None:
+                self.last_frame_time = current_time
                 return self.frame.copy()
         return None
 
@@ -133,7 +152,7 @@ class CameraManager:
         return self.fps
 
     def draw_info(self, frame, extra_info=None):
-        """在画面上绘制信息"""
+        """在画面上绘制信息 - 增强版"""
         if frame is None:
             return None
 
@@ -143,9 +162,9 @@ class CameraManager:
         current_fps = self.calculate_fps()
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # 创建半透明背景
+        # 创建半透明背景（增加高度以容纳更多信息）
         overlay = frame.copy()
-        cv2.rectangle(overlay, (0, 0), (w, 90), (0, 0, 0), -1)
+        cv2.rectangle(overlay, (0, 0), (w, 120), (0, 0, 0), -1)
         frame = cv2.addWeighted(overlay, 0.6, frame, 0.4, 0)
 
         # 显示FPS
@@ -161,12 +180,12 @@ class CameraManager:
         cv2.putText(frame, current_time, (w - time_size[0] - 10, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
-        # 显示额外信息
+        # 显示额外信息（支持多行）
         if extra_info:
-            # 分行显示
             lines = extra_info.split('\n')
-            for i, line in enumerate(lines):
-                cv2.putText(frame, line, (10, 55 + i * 25),
+            for i, line in enumerate(lines[:4]):  # 最多显示4行
+                y_pos = 55 + i * 25
+                cv2.putText(frame, line, (10, y_pos),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
 
         # 图像中心十字线
@@ -176,7 +195,7 @@ class CameraManager:
         cv2.circle(frame, (center_x, center_y), 4, (0, 0, 255), -1)
 
         # 底部提示
-        cv2.putText(frame, "Hover: highlight | Click: track | c: clear | +/-: threshold | q: quit",
+        cv2.putText(frame, "Hover: highlight | Click: track | c: clear | r: reset | +/-: threshold | q: quit",
                     (10, h - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (150, 150, 150), 1)
 
         return frame
@@ -184,7 +203,7 @@ class CameraManager:
     def release(self):
         """释放资源"""
         self.running = False
-        if self.capture_thread:
+        if hasattr(self, 'capture_thread') and self.capture_thread:
             self.capture_thread.join(timeout=1)
 
         if self.picam2:
