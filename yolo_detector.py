@@ -21,7 +21,7 @@ class YOLOPersonDetector:
         self.conf_threshold = conf_threshold
 
         # 性能优化参数
-        self.frame_skip = getattr(Config, 'YOLO_FRAME_SKIP', 3)
+        self.frame_skip = getattr(Config, 'YOLO_FRAME_SKIP', 1)
         self.yolo_image_size = getattr(Config, 'YOLO_IMAGE_SIZE', 320)
         self.frame_count = 0
         self.last_detections = []
