@@ -430,7 +430,7 @@ class PersonTrackingSystem:
                 self.perf_monitor.record_track(track_time)
 
                 # FPS
-                fps = 1.0 / (time.time() - frame_start)
+                fps = 1.0 / (time.time() - track_start)
                 self.perf_monitor.record_fps(fps)
 
         except KeyboardInterrupt:
