@@ -1,4 +1,4 @@
-# config.py - 保持你原来的配置
+# config.py - 完整版
 import os
 
 
@@ -12,8 +12,9 @@ class Config:
 
     # YOLO配置
     YOLO_CONF_THRESHOLD = 0.5
-    YOLO_MODEL = 'yolov5s'
+    YOLO_MODEL = 'yolov5s'  # 可选: yolov5n, yolov5s, yolov5m
     YOLO_TARGET_CLASSES = [0]  # 0 = person
+    YOLO_FRAME_SKIP = 2  # 跳帧检测，提高性能（添加这个配置）
 
     # 舵机配置
     SERVO_PAN_PIN = 18  # 水平舵机 GPIO18
@@ -44,6 +45,7 @@ class Config:
     # 特征追踪配置
     SIMILARITY_THRESHOLD = 0.6
     TRACKING_HISTORY_LEN = 100
+    USE_SIMPLIFIED_FEATURES = True  # 树莓派使用简化特征（添加这个配置）
 
     # 日志配置
     LOG_LEVEL = "INFO"

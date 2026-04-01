@@ -1,3 +1,4 @@
+# yolo_detector.py - 修复版（带默认值）
 import cv2
 import torch
 import numpy as np
@@ -12,7 +13,7 @@ warnings.filterwarnings('ignore')
 
 
 class YOLOPersonDetector:
-    """YOLO人物检测器类 - 集成特征追踪和跳帧优化"""
+    """YOLO人物检测器类 - 集成特征追踪"""
 
     def __init__(self, conf_threshold=0.5, device='cpu'):
         print("=" * 50)
@@ -22,8 +23,8 @@ class YOLOPersonDetector:
         self.device = torch.device(device)
         self.conf_threshold = conf_threshold
 
-        # 跳帧优化
-        self.frame_skip = Config.YOLO_FRAME_SKIP
+        # 跳帧优化 - 使用 getattr 提供默认值
+        self.frame_skip = getattr(Config, 'YOLO_FRAME_SKIP', 2)  # 默认2
         self.frame_count = 0
         self.last_detections = []
         self.last_frame = None
@@ -33,23 +34,26 @@ class YOLOPersonDetector:
 
         try:
             # 使用指定模型
-            self.model = torch.hub.load('ultralytics/yolov5', Config.YOLO_MODEL,
+            model_name = getattr(Config, 'YOLO_MODEL', 'yolov5s')
+            self.model = torch.hub.load('ultralytics/yolov5', model_name,
                                         pretrained=True,
                                         device=self.device,
                                         trust_repo=True)
-            print(f"✅ 模型加载成功: {Config.YOLO_MODEL}")
+            print(f"✅ 模型加载成功: {model_name}")
         except Exception as e:
             print(f"⚠️ 模型加载失败: {e}")
             raise e
 
         # 配置模型
         self.model.conf = conf_threshold
-        self.model.classes = Config.YOLO_TARGET_CLASSES
+        target_classes = getattr(Config, 'YOLO_TARGET_CLASSES', [0])
+        self.model.classes = target_classes
         self.model.iou = 0.45
         self.model.max_det = 20
 
         # 特征追踪器
-        self.smart_tracker = SmartTracker(similarity_threshold=Config.SIMILARITY_THRESHOLD)
+        similarity_threshold = getattr(Config, 'SIMILARITY_THRESHOLD', 0.6)
+        self.smart_tracker = SmartTracker(similarity_threshold=similarity_threshold)
         self.visualizer = TrackingVisualizer()
 
         # 鼠标交互变量
@@ -67,9 +71,7 @@ class YOLOPersonDetector:
         print("=" * 50)
 
     def detect(self, frame):
-        """
-        检测画面中的人物 - 支持跳帧优化
-        """
+        """检测画面中的人物 - 支持跳帧优化"""
         if frame is None:
             return [], frame
 
@@ -78,7 +80,6 @@ class YOLOPersonDetector:
 
         # 跳帧检测
         if self.frame_count % self.frame_skip != 0:
-            # 如果在追踪模式下，使用追踪结果预测
             if self.is_selecting_mode and self.smart_tracker.tracked_person_id is not None:
                 return self._predict_detections(), frame
             return self.last_detections, frame
@@ -88,7 +89,7 @@ class YOLOPersonDetector:
         try:
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-            # 可选：缩小图像加速检测（树莓派优化）
+            # 可选：缩小图像加速检测
             use_resize = frame.shape[1] > 480 and self.device.type == 'cpu'
 
             if use_resize:
@@ -96,7 +97,6 @@ class YOLOPersonDetector:
                 small_frame = cv2.resize(rgb_frame, (480, int(frame.shape[0] * scale)))
                 results = self.model(small_frame)
 
-                # 还原坐标
                 if len(results.xyxy[0]) > 0:
                     for det in results.xyxy[0]:
                         x1, y1, x2, y2, conf, cls_id = det.cpu().numpy()
@@ -121,13 +121,10 @@ class YOLOPersonDetector:
         return detections, frame
 
     def _predict_detections(self):
-        """
-        预测下一帧的检测结果（简单运动预测）
-        """
+        """预测下一帧的检测结果"""
         if not self.last_detections:
             return []
 
-        # 如果在追踪模式下，优先使用追踪结果
         if self.is_selecting_mode and self.smart_tracker.tracked_person_id is not None:
             best_match, _ = self.smart_tracker.track_in_new_frame(self.last_detections, self.last_frame)
             if best_match:

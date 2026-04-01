@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="修改成usb camera" />
+    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="测试摄像头">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yolo_detector.py" beforeDir="false" afterPath="$PROJECT_DIR$/yolo_detector.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -137,7 +141,23 @@
       <option name="project" value="LOCAL" />
       <updated>1775033340551</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="测试摄像头">
+      <option name="closed" value="true" />
+      <created>1775037511997</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1775037511997</updated>
+    </task>
+    <task id="LOCAL-00007" summary="测试摄像头">
+      <option name="closed" value="true" />
+      <created>1775037636412</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1775037636412</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -155,6 +175,7 @@
     <MESSAGE value="可以选中目标人物然后框跟着，弄了个数据集逐帧储存目标数据然后判断" />
     <MESSAGE value="更新from mac" />
     <MESSAGE value="修改成usb camera" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改成usb camera" />
+    <MESSAGE value="测试摄像头" />
+    <option name="LAST_COMMIT_MESSAGE" value="测试摄像头" />
   </component>
 </project>
