@@ -1,4 +1,4 @@
-# feature_tracker.py - 修复追踪丢失问题
+# feature_tracker.py - 修复 calcHist 错误
 import cv2
 import numpy as np
 import os
@@ -19,66 +19,94 @@ class FaceAngle(Enum):
 
 
 class PersonFeatureExtractor:
-    """人物特征提取器 - 改进版"""
+    """人物特征提取器 - 修复版"""
 
     def __init__(self):
         self.use_simplified = getattr(Config, 'USE_SIMPLIFIED_FEATURES', False)
 
-        # 使用更稳定的特征
-        self.hist_bins = [8, 8, 8]  # 使用完整bin数
+        # 使用正确的hist参数
+        self.hist_bins = [8, 8, 8]  # 3通道各8个bin
         self.weights = {
-            'color_hist': 0.5,  # 提高颜色权重
+            'color_hist': 0.5,
             'edge': 0.3,
             'texture': 0.2
         }
 
     def extract_color_histogram(self, person_img):
-        """提取颜色直方图"""
-        if person_img.size == 0:
-            return np.zeros(512)
+        """提取颜色直方图 - 修复calcHist错误"""
+        if person_img is None or person_img.size == 0:
+            return np.zeros(512)  # 8*8*8 = 512
 
-        # 使用完整分辨率
-        hsv = cv2.cvtColor(person_img, cv2.COLOR_BGR2HSV)
-        hist = cv2.calcHist([hsv], [0, 1], None, self.hist_bins, [0, 180, 0, 256])
-        cv2.normalize(hist, hist)
-        return hist.flatten()
+        try:
+            # 转换到HSV颜色空间
+            hsv = cv2.cvtColor(person_img, cv2.COLOR_BGR2HSV)
+
+            # 正确的calcHist参数格式
+            # 对于3通道图像，需要传入3个通道的列表
+            hist = cv2.calcHist(
+                [hsv],  # 图像列表
+                [0, 1, 2],  # 使用的通道 [H, S, V]
+                None,  # 不使用mask
+                self.hist_bins,  # bin数量 [8, 8, 8]
+                [0, 180, 0, 256, 0, 256]  # 范围 [H:0-180, S:0-256, V:0-256]
+            )
+
+            # 归一化
+            cv2.normalize(hist, hist)
+            return hist.flatten()
+
+        except Exception as e:
+            print(f"颜色直方图提取错误: {e}")
+            return np.zeros(512)
 
     def extract_edge_features(self, person_img):
         """提取边缘特征"""
-        if person_img.size == 0:
+        if person_img is None or person_img.size == 0:
             return np.array([0])
 
-        gray = cv2.cvtColor(person_img, cv2.COLOR_BGR2GRAY)
-        edges = cv2.Canny(gray, 50, 150)
-        edge_density = np.sum(edges > 0) / edges.size
-        return np.array([edge_density])
+        try:
+            gray = cv2.cvtColor(person_img, cv2.COLOR_BGR2GRAY)
+            edges = cv2.Canny(gray, 50, 150)
+            edge_density = np.sum(edges > 0) / edges.size
+            return np.array([edge_density])
+        except Exception as e:
+            print(f"边缘特征提取错误: {e}")
+            return np.array([0])
 
     def extract_texture_features(self, person_img):
         """提取纹理特征"""
-        if person_img.size == 0:
+        if person_img is None or person_img.size == 0:
             return np.zeros(16)
 
-        gray = cv2.cvtColor(person_img, cv2.COLOR_BGR2GRAY)
-        small = cv2.resize(gray, (64, 64))
+        try:
+            gray = cv2.cvtColor(person_img, cv2.COLOR_BGR2GRAY)
+            small = cv2.resize(gray, (64, 64))
 
-        # LBP特征
-        lbp = np.zeros_like(small)
-        for i in range(1, small.shape[0] - 1):
-            for j in range(1, small.shape[1] - 1):
-                center = small[i, j]
-                code = 0
-                code |= (small[i - 1, j] > center) << 0
-                code |= (small[i, j + 1] > center) << 1
-                code |= (small[i + 1, j] > center) << 2
-                code |= (small[i, j - 1] > center) << 3
-                lbp[i, j] = code
+            # LBP特征
+            lbp = np.zeros_like(small)
+            for i in range(1, small.shape[0] - 1):
+                for j in range(1, small.shape[1] - 1):
+                    center = small[i, j]
+                    code = 0
+                    code |= (small[i - 1, j] > center) << 0
+                    code |= (small[i, j + 1] > center) << 1
+                    code |= (small[i + 1, j] > center) << 2
+                    code |= (small[i, j - 1] > center) << 3
+                    lbp[i, j] = code
 
-        hist = cv2.calcHist([lbp.astype(np.uint8)], [0], None, [16], [0, 16])
-        cv2.normalize(hist, hist)
-        return hist.flatten()
+            hist = cv2.calcHist([lbp.astype(np.uint8)], [0], None, [16], [0, 16])
+            cv2.normalize(hist, hist)
+            return hist.flatten()
+
+        except Exception as e:
+            print(f"纹理特征提取错误: {e}")
+            return np.zeros(16)
 
     def estimate_face_angle(self, person_img):
         """估计人脸角度"""
+        if person_img is None or person_img.size == 0:
+            return FaceAngle.UNKNOWN, 0.3
+
         h, w = person_img.shape[:2]
         aspect_ratio = w / h if h > 0 else 0.5
 
@@ -94,15 +122,20 @@ class PersonFeatureExtractor:
     def extract_all_features(self, person_img):
         """提取所有特征"""
         if person_img is None or person_img.size == 0:
+            print("人物图像为空，无法提取特征")
             return None
 
-        features = {
-            'color_hist': self.extract_color_histogram(person_img),
-            'edge': self.extract_edge_features(person_img),
-            'texture': self.extract_texture_features(person_img),
-            'face_angle': self.estimate_face_angle(person_img)
-        }
-        return features
+        try:
+            features = {
+                'color_hist': self.extract_color_histogram(person_img),
+                'edge': self.extract_edge_features(person_img),
+                'texture': self.extract_texture_features(person_img),
+                'face_angle': self.estimate_face_angle(person_img)
+            }
+            return features
+        except Exception as e:
+            print(f"特征提取错误: {e}")
+            return None
 
 
 class FeatureComparator:
@@ -114,36 +147,39 @@ class FeatureComparator:
     def compute_similarity(self, features1, features2):
         """计算相似度"""
         if features1 is None or features2 is None:
-            return 0.0
+            return 0.5  # 默认中等分数
 
         scores = {}
 
         # 颜色直方图相似度
         if 'color_hist' in features1 and 'color_hist' in features2:
             try:
-                scores['color_hist'] = cv2.compareHist(
-                    features1['color_hist'].reshape(-1, 1).astype(np.float32),
-                    features2['color_hist'].reshape(-1, 1).astype(np.float32),
-                    cv2.HISTCMP_CORREL
-                )
-                # 确保分数在0-1之间
+                hist1 = features1['color_hist'].reshape(-1, 1).astype(np.float32)
+                hist2 = features2['color_hist'].reshape(-1, 1).astype(np.float32)
+                scores['color_hist'] = cv2.compareHist(hist1, hist2, cv2.HISTCMP_CORREL)
                 scores['color_hist'] = max(0, min(1, scores['color_hist']))
             except:
                 scores['color_hist'] = 0.5
 
         # 边缘特征相似度
         if 'edge' in features1 and 'edge' in features2:
-            edge1 = features1['edge'].flatten()
-            edge2 = features2['edge'].flatten()
-            diff = np.linalg.norm(edge1 - edge2)
-            scores['edge'] = 1 - min(1, diff / (np.linalg.norm(edge1) + np.linalg.norm(edge2) + 1e-6))
+            try:
+                edge1 = features1['edge'].flatten()
+                edge2 = features2['edge'].flatten()
+                diff = np.linalg.norm(edge1 - edge2)
+                scores['edge'] = 1 - min(1, diff / (np.linalg.norm(edge1) + np.linalg.norm(edge2) + 1e-6))
+            except:
+                scores['edge'] = 0.5
 
         # 纹理特征相似度
         if 'texture' in features1 and 'texture' in features2:
-            texture1 = features1['texture'].flatten()
-            texture2 = features2['texture'].flatten()
-            diff = np.linalg.norm(texture1 - texture2)
-            scores['texture'] = 1 - min(1, diff / (np.linalg.norm(texture1) + np.linalg.norm(texture2) + 1e-6))
+            try:
+                texture1 = features1['texture'].flatten()
+                texture2 = features2['texture'].flatten()
+                diff = np.linalg.norm(texture1 - texture2)
+                scores['texture'] = 1 - min(1, diff / (np.linalg.norm(texture1) + np.linalg.norm(texture2) + 1e-6))
+            except:
+                scores['texture'] = 0.5
 
         # 角度相似度
         if 'face_angle' in features1 and 'face_angle' in features2:
@@ -152,7 +188,7 @@ class FeatureComparator:
             if angle1 == angle2:
                 scores['face_angle'] = conf1 * conf2
             else:
-                scores['face_angle'] = 0.3  # 不同角度也给一点分数
+                scores['face_angle'] = 0.3
 
         # 加权平均
         weights = self.extractor.weights
@@ -166,7 +202,7 @@ class FeatureComparator:
 
         if total_weight > 0:
             return total_score / total_weight
-        return 0.5  # 默认中等分数
+        return 0.5
 
 
 class FeatureDataset:
@@ -184,7 +220,7 @@ class FeatureDataset:
 
     def add_person_sample(self, person_img, features, metadata=None):
         """添加样本"""
-        if features is None:
+        if features is None or person_img is None:
             return None
 
         person_id = self.next_id
@@ -193,8 +229,11 @@ class FeatureDataset:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
         # 保存图像
-        img_filename = f"{self.save_dir}/images/person_{person_id}_{timestamp}.jpg"
-        cv2.imwrite(img_filename, person_img)
+        try:
+            img_filename = f"{self.save_dir}/images/person_{person_id}_{timestamp}.jpg"
+            cv2.imwrite(img_filename, person_img)
+        except:
+            pass
 
         # 添加到内存
         if person_id not in self.dataset:
@@ -228,11 +267,11 @@ class FeatureDataset:
 
 
 class SmartTracker:
-    """智能追踪器 - 改进版"""
+    """智能追踪器 - 修复版"""
 
     def __init__(self, similarity_threshold=None):
         if similarity_threshold is None:
-            similarity_threshold = getattr(Config, 'SIMILARITY_THRESHOLD', 0.5)  # 降低阈值
+            similarity_threshold = getattr(Config, 'SIMILARITY_THRESHOLD', 0.5)
 
         self.extractor = PersonFeatureExtractor()
         self.comparator = FeatureComparator()
@@ -247,19 +286,24 @@ class SmartTracker:
         self.last_bbox = None
         self.last_score = 0
         self.lost_counter = 0
-        self.max_lost_frames = 10  # 允许丢失10帧
+        self.max_lost_frames = 10
 
     def select_person(self, person_img, person_bbox, frame_metadata=None):
         """选择人物"""
         if person_img is None or person_img.size == 0:
+            print("人物图像为空，无法选择")
             return None
 
         features = self.extractor.extract_all_features(person_img)
         if features is None:
+            print("特征提取失败，无法选择")
             return None
 
         metadata = {'bbox': person_bbox, 'frame_metadata': frame_metadata}
         person_id = self.dataset.add_person_sample(person_img, features, metadata)
+
+        if person_id is None:
+            return None
 
         self.tracked_person_id = person_id
         self.tracked_features = features
@@ -267,106 +311,15 @@ class SmartTracker:
         self.lost_counter = 0
 
         print(f"\n🎯 开始追踪人物 #{person_id}")
-        print(f"   初始分数阈值: {self.similarity_threshold}")
+        print(f"   相似度阈值: {self.similarity_threshold}")
 
         return person_id
 
-    def track_in_new_frame(self, new_detections, frame):
-        """在新帧中追踪"""
-        if self.tracked_person_id is None:
-            return None, 0
-
-        # 如果没有检测到任何人
-        if len(new_detections) == 0:
-            self.lost_counter += 1
-            if self.lost_counter > self.max_lost_frames:
-                print(f"⚠️ 人物 #{self.tracked_person_id} 追踪丢失")
-                return None, 0
-            return None, 0
-
-        best_match = None
-        best_score = 0
-        best_features = None
-        best_iou = 0
-
-        # 对每个检测到的人物计算相似度和位置重叠度
-        for det in new_detections:
-            x1, y1, x2, y2, conf, cls_id = det
-
-            person_img = frame[y1:y2, x1:x2]
-            if person_img.size == 0:
-                continue
-
-            # 提取特征
-            features = self.extractor.extract_all_features(person_img)
-            if features is None:
-                continue
-
-            # 特征相似度
-            score = self.comparator.compute_similarity(self.tracked_features, features)
-
-            # 位置重叠度（如果有上一帧位置）
-            iou = 0
-            if self.last_bbox is not None:
-                iou = self._calculate_iou(self.last_bbox, (x1, y1, x2, y2))
-
-            # 综合得分：特征相似度 + 位置重叠度
-            combined_score = score * 0.7 + iou * 0.3
-
-            candidate = {
-                'bbox': (x1, y1, x2, y2),
-                'features': features,
-                'score': score,
-                'combined_score': combined_score,
-                'angle': features['face_angle'][0].value,
-                'conf': conf
-            }
-
-            if combined_score > best_score:
-                best_score = combined_score
-                best_match = candidate
-                best_features = features
-                best_iou = iou
-
-        # 判断是否匹配成功
-        if best_score >= self.similarity_threshold and best_match:
-            # 更新特征（平滑更新）
-            if best_features:
-                self.tracked_features = self.smooth_update(
-                    self.tracked_features,
-                    best_features,
-                    alpha=0.2  # 降低更新速度，更稳定
-                )
-
-            self.last_bbox = best_match['bbox']
-            self.last_score = best_match['score']
-            self.lost_counter = 0
-
-            # 记录历史
-            self.tracking_history.append({
-                'timestamp': datetime.now().isoformat(),
-                'score': best_match['score'],
-                'angle': best_match['angle'],
-                'iou': best_iou
-            })
-
-            # 限制历史长度
-            if len(self.tracking_history) > getattr(Config, 'TRACKING_HISTORY_LEN', 100):
-                self.tracking_history = self.tracking_history[-100:]
-
-            # 打印追踪状态（每30帧）
-            if len(self.tracking_history) % 30 == 0:
-                print(f"📊 追踪中: #{self.tracked_person_id} | 分数: {best_match['score']:.2f} | IOU: {best_iou:.2f}")
-
-            return best_match, best_match['score']
-        else:
-            self.lost_counter += 1
-            if self.lost_counter % 5 == 0:  # 每5帧提示一次
-                print(f"⚠️ 追踪分数低: {best_score:.2f} (阈值: {self.similarity_threshold})")
-            return None, best_score
-
     def _calculate_iou(self, bbox1, bbox2):
-        """计算两个框的IOU"""
+        """计算IOU"""
+        if bbox1 is None or bbox2 is None:
+            return 0.0
+
         x1_1, y1_1, x2_1, y2_1 = bbox1
         x1_2, y1_2, x2_2, y2_2 = bbox2
 
@@ -391,7 +344,88 @@ class SmartTracker:
 
         return intersection / union
 
-    def smooth_update(self, old_features, new_features, alpha=0.2):
+    def track_in_new_frame(self, new_detections, frame):
+        """在新帧中追踪"""
+        if self.tracked_person_id is None:
+            return None, 0
+
+        # 如果没有检测到任何人
+        if len(new_detections) == 0:
+            self.lost_counter += 1
+            if self.lost_counter > self.max_lost_frames:
+                print(f"⚠️ 人物 #{self.tracked_person_id} 追踪丢失")
+            return None, 0
+
+        best_match = None
+        best_score = 0
+        best_features = None
+
+        for det in new_detections:
+            x1, y1, x2, y2, conf, cls_id = det
+
+            person_img = frame[y1:y2, x1:x2]
+            if person_img.size == 0:
+                continue
+
+            # 提取特征
+            features = self.extractor.extract_all_features(person_img)
+            if features is None:
+                continue
+
+            # 特征相似度
+            score = self.comparator.compute_similarity(self.tracked_features, features)
+
+            # 位置重叠度
+            iou = self._calculate_iou(self.last_bbox, (x1, y1, x2, y2))
+
+            # 综合得分
+            combined_score = score * 0.7 + iou * 0.3
+
+            candidate = {
+                'bbox': (x1, y1, x2, y2),
+                'features': features,
+                'score': score,
+                'combined_score': combined_score,
+                'angle': features['face_angle'][0].value,
+                'conf': conf
+            }
+
+            if combined_score > best_score:
+                best_score = combined_score
+                best_match = candidate
+                best_features = features
+
+        # 判断是否匹配成功
+        if best_score >= self.similarity_threshold and best_match:
+            # 更新特征
+            if best_features:
+                self.tracked_features = self._smooth_update(
+                    self.tracked_features,
+                    best_features,
+                    alpha=0.2
+                )
+
+            self.last_bbox = best_match['bbox']
+            self.last_score = best_match['score']
+            self.lost_counter = 0
+
+            # 记录历史
+            self.tracking_history.append({
+                'timestamp': datetime.now().isoformat(),
+                'score': best_match['score'],
+                'angle': best_match['angle']
+            })
+
+            # 限制历史长度
+            if len(self.tracking_history) > 100:
+                self.tracking_history = self.tracking_history[-100:]
+
+            return best_match, best_match['score']
+        else:
+            self.lost_counter += 1
+            return None, best_score
+
+    def _smooth_update(self, old_features, new_features, alpha=0.2):
         """平滑更新特征"""
         if old_features is None or new_features is None:
             return new_features
@@ -454,7 +488,7 @@ class TrackingVisualizer:
 
         cv2.rectangle(frame, (x1, y1), (x2, y2), color, 3)
 
-        info_text = f"ID:{tracked_id} | {score:.2f} | {best_match['angle']}"
+        info_text = f"ID:{tracked_id} | {score:.2f}"
         cv2.putText(frame, info_text, (x1, y1 - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
 
