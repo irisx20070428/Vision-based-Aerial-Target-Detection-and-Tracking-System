@@ -1,4 +1,4 @@
-python
+
 # test_camera_only.py
 import cv2
 import sys
