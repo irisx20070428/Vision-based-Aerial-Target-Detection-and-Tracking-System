@@ -14,6 +14,8 @@ from servo_controller import ServoController
 from pid_controller import PanTiltController
 from yolo_detector import YOLOPersonDetector
 from analyze_dataset import analyze_dataset
+from performance_monitor import PerformanceMonitor
+
 
 
 class PersonTrackingSystem:
@@ -50,6 +52,8 @@ class PersonTrackingSystem:
         self.last_analysis_time = 0
 
         self._init_modules()
+        self.perf_monitor = PerformanceMonitor()
+        self.perf_monitor.start_monitoring()
 
     def _init_modules(self):
         """初始化所有模块"""
@@ -413,6 +417,21 @@ class PersonTrackingSystem:
                     elapsed = time.time() - start_time
                     fps = frame_count / elapsed
                     print(f"📊 性能统计: FPS={fps:.1f}, 检测人数={len(self.detections)}")
+
+                detect_start = time.time()#检测计时
+                self.detections, _ = self.detector.detect(self.frame)
+                detect_time = (time.time() - detect_start) * 1000
+                self.perf_monitor.record_detect(detect_time)
+
+                # 追踪计时
+                track_start = time.time()
+                # ... 追踪代码 ...
+                track_time = (time.time() - track_start) * 1000
+                self.perf_monitor.record_track(track_time)
+
+                # FPS
+                fps = 1.0 / (time.time() - frame_start)
+                self.perf_monitor.record_fps(fps)
 
         except KeyboardInterrupt:
             print("\n\n👋 用户中断")

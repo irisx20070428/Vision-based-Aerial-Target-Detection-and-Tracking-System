@@ -334,6 +334,9 @@ class SmartTracker:
         self.similarity_threshold = similarity_threshold
         self.tracking_history = []
 
+        self.feature_extract_count = 0
+        self.feature_extract_interval = getattr(Config, 'FEATURE_EXTRACT_INTERVAL', 3)
+
     def select_person(self, person_img, person_bbox, frame_metadata=None):
         """选择人物开始追踪"""
         features = self.extractor.extract_all_features(person_img)
@@ -353,9 +356,11 @@ class SmartTracker:
         return person_id
 
     def track_in_new_frame(self, new_detections, frame):
-        """在新帧中追踪人物"""
         if self.tracked_person_id is None:
             return None, 0
+
+        self.feature_extract_count += 1
+        extract_features = (self.feature_extract_count % self.feature_extract_interval == 0)
 
         best_match = None
         best_score = 0
@@ -363,19 +368,29 @@ class SmartTracker:
 
         for det in new_detections:
             x1, y1, x2, y2, conf, cls_id = det
-
             person_img = frame[y1:y2, x1:x2]
             if person_img.size == 0:
                 continue
 
-            features = self.extractor.extract_all_features(person_img)
-            score = self.comparator.compute_similarity(self.tracked_features, features)
+            # 只在需要时提取特征
+            if extract_features:
+                features = self.extractor.extract_all_features(person_img)
+            else:
+                # 使用缓存的简单特征
+                features = None
+
+            # 计算相似度
+            if features:
+                score = self.comparator.compute_similarity(self.tracked_features, features)
+            else:
+                # 只使用位置预测
+                score = 0.5  # 默认分数
 
             candidate = {
                 'bbox': (x1, y1, x2, y2),
                 'features': features,
                 'score': score,
-                'angle': features['face_angle'][0].value,
+                'angle': features['face_angle'][0].value if features else "unknown",
                 'conf': conf
             }
 
@@ -385,22 +400,17 @@ class SmartTracker:
                 best_features = features
 
         if best_score >= self.similarity_threshold and best_match:
-            self.tracked_features = self.smooth_update(
-                self.tracked_features,
-                best_features,
-                alpha=0.3
-            )
-
+            if best_features:
+                self.tracked_features = self.smooth_update(
+                    self.tracked_features,
+                    best_features,
+                    alpha=0.3
+                )
             self.tracking_history.append({
                 'timestamp': datetime.now().isoformat(),
                 'score': best_score,
                 'angle': best_match['angle']
             })
-
-            # 限制历史记录长度
-            if len(self.tracking_history) > Config.TRACKING_HISTORY_LEN:
-                self.tracking_history = self.tracking_history[-Config.TRACKING_HISTORY_LEN:]
-
             return best_match, best_score
 
         return None, best_score
