@@ -1,9 +1,9 @@
-# config.py - 确认舵机引脚
+# config.py - 确保追踪参数正确
 import os
 
 
 class Config:
-    """系统配置"""
+    """系统配置 - 增强追踪版"""
 
     # 摄像头配置
     CAMERA_TYPE = "usb"
@@ -17,15 +17,13 @@ class Config:
     YOLO_FRAME_SKIP = 2
     YOLO_IMAGE_SIZE = 320
 
-    # 舵机配置 - 使用 gpiozero
-    SERVO_PAN_PIN = 18   # 水平舵机 GPIO18 (BCM)
-    SERVO_TILT_PIN = 27  # 垂直舵机 GPIO27 (BCM)
+    # 舵机配置
+    SERVO_PAN_PIN = 18
+    SERVO_TILT_PIN = 27
     SERVO_FREQUENCY = 50
     SERVO_ANGLE_MIN = 0
     SERVO_ANGLE_MAX = 180
     SERVO_CENTER_ANGLE = 90
-
-    # 控制参数
     MAX_ANGLE_SPEED = 30
     ACCELERATION = 0.3
     DEAD_ZONE = 20
@@ -34,7 +32,6 @@ class Config:
     PID_PAN_Kp = 0.2
     PID_PAN_Ki = 0.005
     PID_PAN_Kd = 0.02
-
     PID_TILT_Kp = 0.2
     PID_TILT_Ki = 0.005
     PID_TILT_Kd = 0.02
@@ -45,8 +42,7 @@ class Config:
 
     # 特征追踪配置
     SIMILARITY_THRESHOLD = 0.45
-    TRACKING_HISTORY_LEN = 100
-    USE_SIMPLIFIED_FEATURES = False
+    TRACKING_HISTORY_LEN = 1000
 
     # 日志配置
     LOG_LEVEL = "INFO"
