@@ -28,7 +28,7 @@ def test_servo():
 
         # 测试2：向左移动
         print("\n2. 向左移动 (45°)")
-        servo.set_target(45, Config.SERVO_CENTER_ANGLE)
+        servo.set_target(20, Config.SERVO_CENTER_ANGLE)
         for _ in range(30):
             servo.update(0.02)
             time.sleep(0.02)
@@ -36,7 +36,7 @@ def test_servo():
 
         # 测试3：向右移动
         print("\n3. 向右移动 (135°)")
-        servo.set_target(135, Config.SERVO_CENTER_ANGLE)
+        servo.set_target(45, Config.SERVO_CENTER_ANGLE)
         for _ in range(30):
             servo.update(0.02)
             time.sleep(0.02)

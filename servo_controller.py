@@ -1,68 +1,101 @@
-import RPi.GPIO as GPIO
+# servo_controller.py - 使用 gpiozero 版本
 import time
 import threading
-import math
+from gpiozero import Servo
 from config import Config
 
 
 class ServoController:
-    """舵机控制器 - 控制云台"""
+    """舵机控制器 - 使用 gpiozero"""
 
     def __init__(self):
         self.pan_pin = Config.SERVO_PAN_PIN
         self.tilt_pin = Config.SERVO_TILT_PIN
-        self.frequency = Config.SERVO_FREQUENCY
 
         self.current_pan = Config.SERVO_CENTER_ANGLE
         self.current_tilt = Config.SERVO_CENTER_ANGLE
         self.target_pan = Config.SERVO_CENTER_ANGLE
         self.target_tilt = Config.SERVO_CENTER_ANGLE
 
-        self.pan_pwm = None
-        self.tilt_pwm = None
-
-        self.moving = False
         self.move_lock = threading.Lock()
 
-        self._init_gpio()
+        self.pan_servo = None
+        self.tilt_servo = None
 
-    def _init_gpio(self):
-        """初始化GPIO"""
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
+        self._init_servos()
 
-        # 设置引脚
-        GPIO.setup(self.pan_pin, GPIO.OUT)
-        GPIO.setup(self.tilt_pin, GPIO.OUT)
+    def _init_servos(self):
+        """初始化舵机"""
+        print("初始化舵机...")
 
-        # 创建PWM
-        self.pan_pwm = GPIO.PWM(self.pan_pin, self.frequency)
-        self.tilt_pwm = GPIO.PWM(self.tilt_pin, self.frequency)
+        try:
+            # 初始化水平舵机 (GPIO 18)
+            # 参数说明:
+            # min_pulse_width: 最小脉冲宽度 (0度)
+            # max_pulse_width: 最大脉冲宽度 (180度)
+            # 对于 SG90 舵机: 0.5ms = 0度, 2.5ms = 180度
+            self.pan_servo = Servo(
+                self.pan_pin,
+                min_pulse_width=0.5 / 1000,  # 0.5ms
+                max_pulse_width=2.5 / 1000  # 2.5ms
+            )
 
-        # 启动PWM
-        self.pan_pwm.start(0)
-        self.tilt_pwm.start(0)
+            # 初始化垂直舵机 (GPIO 27)
+            self.tilt_servo = Servo(
+                self.tilt_pin,
+                min_pulse_width=0.5 / 1000,
+                max_pulse_width=2.5 / 1000
+            )
 
-        # 移动到中心
-        self._set_angle_immediate(self.current_pan, self.current_tilt)
+            # 移动到中心位置
+            self._set_angle_immediate(self.current_pan, self.current_tilt)
 
-        print(f"✅ 舵机控制器初始化成功")
-        print(f"   - 水平舵机: GPIO{self.pan_pin}")
-        print(f"   - 垂直舵机: GPIO{self.tilt_pin}")
+            print(f"✅ 舵机控制器初始化成功")
+            print(f"   - 水平舵机: GPIO{self.pan_pin}")
+            print(f"   - 垂直舵机: GPIO{self.tilt_pin}")
+            print(f"   - 脉冲范围: 0.5ms - 2.5ms")
 
-    def _angle_to_duty(self, angle):
-        """角度转占空比"""
-        # 公式: duty = angle / 18 + 2.5
-        duty = angle / 18 + 2.5
-        return max(2.5, min(12.5, duty))
+        except Exception as e:
+            print(f"❌ 舵机初始化失败: {e}")
+            raise e
+
+    def _angle_to_value(self, angle):
+        """
+        将角度转换为 gpiozero 的 value (-1 到 1)
+
+        参数:
+            angle: 0-180 度
+
+        返回:
+            value: -1 到 1
+            -1 = 0度
+            0 = 90度
+            1 = 180度
+        """
+        # 将角度映射到 -1 到 1
+        value = (angle - 90) / 90
+        return max(-1, min(1, value))
+
+    def _value_to_angle(self, value):
+        """
+        将 gpiozero 的 value 转换为角度
+
+        参数:
+            value: -1 到 1
+
+        返回:
+            angle: 0-180 度
+        """
+        angle = (value * 90) + 90
+        return max(0, min(180, angle))
 
     def _set_angle_immediate(self, pan_angle, tilt_angle):
         """立即设置角度"""
-        pan_duty = self._angle_to_duty(pan_angle)
-        tilt_duty = self._angle_to_duty(tilt_angle)
+        pan_value = self._angle_to_value(pan_angle)
+        tilt_value = self._angle_to_value(tilt_angle)
 
-        self.pan_pwm.ChangeDutyCycle(pan_duty)
-        self.tilt_pwm.ChangeDutyCycle(tilt_duty)
+        self.pan_servo.value = pan_value
+        self.tilt_servo.value = tilt_value
 
         self.current_pan = pan_angle
         self.current_tilt = tilt_angle
@@ -78,7 +111,7 @@ class ServoController:
 
     def update(self, dt=0.02):
         """
-        更新舵机位置（带加速度和速度限制）
+        更新舵机位置（平滑移动）
 
         参数:
             dt: 时间间隔（秒）
@@ -122,9 +155,9 @@ class ServoController:
 
     def cleanup(self):
         """清理资源"""
-        if self.pan_pwm:
-            self.pan_pwm.stop()
-        if self.tilt_pwm:
-            self.tilt_pwm.stop()
-        GPIO.cleanup()
+        # 停止舵机
+        if self.pan_servo:
+            self.pan_servo.detach()
+        if self.tilt_servo:
+            self.tilt_servo.detach()
         print("✅ 舵机已关闭")
