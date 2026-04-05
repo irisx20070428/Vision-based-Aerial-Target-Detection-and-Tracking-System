@@ -5,14 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="可以选中目标人物然后框跟着，弄了个数据集逐帧储存目标数据然后判断">
-      <change beforePath="$PROJECT_DIR$/.idea/PythonProject.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PythonProject.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analyze_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/analyze_dataset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/camera.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/feature_tracker.py" beforeDir="false" afterPath="$PROJECT_DIR$/feature_tracker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yolo_detector.py" beforeDir="false" afterPath="$PROJECT_DIR$/yolo_detector.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,7 +136,23 @@
       <option name="project" value="LOCAL" />
       <updated>1773770520708</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="可以选中目标人物然后框跟着，弄了个数据集逐帧储存目标数据然后判断">
+      <option name="closed" value="true" />
+      <created>1775375579706</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1775375579706</updated>
+    </task>
+    <task id="LOCAL-00003" summary="可以选中目标人物然后框跟着，弄了个数据集逐帧储存目标数据然后判断">
+      <option name="closed" value="true" />
+      <created>1775376671281</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1775376671281</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -158,6 +167,7 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="修改检测逻辑，让锁定之后的画面更加流畅" />
     <MESSAGE value="可以选中目标人物然后框跟着，弄了个数据集逐帧储存目标数据然后判断" />
     <option name="LAST_COMMIT_MESSAGE" value="可以选中目标人物然后框跟着，弄了个数据集逐帧储存目标数据然后判断" />
   </component>
