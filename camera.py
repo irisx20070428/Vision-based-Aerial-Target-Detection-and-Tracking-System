@@ -1,25 +1,24 @@
-# camera.py (调整显示布局，为鼠标提示留出空间)
+# camera.py (最终版 - 支持 Windows DirectShow)
 import cv2
 import time
 from datetime import datetime
 
 
 class MacCameraPreview:
-    """Mac 摄像头预览 - 显示FPS和时间"""
+    """摄像头预览 - 跨平台，Windows 下使用 DirectShow"""
 
     def __init__(self, camera_id=0, width=640, height=480):
-        """初始化摄像头"""
         print("=" * 50)
-        print("📹 Mac 摄像头实时预览")
+        print("📹 摄像头实时预览")
         print("=" * 50)
 
-        # 打开摄像头
-        self.cap = cv2.VideoCapture(camera_id)
+        # 打开摄像头（Windows 下使用 CAP_DSHOW 提高兼容性）
+        self.cap = cv2.VideoCapture(camera_id, cv2.CAP_DSHOW)
 
         if not self.cap.isOpened():
             for i in range(1, 5):
                 print(f"尝试摄像头 ID {i}...")
-                self.cap = cv2.VideoCapture(i)
+                self.cap = cv2.VideoCapture(i, cv2.CAP_DSHOW)
                 if self.cap.isOpened():
                     print(f"✅ 找到摄像头 ID {i}")
                     break
@@ -71,11 +70,10 @@ class MacCameraPreview:
 
         h, w = frame.shape[:2]
 
-        # 计算FPS
         current_fps = self.calculate_fps()
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # 创建半透明黑色背景条 (顶部 - 增加高度为80)
+        # 半透明黑色背景条 (顶部)
         overlay = frame.copy()
         cv2.rectangle(overlay, (0, 0), (w, 80), (0, 0, 0), -1)
         alpha = 0.6
@@ -84,28 +82,25 @@ class MacCameraPreview:
         # 显示FPS
         cv2.putText(frame, f"FPS: {current_fps:.1f}", (10, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
-        # 显示分辨率
+        # 分辨率
         cv2.putText(frame, f"{w}x{h}", (100, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
-
-        # 显示时间
+        # 时间
         time_size = cv2.getTextSize(current_time, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
         cv2.putText(frame, current_time, (w - time_size[0] - 10, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-
-        # 显示额外信息
+        # 额外信息
         if extra_info:
             cv2.putText(frame, extra_info, (10, 55),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
 
-        # 图像中心十字线
+        # 中心十字线
         center_x, center_y = w // 2, h // 2
         cv2.line(frame, (center_x - 20, center_y), (center_x + 20, center_y), (0, 255, 0), 1)
         cv2.line(frame, (center_x, center_y - 20), (center_x, center_y + 20), (0, 255, 0), 1)
         cv2.circle(frame, (center_x, center_y), 3, (0, 0, 255), -1)
 
-        # 底部退出提示
+        # 底部提示
         cv2.putText(frame, "Mouse: hover to highlight | click to select | 'c' clear | 'q' quit",
                     (10, h - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150, 150, 150), 1)
 
