@@ -16,7 +16,7 @@ class MacCameraPreview:
         self.cap = cv2.VideoCapture(camera_id, cv2.CAP_DSHOW)
 
         if not self.cap.isOpened():
-            for i in range(1, 5):
+            for i in range(5):
                 print(f"尝试摄像头 ID {i}...")
                 self.cap = cv2.VideoCapture(i, cv2.CAP_DSHOW)
                 if self.cap.isOpened():
