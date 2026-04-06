@@ -67,13 +67,31 @@ class YOLOPersonDetector:
             return [], frame
         detections = []
         try:
-            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            results = self.model(rgb_frame)
-            if len(results.xyxy[0]) > 0:
+            h, w = frame.shape[:2]
+            # 设置检测时的目标尺寸（宽度不超过 320，保持宽高比）
+            target_width = 320
+            scale = target_width / w
+            if scale < 1:  # 只有当原图宽度大于 target_width 时才缩小
+                new_w = target_width
+                new_h = int(h * scale)
+                small_frame = cv2.resize(frame, (new_w, new_h))
+                rgb_small = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+                results = self.model(rgb_small)
+                # 将检测框坐标还原到原图
                 for det in results.xyxy[0]:
                     x1, y1, x2, y2, conf, cls_id = det.cpu().numpy()
-                    if int(cls_id) == 0:
-                        detections.append([int(x1), int(y1), int(x2), int(y2), float(conf), int(cls_id)])
+                    x1 = int(x1 / scale)
+                    y1 = int(y1 / scale)
+                    x2 = int(x2 / scale)
+                    y2 = int(y2 / scale)
+                    detections.append([x1, y1, x2, y2, float(conf), int(cls_id)])
+            else:
+                # 原图已经很小，直接检测
+                rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                results = self.model(rgb_frame)
+                for det in results.xyxy[0]:
+                    x1, y1, x2, y2, conf, cls_id = det.cpu().numpy()
+                    detections.append([int(x1), int(y1), int(x2), int(y2), float(conf), int(cls_id)])
         except Exception as e:
             print(f"检测错误: {e}")
         return detections, frame

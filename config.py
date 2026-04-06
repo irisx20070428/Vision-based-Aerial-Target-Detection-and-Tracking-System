@@ -7,14 +7,14 @@ class Config:
 
     # 摄像头配置
     CAMERA_TYPE = "usb"
-    CAMERA_RESOLUTION = (320, 240)
+    CAMERA_RESOLUTION = (640, 480)
     CAMERA_FPS = 15
 
     # YOLO配置
     YOLO_CONF_THRESHOLD = 0.5
     YOLO_MODEL = 'yolov5n'
     YOLO_TARGET_CLASSES = [0]
-    YOLO_FRAME_SKIP = 2
+    YOLO_FRAME_SKIP = 3
     YOLO_IMAGE_SIZE = 320
 
     # 舵机配置
