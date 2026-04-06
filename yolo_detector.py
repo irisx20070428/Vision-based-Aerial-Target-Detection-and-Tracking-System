@@ -4,7 +4,8 @@ import torch
 import numpy as np
 import ssl
 import warnings
-from feature_tracker import SmartTracker, TrackingVisualizer
+from feature_tracker import SmartTracker
+from config import Config
 
 ssl._create_default_https_context = ssl._create_unverified_context
 warnings.filterwarnings('ignore')
@@ -17,7 +18,7 @@ class YOLOPersonDetector:
         print("=" * 50)
 
         self.device = torch.device(device)
-        self.conf_threshold = conf_threshold
+        self.conf_threshold = conf_threshold or Config.YOLO_CONF_THRESHOLD
 
         print("\n1. 加载YOLOv5模型...")
         print("   (第一次运行会下载模型，约需1-2分钟)")
@@ -37,7 +38,7 @@ class YOLOPersonDetector:
         self.model.max_det = 20
 
         self.smart_tracker = SmartTracker(similarity_threshold=0.3)  # 降低阈值
-        self.visualizer = TrackingVisualizer()
+        # self.visualizer = TrackingVisualizer()
 
         self.mouse_x = -1
         self.mouse_y = -1
@@ -47,7 +48,7 @@ class YOLOPersonDetector:
         self.is_selecting_mode = False
 
         # 帧跳过优化
-        self.frame_skip = 3
+        self.frame_skip = Config.YOLO_FRAME_SKIP
         self.frame_count = 0
         self.cached_match = None
         self.prev_track_bbox = None
