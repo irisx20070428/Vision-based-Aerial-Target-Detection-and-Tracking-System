@@ -13,6 +13,10 @@ warnings.filterwarnings('ignore')
 
 class YOLOPersonDetector:
     def __init__(self, conf_threshold=0.5, device='cpu'):
+
+        self.tracker = None  # OpenCV 追踪器
+        self.tracker_type = 'CSRT'  # 或 'KCF'（更快但稍弱）
+
         print("=" * 50)
         print("🎯 YOLO人物检测器初始化")
         print("=" * 50)
@@ -113,80 +117,42 @@ class YOLOPersonDetector:
         if 0 <= index < len(detections):
             det = detections[index]
             x1, y1, x2, y2, conf, _ = det
-            person_img = frame[y1:y2, x1:x2]
-
-            # 保存到数据集（异步，不阻塞）
-            person_id = self.smart_tracker.select_person(person_img, (x1, y1, x2, y2), {'confidence': conf})
-
-            # 🔥 关键：记录上一帧位置，重置丢失计数，进入追踪模式
-            self.prev_track_bbox = (x1, y1, x2, y2)
-            self.lost_frame_count = 0
+            bbox = (x1, y1, x2 - x1, y2 - y1)  # (x, y, w, h)
+            # 初始化追踪器
+            if self.tracker_type == 'CSRT':
+                self.tracker = cv2.TrackerCSRT_create()
+            else:
+                self.tracker = cv2.TrackerKCF_create()
+            self.tracker.init(frame, bbox)
             self.is_selecting_mode = True
-            self.selected_person_index = index
             self.selected_person = det
-
-            print(f"\n🎯 已选中人物 #{index + 1} (ID: {person_id})")
-            print(f"   位置: ({x1}, {y1}) - ({x2}, {y2})")
+            self.prev_track_bbox = (x1, y1, x2, y2)
+            print(f"🎯 已选中人物并启动追踪器")
 
     def draw_detections(self, frame, detections):
-        """
-        绘制检测框和追踪框（追踪模式使用 IoU 匹配，无特征提取，保证流畅）
-        """
         if frame is None:
-            return None
-
-        # ========== 追踪模式 ==========
-        if self.is_selecting_mode and self.smart_tracker.tracked_person_id is not None:
-            self.frame_count += 1
-            best_match = None
-            best_iou = 0.0
-
-            # 用 IoU 寻找最佳匹配（不提取任何特征）
-            if self.prev_track_bbox is not None:
-                for det in detections:
-                    x1, y1, x2, y2, conf, _ = det
-                    iou = self._compute_iou(self.prev_track_bbox, (x1, y1, x2, y2))
-                    if iou > best_iou:
-                        best_iou = iou
-                        best_match = {
-                            'bbox': (x1, y1, x2, y2),
-                            'score': iou,
-                            'angle': 'unknown',
-                            'conf': conf
-                        }
-
-            # 匹配成功（IoU > 阈值）
-            if best_match and best_iou > 0.3:
-                self.lost_frame_count = 0
-                self.prev_track_bbox = best_match['bbox']
-                x1, y1, x2, y2 = best_match['bbox']
-                conf = best_match['conf']
-                # 绘制追踪框（绿色，粗边框）
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                cv2.putText(frame, f"TRACKING (IoU={best_iou:.2f})", (x1, y1 - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-                cv2.putText(frame, f"conf={conf:.2f}", (x1, y2 + 20),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
-            else:
-                # 匹配失败：增加丢失计数
-                self.lost_frame_count += 1
-                if self.lost_frame_count <= self.max_lost_frames and self.prev_track_bbox is not None:
-                    # 预测位置（简单沿用上一帧位置）
-                    x1, y1, x2, y2 = self.prev_track_bbox
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (128, 128, 128), 2)
-                    cv2.putText(frame, "predicting...", (x1, y1 - 10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 128), 1)
-                else:
-                    # 真正丢失：清空状态
-                    self.cached_match = None
-                    self.prev_track_bbox = None
-                    self.lost_frame_count = 0
-                    self.is_selecting_mode = False  # 自动退出追踪模式
-                    h, w = frame.shape[:2]
-                    cv2.putText(frame, "⚠️ TRACKING LOST", (w // 2 - 150, h // 2),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            # 注意：追踪模式下不再绘制普通检测框，以免干扰（也可以选择绘制半透明框，但通常不需要）
             return frame
+
+        if self.is_selecting_mode and self.tracker is not None:
+            # 更新追踪器
+            success, bbox = self.tracker.update(frame)
+            if success:
+                x, y, w, h = [int(v) for v in bbox]
+                x1, y1, x2, y2 = x, y, x + w, y + h
+                self.prev_track_bbox = (x1, y1, x2, y2)
+                # 绘制绿色追踪框
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+                cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+            else:
+                # 追踪失败
+                cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                self.clear_selection()
+            return frame  # 追踪模式下不画普通检测框
+
+        # 普通模式（未选中）...
+        # （保持不变，显示 YOLO 检测框和鼠标悬停）
 
         # ========== 普通模式（未选中任何人） ==========
         # 找出鼠标悬停的人物索引
