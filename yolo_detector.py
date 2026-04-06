@@ -23,7 +23,7 @@ class YOLOPersonDetector:
         print("\n1. 加载YOLOv5模型...")
         print("   (第一次运行会下载模型，约需1-2分钟)")
         try:
-            self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s',
+            self.model = torch.hub.load('ultralytics/yolov5', 'yolov5n',
                                         pretrained=True,
                                         device=self.device,
                                         trust_repo=True)
