@@ -1,4 +1,4 @@
-# servo_controller.py - 修改 update 方法，降低移动速度
+# servo_controller.py - 添加 target 角度属性访问
 import time
 import threading
 from gpiozero import Servo
@@ -6,7 +6,7 @@ from config import Config
 
 
 class ServoController:
-    """舵机控制器 - 超慢速平滑移动版"""
+    """舵机控制器 - 使用 gpiozero - 防抽搐优化版"""
 
     def __init__(self):
         self.pan_pin = Config.SERVO_PAN_PIN
@@ -22,8 +22,8 @@ class ServoController:
         self.pan_servo = None
         self.tilt_servo = None
 
-        # 速度限制 - 单次最大角度变化（度）
-        self.max_angle_change = 0.5  # 降低到0.5度/次（原1.0）
+        # 速度限制
+        self.max_angle_change = 1.0
         self.last_update_time = time.time()
 
         # 追踪使能标志
@@ -74,7 +74,6 @@ class ServoController:
             print(f"   - 水平舵机: GPIO{self.pan_pin}")
             print(f"   - 垂直舵机: GPIO{self.tilt_pin}")
             print(f"   - 最大转动速度: {Config.MAX_ANGLE_SPEED}°/秒")
-            print(f"   - 单次最大变化: {self.max_angle_change}°")
             print(f"   - 初始位置: 中心 ({Config.SERVO_CENTER_ANGLE}°)")
 
         except Exception as e:
@@ -103,17 +102,15 @@ class ServoController:
             self.target_tilt = tilt_angle
 
     def update(self, dt=None):
-        """
-        更新舵机位置 - 非常缓慢的平滑移动
-        """
+        """更新舵机位置"""
         if not self.initialized or not self.tracking_enabled:
             return
 
         # 计算时间间隔
         current_time = time.time()
         if dt is None:
-            dt = min(0.1, current_time - self.last_update_time)  # 最大0.1秒
-            dt = max(0.05, dt)  # 最小0.05秒
+            dt = min(0.1, current_time - self.last_update_time)
+            dt = max(0.05, dt)
 
         self.last_update_time = current_time
 
@@ -122,8 +119,8 @@ class ServoController:
             pan_diff = self.target_pan - self.current_pan
             tilt_diff = self.target_tilt - self.current_tilt
 
-            # 扩大死区 - 1.5度以内不移动
-            deadband = 1.5
+            # 死区处理
+            deadband = 1.0
             if abs(pan_diff) < deadband:
                 pan_diff = 0
             if abs(tilt_diff) < deadband:
@@ -132,27 +129,35 @@ class ServoController:
             if pan_diff == 0 and tilt_diff == 0:
                 return
 
-            # 计算最大移动步长（基于配置的最大速度）
-            max_speed = Config.MAX_ANGLE_SPEED  # 度/秒
+            # 计算最大移动步长
+            max_speed = Config.MAX_ANGLE_SPEED
             max_step = max_speed * dt
             max_step = min(max_step, self.max_angle_change)
 
-            # 非常缓慢的移动
+            # 移动
             pan_move = 0
             tilt_move = 0
 
             if pan_diff != 0:
-                # 使用更慢的速度因子（0.3 = 30%速度）
-                speed_factor = 0.3
+                if abs(pan_diff) > 10:
+                    speed_factor = 0.8
+                elif abs(pan_diff) > 5:
+                    speed_factor = 0.5
+                else:
+                    speed_factor = 0.3
                 pan_move = pan_diff * speed_factor * dt
                 pan_move = max(-max_step, min(max_step, pan_move))
 
             if tilt_diff != 0:
-                speed_factor = 0.3
+                if abs(tilt_diff) > 10:
+                    speed_factor = 0.8
+                elif abs(tilt_diff) > 5:
+                    speed_factor = 0.5
+                else:
+                    speed_factor = 0.3
                 tilt_move = tilt_diff * speed_factor * dt
                 tilt_move = max(-max_step, min(max_step, tilt_move))
 
-            # 只有当移动量足够大时才更新
             if abs(pan_move) > 0.1 or abs(tilt_move) > 0.1:
                 new_pan = self.current_pan + pan_move
                 new_tilt = self.current_tilt + tilt_move

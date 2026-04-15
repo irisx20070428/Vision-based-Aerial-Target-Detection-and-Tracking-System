@@ -1,4 +1,4 @@
-# main.py - 完整修复版（舵机初始化静止，点击后开始追踪）
+# main.py - 完整修复版（添加舵机指令显示）
 import cv2
 import time
 import sys
@@ -50,9 +50,14 @@ class PersonDetectionApp:
         self.last_servo_update = 0
 
         # 添加明确的追踪状态
-        self.is_tracking = False  # 是否正在追踪人物
-        self.tracked_person_center = None  # 被追踪人物的中心点
-        self.has_clicked = False  # 是否已经点击选择人物
+        self.is_tracking = False
+        self.tracked_person_center = None
+        self.has_clicked = False
+
+        # 添加舵机指令显示变量
+        self.current_servo_command = "等待点击"  # 当前舵机指令
+        self.last_pan_target = 90  # 上次水平目标角度
+        self.last_tilt_target = 90  # 上次垂直目标角度
 
         # 降低 YOLO 检测频率的变量
         self.detect_skip = Config.YOLO_FRAME_SKIP
@@ -149,6 +154,7 @@ class PersonDetectionApp:
                 if self.servo and hasattr(self.servo, 'enable_tracking'):
                     self.servo.enable_tracking(True)
                     print("🎯 舵机追踪已启用")
+                    self.current_servo_command = "舵机已启用"
 
                 if self.pid_controller and hasattr(self.pid_controller, 'set_tracking_enabled'):
                     self.pid_controller.set_tracking_enabled(True)
@@ -184,6 +190,71 @@ class PersonDetectionApp:
         persons = len(dataset.dataset)
         cv2.putText(frame, f"Different persons: {persons}", (panel_x + 10, y_offset),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        return frame
+
+    def draw_servo_command_panel(self, frame):
+        """在屏幕一角绘制舵机指令面板"""
+        h, w = frame.shape[:2]
+
+        # 面板位置（右上角，在原有信息下方）
+        panel_x = w - 280
+        panel_y = 100
+        panel_w = 270
+        panel_h = 150
+
+        # 创建半透明背景
+        overlay = frame.copy()
+        cv2.rectangle(overlay, (panel_x, panel_y), (panel_x + panel_w, panel_y + panel_h), (0, 0, 0), -1)
+        cv2.addWeighted(overlay, 0.7, frame, 0.3, 0, frame)
+
+        # 绘制边框
+        cv2.rectangle(frame, (panel_x, panel_y), (panel_x + panel_w, panel_y + panel_h), (0, 255, 255), 2)
+
+        # 标题
+        cv2.putText(frame, "Servo Command", (panel_x + 10, panel_y + 25),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
+
+        # 获取当前舵机状态
+        if self.servo and hasattr(self.servo, 'tracking_enabled'):
+            if self.servo.tracking_enabled:
+                # 获取当前角度
+                pan, tilt = self.servo.get_current_angles()
+                # 获取目标角度
+                if hasattr(self.servo, 'target_pan'):
+                    target_pan = self.servo.target_pan
+                    target_tilt = self.servo.target_tilt
+                else:
+                    target_pan = pan
+                    target_tilt = tilt
+
+                # 显示当前角度
+                cv2.putText(frame, f"Current Pan: {pan:.1f}°", (panel_x + 10, panel_y + 55),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+                cv2.putText(frame, f"Current Tilt: {tilt:.1f}°", (panel_x + 10, panel_y + 75),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+
+                # 显示目标角度
+                cv2.putText(frame, f"Target Pan: {target_pan:.1f}°", (panel_x + 10, panel_y + 100),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                cv2.putText(frame, f"Target Tilt: {target_tilt:.1f}°", (panel_x + 10, panel_y + 120),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+
+                # 显示误差
+                error_pan = target_pan - pan
+                error_tilt = target_tilt - tilt
+                cv2.putText(frame, f"Error: ({error_pan:+.1f}, {error_tilt:+.1f})", (panel_x + 10, panel_y + 145),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 0), 1)
+            else:
+                # 舵机未启用
+                cv2.putText(frame, "STAND BY", (panel_x + 10, panel_y + 55),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 165, 255), 2)
+                cv2.putText(frame, "Click on person to start", (panel_x + 10, panel_y + 80),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
+        else:
+            # 无舵机
+            cv2.putText(frame, "No Servo", (panel_x + 10, panel_y + 55),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
         return frame
 
     def run(self):
@@ -237,6 +308,7 @@ class PersonDetectionApp:
                             self.servo.enable_tracking(False)
                         if self.pid_controller and hasattr(self.pid_controller, 'set_tracking_enabled'):
                             self.pid_controller.set_tracking_enabled(False)
+                        self.current_servo_command = "追踪已停止"
                         print("⏸️ 舵机追踪已暂停（未选中人物）")
 
                 # 5. PID 控制（只在追踪模式下且舵机可用时）
@@ -244,16 +316,22 @@ class PersonDetectionApp:
                     # 计算目标角度
                     pan_angle, tilt_angle = self.pid_controller.compute_angles(target_center[0], target_center[1])
 
+                    # 更新舵机指令显示
+                    if abs(pan_angle - self.last_pan_target) > 0.5 or abs(tilt_angle - self.last_tilt_target) > 0.5:
+                        self.last_pan_target = pan_angle
+                        self.last_tilt_target = tilt_angle
+                        self.current_servo_command = f"Pan:{pan_angle:.1f}° Tilt:{tilt_angle:.1f}°"
+
                     # 设置舵机目标（舵机内部会检查 tracking_enabled）
                     if self.servo and hasattr(self.servo, 'set_target'):
                         self.servo.set_target(pan_angle, tilt_angle)
 
-                # 6. 更新舵机位置（平滑移动）- 降低更新频率
+                # 6. 更新舵机位置（平滑移动）
                 if self.servo and hasattr(self.servo, 'update'):
                     now = time.time()
-                    # 降低更新频率到10Hz，减少抖动
-                    if now - self.last_servo_update >= 0.15:  # 100ms
-                        self.servo.update(0.15)  # 固定dt=0.1秒
+                    # 更新频率10Hz
+                    if now - self.last_servo_update >= 0.1:
+                        self.servo.update(0.1)
                         self.last_servo_update = now
 
                 # 7. 构建信息文本
@@ -272,13 +350,6 @@ class PersonDetectionApp:
                     f"{mode_text} {detection_summary}",
                     f"conf: {self.detector.get_confidence_threshold():.2f}"
                 ]
-
-                if self.servo and hasattr(self.servo, 'get_current_angles'):
-                    if hasattr(self.servo, 'tracking_enabled') and self.servo.tracking_enabled:
-                        pan, tilt = self.servo.get_current_angles()
-                        info_lines.append(f"Pan: {pan:.1f}° Tilt: {tilt:.1f}° [TRACKING]")
-                    else:
-                        info_lines.append(f"Servo: [STAND BY]")
 
                 if target_center and self.is_tracking:
                     h, w = self.frame.shape[:2]
@@ -308,10 +379,13 @@ class PersonDetectionApp:
                 display_frame = self.camera.draw_info(display_frame, info_text, show_fps=False)
                 display_frame = self.draw_dataset_info(display_frame)
 
-                # 11. 显示画面
+                # 11. 绘制舵机指令面板（新增）
+                display_frame = self.draw_servo_command_panel(display_frame)
+
+                # 12. 显示画面
                 cv2.imshow(self.window_name, display_frame)
 
-                # 12. 按键处理
+                # 13. 按键处理
                 key = cv2.waitKey(1) & 0xFF
                 if key == ord('q') or key == 27:
                     self.running = False
@@ -320,6 +394,7 @@ class PersonDetectionApp:
                     self.detector.clear_selection()
                     self.is_tracking = False
                     self.has_clicked = False
+                    self.current_servo_command = "追踪已清除"
                     if self.servo and hasattr(self.servo, 'enable_tracking'):
                         self.servo.enable_tracking(False)
                     if self.pid_controller:
@@ -334,6 +409,7 @@ class PersonDetectionApp:
                             self.servo.reset_to_center()
                         if self.pid_controller and hasattr(self.pid_controller, 'reset'):
                             self.pid_controller.reset()
+                        self.current_servo_command = "重置到中心"
                         print("\n🔄 云台已重置到中心")
                     else:
                         print("\n⚠️ 舵机未启用追踪，无需重置")

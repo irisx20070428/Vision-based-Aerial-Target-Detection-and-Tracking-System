@@ -11,7 +11,7 @@ class Config:
     CAMERA_FPS = 15
 
     # YOLO配置
-    YOLO_CONF_THRESHOLD = 0.5
+    YOLO_CONF_THRESHOLD = 0.7
     YOLO_MODEL = 'yolov5n'
     YOLO_TARGET_CLASSES = [0]
     YOLO_FRAME_SKIP = 3
