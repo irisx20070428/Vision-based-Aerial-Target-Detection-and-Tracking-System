@@ -3,25 +3,41 @@ import time
 from config import Config
 
 
-class PIDController:
-    """PID控制器 - 平滑控制云台"""
+class PanTiltController:
+    def __init__(self):
+        # PID增益已经很低，进一步降低
+        self.pid_pan = PIDController(
+            Kp=Config.PID_PAN_Kp * 0.3,  # 再降低到30%
+            Ki=Config.PID_PAN_Ki * 0.2,  # 再降低到20%
+            Kd=Config.PID_PAN_Kd * 0.5,  # 再降低到50%
+            max_output=8  # 减小最大输出到8度
+        )
 
-    def __init__(self, Kp, Ki, Kd, max_output=30):
-        self.Kp = Kp
-        self.Ki = Ki
-        self.Kd = Kd
-        self.max_output = max_output
+        self.pid_tilt = PIDController(
+            Kp=Config.PID_TILT_Kp * 0.3,
+            Ki=Config.PID_TILT_Ki * 0.2,
+            Kd=Config.PID_TILT_Kd * 0.5,
+            max_output=8
+        )
 
-        self.last_error = 0
-        self.integral = 0
-        self.last_time = time.time()
+        self.image_center_x = Config.IMAGE_CENTER_X
+        self.image_center_y = Config.IMAGE_CENTER_Y
 
-        # 添加输出平滑
-        self.last_output = 0
-        self.output_smoothing = 0.3  # 平滑因子
+        self.current_pan = Config.SERVO_CENTER_ANGLE
+        self.current_tilt = Config.SERVO_CENTER_ANGLE
 
-        self.output_min = -max_output
-        self.output_max = max_output
+        self.dead_zone = 80  # 更大的死区（80像素）
+        self.tracking_enabled = False
+
+        # 角度变化限制 - 非常小
+        self.max_angle_change = 1.5  # 单次最大1.5度（原3度）
+
+        self.first_update = True
+
+        print(f"✅ 云台PID控制器初始化成功")
+        print(f"   - 图像中心: ({self.image_center_x}, {self.image_center_y})")
+        print(f"   - 死区范围: {self.dead_zone}像素")
+        print(f"   - 最大输出: {self.max_angle_change}度/次")
 
     def reset(self):
         """重置控制器"""

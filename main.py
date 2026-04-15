@@ -252,8 +252,8 @@ class PersonDetectionApp:
                 if self.servo and hasattr(self.servo, 'update'):
                     now = time.time()
                     # 降低更新频率到10Hz，减少抖动
-                    if now - self.last_servo_update >= 0.1:  # 100ms
-                        self.servo.update(0.1)  # 固定dt=0.1秒
+                    if now - self.last_servo_update >= 0.15:  # 100ms
+                        self.servo.update(0.15)  # 固定dt=0.1秒
                         self.last_servo_update = now
 
                 # 7. 构建信息文本
