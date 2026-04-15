@@ -114,21 +114,26 @@ class YOLOPersonDetector:
         return -1
 
     def select_hovered_person(self, detections, index, frame):
+        """选择悬停的人物开始追踪"""
         if 0 <= index < len(detections):
             det = detections[index]
             x1, y1, x2, y2, conf, _ = det
-            bbox = (x1, y1, x2 - x1, y2 - y1)  # (x, y, w, h)
+            bbox = (x1, y1, x2 - x1, y2 - y1)
+
             # 初始化追踪器
             if self.tracker_type == 'CSRT':
                 self.tracker = cv2.TrackerCSRT_create()
             else:
                 self.tracker = cv2.TrackerKCF_create()
             self.tracker.init(frame, bbox)
-            self.is_selecting_mode = True
-            self.selected_person = det
-            self.prev_track_bbox = (x1, y1, x2, y2)
-            print(f"🎯 已选中人物并启动追踪器")
 
+            # 设置追踪状态
+            self.is_selecting_mode = True
+            self.selected_person = det  # 保存完整检测信息
+
+            print(f"🎯 已选中人物并启动追踪器")
+            print(f"   位置: ({x1}, {y1}) -> ({x2}, {y2})")
+            print(f"   置信度: {conf:.2f}")
     def draw_detections(self, frame, detections):
         if frame is None:
             return frame

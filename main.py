@@ -24,6 +24,33 @@ try:
 except ImportError:
     print("⚠️ 舵机模块未找到，将以 --no-servo 模式运行")
 
+# main.py - 修复版（移除重复的异常处理）
+import cv2
+import time
+import sys
+import os
+import argparse
+from datetime import datetime
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from config import Config
+from camera import CameraManager
+from yolo_detector import YOLOPersonDetector
+from analyze_dataset import analyze_dataset
+
+# 舵机相关（可选）
+SERVO_AVAILABLE = False
+ServoController = None
+PanTiltController = None
+try:
+    from servo_controller import ServoController
+    from pid_controller import PanTiltController
+
+    SERVO_AVAILABLE = True
+except ImportError:
+    print("⚠️ 舵机模块未找到，将以 --no-servo 模式运行")
+
 
 class PersonDetectionApp:
     """人物检测应用程序 - 整合版（支持树莓派和舵机）"""
@@ -48,8 +75,12 @@ class PersonDetectionApp:
         self.last_analysis_time = 0
         self.last_servo_update = 0
 
+        # 添加明确的追踪状态
+        self.is_tracking = False  # 是否正在追踪人物
+        self.tracked_person_center = None  # 被追踪人物的中心点
+
         # 降低 YOLO 检测频率的变量
-        self.detect_skip = Config.YOLO_FRAME_SKIP   # 从 config 读取
+        self.detect_skip = Config.YOLO_FRAME_SKIP
         self.detect_counter = 0
         self.last_detections = []
 
@@ -61,9 +92,9 @@ class PersonDetectionApp:
         try:
             # 1. 摄像头
             print("\n📹 初始化摄像头...")
-            self.camera = CameraManager()   # 使用你朋友的 CameraManager
+            self.camera = CameraManager()
 
-            # 2. YOLO 检测器（你的版本）
+            # 2. YOLO 检测器
             print("\n🤖 初始化YOLO检测器...")
             if conf_threshold is None:
                 conf_threshold = Config.YOLO_CONF_THRESHOLD
@@ -75,10 +106,13 @@ class PersonDetectionApp:
                 self.servo = ServoController()
                 print("\n🎛️ 初始化PID控制器...")
                 self.pid_controller = PanTiltController()
+                # 初始时禁用追踪
+                self.pid_controller.set_tracking_enabled(False)
             else:
                 print("\n⚠️ 舵机控制已禁用（--no-servo 或模块缺失）")
                 self.servo = None
                 self.pid_controller = None
+                self.is_tracking = False
 
             # 4. 窗口设置
             self.window_name = "Person Tracking System - Hover & Click"
@@ -96,16 +130,17 @@ class PersonDetectionApp:
             sys.exit(1)
 
     def _print_instructions(self):
+        """打印操作说明"""
         print("\n" + "=" * 70)
         print("▶️ 系统启动成功！")
         print("=" * 70)
         print("🖱️ 鼠标操作:")
         print("   - 悬停: 人物框高亮显示")
-        print("   - 左键点击: 开始追踪该人物")
+        print("   - 左键点击: 开始追踪该人物（同时启用舵机）")
         print("")
         print("⌨️ 键盘命令:")
         print("   - 'q' 或 ESC: 退出程序")
-        print("   - 'c': 清除追踪选择")
+        print("   - 'c': 清除追踪选择（停止舵机）")
         if self.servo:
             print("   - 'r': 云台重置到中心")
         print("   - 's': 保存当前画面")
@@ -118,55 +153,64 @@ class PersonDetectionApp:
         print("=" * 70)
 
     def mouse_callback(self, event, x, y, flags, param):
+        """鼠标回调函数 - 点击开始追踪"""
         if self.detector is None:
             return
+
         self.detector.update_mouse_position(x, y)
+
         if event == cv2.EVENT_LBUTTONDOWN:
             hovered_index = self.detector.hovered_person_index
             if hovered_index >= 0 and self.frame is not None:
+                # 选择人物开始追踪
                 self.detector.select_hovered_person(self.detections, hovered_index, self.frame)
-                print(f"📸 已保存人物图像到数据集，开始追踪")
-                # 如果启用了PID，则启用追踪
+
+                # 重要：启用舵机追踪
                 if self.pid_controller:
                     self.pid_controller.set_tracking_enabled(True)
+                    print("🎯 舵机追踪已启用")
+
+                # 设置追踪标志
+                self.is_tracking = True
+
+                print(f"📸 已保存人物图像到数据集，开始追踪")
 
     def draw_dataset_info(self, frame):
+        """绘制数据集信息"""
         if not self.show_dataset_info or self.detector is None:
             return frame
+
         h, w = frame.shape[:2]
         panel_x, panel_y = w - 300, 100
         panel_w, panel_h = 280, 200
         overlay = frame.copy()
-        cv2.rectangle(overlay, (panel_x, panel_y), (panel_x+panel_w, panel_y+panel_h), (0,0,0), -1)
+        cv2.rectangle(overlay, (panel_x, panel_y), (panel_x + panel_w, panel_y + panel_h), (0, 0, 0), -1)
         cv2.addWeighted(overlay, 0.7, frame, 0.3, 0, frame)
-        cv2.rectangle(frame, (panel_x, panel_y), (panel_x+panel_w, panel_y+panel_h), (255,255,255), 1)
-        cv2.putText(frame, "📊 Dataset Info", (panel_x+10, panel_y+25),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,0), 2)
+        cv2.rectangle(frame, (panel_x, panel_y), (panel_x + panel_w, panel_y + panel_h), (255, 255, 255), 1)
+        cv2.putText(frame, "📊 Dataset Info", (panel_x + 10, panel_y + 25),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
 
         dataset = self.detector.smart_tracker.dataset
         y_offset = panel_y + 55
         total_samples = sum(len(samples) for samples in dataset.dataset.values())
-        cv2.putText(frame, f"Total samples: {total_samples}", (panel_x+10, y_offset),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
+        cv2.putText(frame, f"Total samples: {total_samples}", (panel_x + 10, y_offset),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         y_offset += 25
         persons = len(dataset.dataset)
-        cv2.putText(frame, f"Different persons: {persons}", (panel_x+10, y_offset),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1)
+        cv2.putText(frame, f"Different persons: {persons}", (panel_x + 10, y_offset),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         return frame
 
     def run(self):
-
+        """主循环"""
         frame_count = 0
         start_time = time.time()
-        real_fps = 0.0
 
         if not self.camera or not self.detector:
             print("❌ 系统未正确初始化")
             return
 
         print("\n开始检测...")
-        frame_count = 0
-        start_time = time.time()
 
         try:
             while self.running:
@@ -184,20 +228,34 @@ class PersonDetectionApp:
                 else:
                     self.detections = self.last_detections
 
-                # 3. 绘制检测框（你的绘制逻辑）
+                # 3. 绘制检测框
                 display_frame = self.frame.copy()
                 if self.show_detections:
                     display_frame = self.detector.draw_detections(display_frame, self.detections)
 
-                # 4. 追踪模式下获取目标中心点（用于舵机控制）
+                # 4. 获取追踪目标（只有在追踪模式下才获取）
                 target_center = None
                 if self.detector.is_selecting_mode and self.detector.selected_person is not None:
+                    # 获取当前追踪的人物位置
                     x1, y1, x2, y2, conf, _ = self.detector.selected_person
                     target_center = ((x1 + x2) // 2, (y1 + y2) // 2)
 
-                # 5. PID 控制（如果启用舵机）
-                if self.pid_controller and target_center:
+                    # 更新追踪标志
+                    self.is_tracking = True
+                else:
+                    # 没有选中人物时，确保舵机不追踪
+                    if self.is_tracking:
+                        self.is_tracking = False
+                        if self.pid_controller:
+                            self.pid_controller.set_tracking_enabled(False)
+                            print("⏸️ 舵机追踪已暂停（未选中人物）")
+
+                # 5. PID 控制（只在追踪模式下且舵机可用时）
+                if self.pid_controller and target_center and self.is_tracking:
+                    # 计算目标角度
                     pan_angle, tilt_angle = self.pid_controller.compute_angles(target_center[0], target_center[1])
+
+                    # 设置舵机目标
                     if self.servo:
                         self.servo.set_target(pan_angle, tilt_angle)
 
@@ -205,43 +263,50 @@ class PersonDetectionApp:
                 if self.servo:
                     now = time.time()
                     dt = now - self.last_servo_update
-                    if dt > 0.02:   # 50Hz
+                    if dt > 0.02:  # 50Hz
                         self.servo.update(dt)
                         self.last_servo_update = now
 
-                frame_count += 1
-                elapsed = time.time() - start_time
-                real_fps = frame_count / elapsed if elapsed > 0 else 0
-
                 # 7. 构建信息文本
                 detection_summary = self.detector.get_detection_summary(self.detections)
-                mode_text = "[TRACKING MODE]" if self.detector.is_selecting_mode else "[NORMAL MODE]"
+
+                # 显示追踪状态
+                if self.is_tracking:
+                    mode_text = "[TRACKING ACTIVE]"
+                elif self.detector.is_selecting_mode:
+                    mode_text = "[TRACKING SELECTED]"
+                else:
+                    mode_text = "[NORMAL MODE]"
+
                 info_lines = [
                     f"{mode_text} {detection_summary}",
                     f"conf: {self.detector.get_confidence_threshold():.2f}"
                 ]
-                if self.servo:
+
+                if self.servo and self.is_tracking:
                     pan, tilt = self.servo.get_current_angles()
                     info_lines.append(f"Pan: {pan:.1f}° Tilt: {tilt:.1f}°")
-                if target_center:
+
+                if target_center and self.is_tracking:
                     h, w = self.frame.shape[:2]
-                    err_x = target_center[0] - w//2
-                    err_y = target_center[1] - h//2
+                    err_x = target_center[0] - w // 2
+                    err_y = target_center[1] - h // 2
                     info_lines.append(f"Error: ({err_x:+d}, {err_y:+d}) px")
+
                 info_text = "\n".join(info_lines)
 
                 # 8. 绘制鼠标位置提示
                 if self.detector.mouse_x >= 0 and self.detector.mouse_y >= 0:
                     mouse_text = f"Mouse: ({self.detector.mouse_x}, {self.detector.mouse_y})"
                     if self.detector.hovered_person_index >= 0:
-                        mouse_text += f" - Person #{self.detector.hovered_person_index + 1}"
+                        mouse_text += f" - Person #{self.detector.hovered_person_index + 1} (Click to track)"
                     h, w = display_frame.shape[:2]
                     text_size = cv2.getTextSize(mouse_text, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)[0]
                     cv2.putText(display_frame, mouse_text, (w - text_size[0] - 10, 70),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
 
-                # 9. 摄像头信息绘制（使用 CameraManager 的 draw_info）
-                display_frame = self.camera.draw_info(display_frame, info_text,show_fps=False)
+                # 9. 摄像头信息绘制
+                display_frame = self.camera.draw_info(display_frame, info_text, show_fps=False)
                 display_frame = self.draw_dataset_info(display_frame)
 
                 # 10. 显示画面
@@ -252,10 +317,13 @@ class PersonDetectionApp:
                 if key == ord('q') or key == 27:
                     self.running = False
                 elif key == ord('c'):
+                    # 清除追踪选择
                     self.detector.clear_selection()
+                    self.is_tracking = False
                     if self.pid_controller:
                         self.pid_controller.reset()
-                    print("\n🔄 已清除追踪选择")
+                        self.pid_controller.set_tracking_enabled(False)
+                    print("\n🔄 已清除追踪选择，舵机追踪已停止")
                 elif key == ord('r') and self.servo:
                     self.servo.reset_to_center()
                     if self.pid_controller:
@@ -288,7 +356,7 @@ class PersonDetectionApp:
                 if frame_count % 100 == 0:
                     elapsed = time.time() - start_time
                     fps = frame_count / elapsed
-                    print(f"📊 性能: FPS={fps:.1f}, 检测人数={len(self.detections)}")
+                    print(f"📊 性能: FPS={fps:.1f}, 检测人数={len(self.detections)}, 追踪={self.is_tracking}")
 
         except KeyboardInterrupt:
             print("\n\n👋 用户中断")
@@ -300,6 +368,7 @@ class PersonDetectionApp:
             self.cleanup()
 
     def _save_frame(self, frame):
+        """保存当前画面"""
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             mode = "tracking" if self.detector.is_selecting_mode else "normal"
@@ -310,16 +379,40 @@ class PersonDetectionApp:
             print(f"\n❌ 保存失败: {e}")
 
     def cleanup(self):
+        """清理资源"""
+        print("\n正在关闭系统...")
+
         if self.camera:
             self.camera.release()
+
         if self.servo:
-            self.servo.cleanup()
+            # 舵机回中
+            print("🔄 舵机正在回中...")
+            try:
+                self.servo.reset_to_center()
+                time.sleep(0.5)  # 等待舵机移动到中心
+                self.servo.cleanup()
+            except Exception as e:
+                print(f"⚠️ 舵机关闭时出错: {e}")
+
         cv2.destroyAllWindows()
+
         if self.detector and hasattr(self.detector, 'smart_tracker'):
             dataset = self.detector.smart_tracker.dataset
             total_samples = sum(len(samples) for samples in dataset.dataset.values())
             print(f"\n📊 会话结束 - 数据集总样本数: {total_samples}")
+
         print("✅ 系统已关闭")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='树莓派人物追踪系统 - 整合版')
+    parser.add_argument('--conf', type=float, default=None, help='置信度阈值 (0-1)')
+    parser.add_argument('--no-servo', action='store_true', help='禁用舵机控制（调试模式）')
+    args = parser.parse_args()
+
+    app = PersonDetectionApp(conf_threshold=args.conf, no_servo=args.no_servo)
+    app.run()
 
 
 if __name__ == "__main__":
