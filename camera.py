@@ -16,6 +16,8 @@ class CameraManager:
         self.height = Config.CAMERA_RESOLUTION[1]
         self.fps_target = Config.CAMERA_FPS
 
+        self.fps_target = 15
+
         self.cap = None
         self.picam2 = None
         self.frame = None
@@ -122,14 +124,14 @@ class CameraManager:
                 print(f"采集错误: {e}")
 
     def _usb_camera_capture_loop(self):
-        """USB摄像头采集循环（带帧率控制）"""
-        frame_time = 1.0 / self.fps_target if self.fps_target > 0 else 0.033
+        """USB摄像头采集循环 - 控制帧率"""
+        frame_time = 1.0 / self.fps_target  # 目标帧率间隔（秒）
         while self.running:
             ret, frame = self.cap.read()
             if ret:
                 with self.frame_lock:
                     self.frame = frame
-            time.sleep(frame_time)  # 控制采集频率
+            time.sleep(frame_time)  # 关键：控制采集速度
 
     def get_frame(self):
         """获取最新帧"""
@@ -147,15 +149,31 @@ class CameraManager:
         self.prev_frame_time = curr_time
         return self.fps
 
-    def draw_info(self, frame, extra_info=None):
-        """在画面上绘制信息"""
+    def draw_info(self, frame, extra_info=None, display_fps=None,show_fps=True):
+        """在画面上绘制信息
+
+        参数:
+            frame: 图像帧
+            extra_info: 额外多行文本
+            display_fps: 可选，如果提供则显示该帧率（真实显示帧率），否则使用摄像头采集帧率
+        """
+
+
+
+
         if frame is None:
             return None
 
         h, w = frame.shape[:2]
 
-        # 计算FPS
-        current_fps = self.calculate_fps()
+        # 帧率：优先使用传入的 display_fps，否则使用摄像头采集帧率
+        if display_fps is not None:
+            current_fps = display_fps
+            fps_label = "Disp FPS"
+        else:
+            current_fps = self.calculate_fps()
+            fps_label = "FPS"
+
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # 创建半透明背景
@@ -163,9 +181,11 @@ class CameraManager:
         cv2.rectangle(overlay, (0, 0), (w, 90), (0, 0, 0), -1)
         frame = cv2.addWeighted(overlay, 0.6, frame, 0.4, 0)
 
-        # 显示FPS
-        cv2.putText(frame, f"FPS: {current_fps:.1f}", (10, 25),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        # 显示帧率（用不同标签区分）
+        # 显示FPS（可选择性显示）
+        if show_fps:  # 增加参数 show_fps 默认为 True
+            cv2.putText(frame, f"{fps_label}: {current_fps:.1f}", (10, 25),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
         # 显示分辨率
         cv2.putText(frame, f"{w}x{h}", (120, 25),
@@ -178,7 +198,6 @@ class CameraManager:
 
         # 显示额外信息
         if extra_info:
-            # 分行显示
             lines = extra_info.split('\n')
             for i, line in enumerate(lines):
                 cv2.putText(frame, line, (10, 55 + i * 25),

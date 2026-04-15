@@ -59,7 +59,7 @@ class YOLOPersonDetector:
 
         # 丢失容忍
         self.lost_frame_count = 0
-        self.max_lost_frames = 10
+        self.max_lost_frames = 3
 
         print(f"\n✅ YOLO模型配置完成")
         print(f"   - 置信度阈值: {conf_threshold}")
@@ -133,26 +133,47 @@ class YOLOPersonDetector:
         if frame is None:
             return frame
 
+        # ========== 追踪模式 ==========
         if self.is_selecting_mode and self.tracker is not None:
             # 更新追踪器
             success, bbox = self.tracker.update(frame)
+            h, w = frame.shape[:2]
+
             if success:
-                x, y, w, h = [int(v) for v in bbox]
-                x1, y1, x2, y2 = x, y, x + w, y + h
+                x, y, bw, bh = [int(v) for v in bbox]
+                x1, y1, x2, y2 = x, y, x + bw, y + bh
+
+                # ===== 新增：有效性检查 =====
+                # 1. 检查框是否超出画面边界（允许少量超出，但超出太多则无效）
+                margin = 20
+                if (x2 < -margin or x1 > w + margin or
+                        y2 < -margin or y1 > h + margin):
+                    success = False
+                # 2. 检查框面积是否合理（避免漂移到极小区域）
+                elif bw * bh < 100:  # 面积太小，认为丢失
+                    success = False
+                # 3. 可选：检查框中心是否离画面中心太远（如果人物完全离开）
+                # center_x = (x1 + x2) // 2
+                # center_y = (y1 + y2) // 2
+                # if center_x < -50 or center_x > w+50 or center_y < -50 or center_y > h+50:
+                #     success = False
+                # ===========================
+
+            if success:
+                # 更新上一帧位置
                 self.prev_track_bbox = (x1, y1, x2, y2)
                 # 绘制绿色追踪框
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
                 cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             else:
-                # 追踪失败
+                # 追踪失败：立即清除追踪状态
                 cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                self.clear_selection()
+                self.clear_selection()  # 退出追踪模式
+                self.tracker = None  # 释放追踪器
+                self.prev_track_bbox = None  # 清除上一帧位置
             return frame  # 追踪模式下不画普通检测框
-
-        # 普通模式（未选中）...
-        # （保持不变，显示 YOLO 检测框和鼠标悬停）
 
         # ========== 普通模式（未选中任何人） ==========
         # 找出鼠标悬停的人物索引

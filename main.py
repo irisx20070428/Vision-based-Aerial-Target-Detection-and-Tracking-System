@@ -155,6 +155,11 @@ class PersonDetectionApp:
         return frame
 
     def run(self):
+
+        frame_count = 0
+        start_time = time.time()
+        real_fps = 0.0
+
         if not self.camera or not self.detector:
             print("❌ 系统未正确初始化")
             return
@@ -204,6 +209,10 @@ class PersonDetectionApp:
                         self.servo.update(dt)
                         self.last_servo_update = now
 
+                frame_count += 1
+                elapsed = time.time() - start_time
+                real_fps = frame_count / elapsed if elapsed > 0 else 0
+
                 # 7. 构建信息文本
                 detection_summary = self.detector.get_detection_summary(self.detections)
                 mode_text = "[TRACKING MODE]" if self.detector.is_selecting_mode else "[NORMAL MODE]"
@@ -232,7 +241,7 @@ class PersonDetectionApp:
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
 
                 # 9. 摄像头信息绘制（使用 CameraManager 的 draw_info）
-                display_frame = self.camera.draw_info(display_frame, info_text)
+                display_frame = self.camera.draw_info(display_frame, info_text,show_fps=False)
                 display_frame = self.draw_dataset_info(display_frame)
 
                 # 10. 显示画面
