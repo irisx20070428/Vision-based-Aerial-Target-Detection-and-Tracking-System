@@ -1,43 +1,27 @@
-# pid_controller.py - 完整修复版
+# pid_controller.py - 完整修复版（慢速平滑追踪）
 import time
 from config import Config
 
 
-class PanTiltController:
-    def __init__(self):
-        # PID增益已经很低，进一步降低
-        self.pid_pan = PIDController(
-            Kp=Config.PID_PAN_Kp * 0.3,  # 再降低到30%
-            Ki=Config.PID_PAN_Ki * 0.2,  # 再降低到20%
-            Kd=Config.PID_PAN_Kd * 0.5,  # 再降低到50%
-            max_output=8  # 减小最大输出到8度
-        )
+class PIDController:
+    """PID控制器 - 平滑控制云台"""
 
-        self.pid_tilt = PIDController(
-            Kp=Config.PID_TILT_Kp * 0.3,
-            Ki=Config.PID_TILT_Ki * 0.2,
-            Kd=Config.PID_TILT_Kd * 0.5,
-            max_output=8
-        )
+    def __init__(self, Kp, Ki, Kd, max_output=30):
+        self.Kp = Kp
+        self.Ki = Ki
+        self.Kd = Kd
+        self.max_output = max_output
 
-        self.image_center_x = Config.IMAGE_CENTER_X
-        self.image_center_y = Config.IMAGE_CENTER_Y
+        self.last_error = 0
+        self.integral = 0
+        self.last_time = time.time()
 
-        self.current_pan = Config.SERVO_CENTER_ANGLE
-        self.current_tilt = Config.SERVO_CENTER_ANGLE
+        # 添加输出平滑
+        self.last_output = 0
+        self.output_smoothing = 0.3  # 平滑因子
 
-        self.dead_zone = 80  # 更大的死区（80像素）
-        self.tracking_enabled = False
-
-        # 角度变化限制 - 非常小
-        self.max_angle_change = 1.5  # 单次最大1.5度（原3度）
-
-        self.first_update = True
-
-        print(f"✅ 云台PID控制器初始化成功")
-        print(f"   - 图像中心: ({self.image_center_x}, {self.image_center_y})")
-        print(f"   - 死区范围: {self.dead_zone}像素")
-        print(f"   - 最大输出: {self.max_angle_change}度/次")
+        self.output_min = -max_output
+        self.output_max = max_output
 
     def reset(self):
         """重置控制器"""
@@ -59,6 +43,7 @@ class PanTiltController:
 
         # 积分项（抗积分饱和）
         self.integral += error * dt
+        # 限制积分项范围
         self.integral = max(-100, min(100, self.integral))
         I = self.Ki * self.integral
 
@@ -84,86 +69,92 @@ class PanTiltController:
 
 
 class PanTiltController:
-    """云台控制器 - 根据目标位置计算角度"""
+    """云台控制器 - 根据目标位置计算角度（慢速平滑版）"""
 
     def __init__(self):
-        # 降低PID增益，减少抖动
+        # 从配置读取PID参数，并进一步降低增益以实现慢速追踪
+        # 使用更低的增益，让舵机转动更慢、更平滑
         self.pid_pan = PIDController(
-            Kp=Config.PID_PAN_Kp * 0.5,  # 降低比例增益
-            Ki=Config.PID_PAN_Ki * 0.3,  # 降低积分增益
-            Kd=Config.PID_PAN_Kd * 0.8,  # 降低微分增益
-            max_output=15  # 减小最大输出
+            Kp=Config.PID_PAN_Kp * 0.3,  # 降低到30%
+            Ki=Config.PID_PAN_Ki * 0.2,  # 降低到20%
+            Kd=Config.PID_PAN_Kd * 0.5,  # 降低到50%
+            max_output=8  # 减小最大输出到8度
         )
 
         self.pid_tilt = PIDController(
-            Kp=Config.PID_TILT_Kp * 0.5,
-            Ki=Config.PID_TILT_Ki * 0.3,
-            Kd=Config.PID_TILT_Kd * 0.8,
-            max_output=15
+            Kp=Config.PID_TILT_Kp * 0.3,
+            Ki=Config.PID_TILT_Ki * 0.2,
+            Kd=Config.PID_TILT_Kd * 0.5,
+            max_output=8
         )
 
-        # 重要：明确初始化图像中心坐标
+        # 图像中心坐标（从配置读取）
         self.image_center_x = Config.IMAGE_CENTER_X
         self.image_center_y = Config.IMAGE_CENTER_Y
 
+        # 当前舵机角度
         self.current_pan = Config.SERVO_CENTER_ANGLE
         self.current_tilt = Config.SERVO_CENTER_ANGLE
 
-        self.dead_zone = Config.DEAD_ZONE
-        self.tracking_enabled = False  # 默认禁用追踪
+        # 死区范围（像素）- 扩大死区，减少微小移动
+        self.dead_zone = 80  # 80像素以内不响应
 
-        # 增加死区，减少微调
-        self.dead_zone = 50  # 像素，覆盖Config中的值
+        # 追踪启用标志
+        self.tracking_enabled = False
 
-        # 角度变化限制
-        self.max_angle_change = 3  # 单次最大角度变化
+        # 角度变化限制（度）- 单次最大变化量
+        self.max_angle_change = 1.5  # 每次最多变化1.5度
 
-        # 添加初始输出保护
-        self.first_update = True  # 首次更新标志
+        # 首次更新标志（避免初始突变）
+        self.first_update = True
 
         print(f"✅ 云台PID控制器初始化成功")
         print(f"   - 图像中心: ({self.image_center_x}, {self.image_center_y})")
         print(f"   - 死区范围: {self.dead_zone}像素")
         print(f"   - 最大角度变化: {self.max_angle_change}度/次")
-        print(f"   - 初始输出: 禁用状态")
+        print(f"   - PID最大输出: 8度")
+        print(f"   - 追踪状态: 已禁用")
 
     def compute_angles(self, target_x, target_y):
         """
         根据目标位置计算云台角度
 
         参数:
-            target_x, target_y: 目标在图像中的位置
+            target_x, target_y: 目标在图像中的位置（像素坐标）
 
         返回:
-            pan_angle, tilt_angle: 水平和垂直角度
+            pan_angle, tilt_angle: 水平和垂直角度（0-180度）
         """
+        # 如果追踪未启用，返回当前位置
         if not self.tracking_enabled or target_x is None or target_y is None:
             return self.current_pan, self.current_tilt
 
-        # 首次更新时，不产生任何输出
+        # 首次更新时，不产生任何输出，避免初始化时的突变
         if self.first_update:
             self.first_update = False
+            print(f"🎯 PID控制器首次激活，保持当前位置")
             return self.current_pan, self.current_tilt
 
-        # 计算误差
+        # 计算误差（图像中心 - 目标位置）
+        # 正误差表示目标在中心左侧/上方，需要向右/下转动
         error_x = self.image_center_x - target_x
         error_y = self.image_center_y - target_y
 
-        # 死区处理 - 小误差不移动
+        # 死区处理 - 误差小于死区时不移动
         if abs(error_x) < self.dead_zone:
             error_x = 0
         if abs(error_y) < self.dead_zone:
             error_y = 0
 
-        # 如果误差很小，不移动
+        # 如果误差为零，不移动
         if error_x == 0 and error_y == 0:
             return self.current_pan, self.current_tilt
 
-        # PID计算
+        # PID计算控制量
         control_x = self.pid_pan.update(error_x)
         control_y = self.pid_tilt.update(error_y)
 
-        # 限制单次变化量
+        # 限制单次变化量（防止突变）
         control_x = max(-self.max_angle_change, min(self.max_angle_change, control_x))
         control_y = max(-self.max_angle_change, min(self.max_angle_change, control_y))
 
@@ -171,7 +162,7 @@ class PanTiltController:
         self.current_pan += control_x
         self.current_tilt += control_y
 
-        # 限制角度范围
+        # 限制角度范围（0-180度）
         self.current_pan = max(Config.SERVO_ANGLE_MIN,
                                min(Config.SERVO_ANGLE_MAX, self.current_pan))
         self.current_tilt = max(Config.SERVO_ANGLE_MIN,
@@ -180,32 +171,55 @@ class PanTiltController:
         return self.current_pan, self.current_tilt
 
     def reset(self):
-        """重置控制器"""
+        """重置PID控制器和角度"""
         self.pid_pan.reset()
         self.pid_tilt.reset()
         self.current_pan = Config.SERVO_CENTER_ANGLE
         self.current_tilt = Config.SERVO_CENTER_ANGLE
         self.first_update = True  # 重置首次更新标志
-        print("🔄 PID控制器已重置")
+        print("🔄 PID控制器已重置，角度已回中")
 
     def set_tracking_enabled(self, enabled):
-        """设置跟踪启用状态"""
+        """设置追踪启用状态"""
         self.tracking_enabled = enabled
         if enabled:
             self.first_update = True  # 重新启用时重置首次更新标志
-        print(f"🎯 PID追踪: {'已启用' if enabled else '已禁用'}")
+            print(f"🎯 PID追踪已启用（死区:{self.dead_zone}px, 最大变化:{self.max_angle_change}°）")
+        else:
+            print(f"🎯 PID追踪已禁用")
 
     def update_image_center(self, width, height):
-        """更新图像中心"""
+        """更新图像中心坐标（当分辨率改变时使用）"""
         self.image_center_x = width // 2
         self.image_center_y = height // 2
-        print(f"📐 图像中心更新: ({self.image_center_x}, {self.image_center_y})")
+        print(f"📐 图像中心已更新: ({self.image_center_x}, {self.image_center_y})")
+
+    def set_dead_zone(self, dead_zone_pixels):
+        """动态设置死区大小"""
+        self.dead_zone = dead_zone_pixels
+        print(f"📐 死区已更新: {self.dead_zone}像素")
+
+    def set_max_angle_change(self, max_change_degrees):
+        """动态设置最大角度变化量"""
+        self.max_angle_change = max_change_degrees
+        print(f"📐 最大角度变化已更新: {self.max_angle_change}度/次")
 
     def get_status(self):
-        """获取控制器状态"""
+        """获取控制器状态（用于调试）"""
         return {
             'pan_angle': self.current_pan,
             'tilt_angle': self.current_tilt,
             'tracking_enabled': self.tracking_enabled,
+            'dead_zone': self.dead_zone,
+            'max_angle_change': self.max_angle_change,
             'error': (self.pid_pan.last_error, self.pid_tilt.last_error)
+        }
+
+    def get_debug_info(self):
+        """获取调试信息"""
+        return {
+            'image_center': (self.image_center_x, self.image_center_y),
+            'current_angles': (self.current_pan, self.current_tilt),
+            'pid_outputs': (self.pid_pan.last_output, self.pid_tilt.last_output),
+            'first_update': self.first_update
         }

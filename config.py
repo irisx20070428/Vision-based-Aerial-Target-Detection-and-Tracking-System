@@ -1,4 +1,4 @@
-# config.py - 调整舵机速度参数
+# config.py - 确保包含以下配置
 import os
 
 
@@ -25,24 +25,23 @@ class Config:
     SERVO_ANGLE_MAX = 180
     SERVO_CENTER_ANGLE = 90
 
-    # 关键参数：最大转动速度（度/秒）
-    # 原值30度/秒，现在降到10度/秒，转动非常慢
-    MAX_ANGLE_SPEED = 10  # 度/秒（原30）
+    # 最大转动速度（度/秒）
+    MAX_ANGLE_SPEED = 10  # 10度/秒，非常慢
 
-    ACCELERATION = 0.03  # 更低的加速度（原0.05）
-    DEAD_ZONE = 60  # 更大的死区（原50）
+    ACCELERATION = 0.03  # 加速度
+    DEAD_ZONE = 50  # 死区（像素）
 
-    # PID控制参数 - 非常低的增益
-    PID_PAN_Kp = 0.04  # 大幅降低（原0.08）
-    PID_PAN_Ki = 0.0005  # 大幅降低（原0.001）
-    PID_PAN_Kd = 0.002  # 大幅降低（原0.005）
-    PID_TILT_Kp = 0.04  # 大幅降低
-    PID_TILT_Ki = 0.0005  # 大幅降低
-    PID_TILT_Kd = 0.002  # 大幅降低
+    # PID控制参数 - 低增益
+    PID_PAN_Kp = 0.04  # 比例增益
+    PID_PAN_Ki = 0.0005  # 积分增益
+    PID_PAN_Kd = 0.002  # 微分增益
+    PID_TILT_Kp = 0.04  # 比例增益
+    PID_TILT_Ki = 0.0005  # 积分增益
+    PID_TILT_Kd = 0.002  # 微分增益
 
-    # 图像中心点
-    IMAGE_CENTER_X = CAMERA_RESOLUTION[0] // 2
-    IMAGE_CENTER_Y = CAMERA_RESOLUTION[1] // 2
+    # 图像中心点（重要：必须定义）
+    IMAGE_CENTER_X = CAMERA_RESOLUTION[0] // 2  # 320
+    IMAGE_CENTER_Y = CAMERA_RESOLUTION[1] // 2  # 240
 
     # 特征追踪配置
     SIMILARITY_THRESHOLD = 0.45
