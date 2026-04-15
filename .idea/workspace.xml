@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="优化yolo跟踪逻辑">
+    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="修改舵机测试">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/camera.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yolo_detector.py" beforeDir="false" afterPath="$PROJECT_DIR$/yolo_detector.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,15 +46,13 @@
   &quot;keyToString&quot;: {
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;Python.camera.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;with-target-to-center&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Dp/OU/PYTHON/yolo_project/with-target-to-center&quot;
+    &quot;git-widget-placeholder&quot;: &quot;with-target-to-center&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager">
     <configuration name="camera" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="PythonProject" />
       <option name="ENV_FILES" value="" />
@@ -80,31 +75,8 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="PythonProject" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main" />
         <item itemvalue="Python.camera" />
       </list>
     </recent_temporary>
@@ -112,11 +84,10 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-babbdf50b680-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.15989.155" />
+        <option value="bundled-python-sdk-ce6832f46686-7b97d883f26b-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.25557.178" />
       </set>
     </attachedChunks>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -232,47 +203,23 @@
       <option name="project" value="LOCAL" />
       <updated>1775040571735</updated>
     </task>
-    <task id="LOCAL-00014" summary="修改摄像头调用参数">
+    <task id="LOCAL-00014" summary="修改舵机测试">
       <option name="closed" value="true" />
-      <created>1775382156807</created>
+      <created>1775111972993</created>
       <option name="number" value="00014" />
       <option name="presentableId" value="LOCAL-00014" />
       <option name="project" value="LOCAL" />
-      <updated>1775382156807</updated>
+      <updated>1775111972993</updated>
     </task>
-    <task id="LOCAL-00015" summary="修改摄像头调用参数">
+    <task id="LOCAL-00015" summary="修改舵机测试">
       <option name="closed" value="true" />
-      <created>1775468196003</created>
+      <created>1775112052454</created>
       <option name="number" value="00015" />
       <option name="presentableId" value="LOCAL-00015" />
       <option name="project" value="LOCAL" />
-      <updated>1775468196003</updated>
+      <updated>1775112052454</updated>
     </task>
-    <task id="LOCAL-00016" summary="修改yolo模型（s到n）">
-      <option name="closed" value="true" />
-      <created>1775471457972</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1775471457972</updated>
-    </task>
-    <task id="LOCAL-00017" summary="优化截取检测逻辑">
-      <option name="closed" value="true" />
-      <created>1775472706374</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1775472706374</updated>
-    </task>
-    <task id="LOCAL-00018" summary="优化yolo跟踪逻辑">
-      <option name="closed" value="true" />
-      <created>1775479110619</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1775479110619</updated>
-    </task>
-    <option name="localTasksCounter" value="19" />
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -296,10 +243,7 @@
     <MESSAGE value="修改main.py" />
     <MESSAGE value="修改feature_tracker" />
     <MESSAGE value="添加舵机测试" />
-    <MESSAGE value="修改摄像头调用参数" />
-    <MESSAGE value="修改yolo模型（s到n）" />
-    <MESSAGE value="优化截取检测逻辑" />
-    <MESSAGE value="优化yolo跟踪逻辑" />
-    <option name="LAST_COMMIT_MESSAGE" value="优化yolo跟踪逻辑" />
+    <MESSAGE value="修改舵机测试" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改舵机测试" />
   </component>
 </project>

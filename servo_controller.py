@@ -112,37 +112,52 @@ class ServoController:
     def update(self, dt=0.02):
         """
         更新舵机位置（平滑移动）
-
-        参数:
-            dt: 时间间隔（秒）
         """
         with self.move_lock:
             # 计算角度差
             pan_diff = self.target_pan - self.current_pan
             tilt_diff = self.target_tilt - self.current_tilt
 
-            # 计算移动步长（带速度限制）
+            # === 1. 添加死区 ===
+            deadband = 0.3  # 死区范围（度）
+            if abs(pan_diff) < deadband:
+                pan_diff = 0
+            if abs(tilt_diff) < deadband:
+                tilt_diff = 0
+
+            # === 2. 计算最大移动步长 ===
             max_move = Config.MAX_ANGLE_SPEED * dt
 
-            # 限制移动速度
+            # === 3. 修复加速度逻辑 ===
+            # 直接限制移动步长，不使用错误的加速度
             pan_move = max(-max_move, min(max_move, pan_diff))
             tilt_move = max(-max_move, min(max_move, tilt_diff))
 
-            # 应用加速度（平滑加速减速）
-            if abs(pan_diff) > max_move * 2:
-                pan_move *= (1 + Config.ACCELERATION)
-            elif abs(pan_diff) < max_move * 0.5:
-                pan_move *= (1 - Config.ACCELERATION * 0.5)
+            # 可选：简单的缓动效果（加速/减速）
+            # 距离目标较远时加速，较近时减速
+            if abs(pan_diff) > 10:  # 大于10度，全速移动
+                pan_move = max(-max_move, min(max_move, pan_diff))
+            elif abs(pan_diff) > 2:  # 2-10度，线性减速
+                speed_factor = abs(pan_diff) / 10
+                pan_move = pan_diff * speed_factor
+                pan_move = max(-max_move, min(max_move, pan_move))
+            else:  # 小于2度，不移动（由死区处理）
+                pan_move = 0
 
-            pan_move = max(-max_move, min(max_move, pan_move))
-            tilt_move = max(-max_move, min(max_move, tilt_move))
+            if abs(tilt_diff) > 10:
+                tilt_move = max(-max_move, min(max_move, tilt_diff))
+            elif abs(tilt_diff) > 2:
+                speed_factor = abs(tilt_diff) / 10
+                tilt_move = tilt_diff * speed_factor
+                tilt_move = max(-max_move, min(max_move, tilt_move))
+            else:
+                tilt_move = 0
 
             # 更新角度
-            new_pan = self.current_pan + pan_move
-            new_tilt = self.current_tilt + tilt_move
-
-            # 设置角度
-            self._set_angle_immediate(new_pan, new_tilt)
+            if pan_move != 0 or tilt_move != 0:
+                new_pan = self.current_pan + pan_move
+                new_tilt = self.current_tilt + tilt_move
+                self._set_angle_immediate(new_pan, new_tilt)
 
     def get_current_angles(self):
         """获取当前角度"""
