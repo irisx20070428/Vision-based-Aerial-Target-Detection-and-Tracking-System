@@ -17,24 +17,24 @@ class Config:
     YOLO_FRAME_SKIP = 3
     YOLO_IMAGE_SIZE = 320
 
-    # 舵机配置
+    # 舵机配置 - 降低速度，增加稳定性
     SERVO_PAN_PIN = 18
     SERVO_TILT_PIN = 27
     SERVO_FREQUENCY = 50
     SERVO_ANGLE_MIN = 0
     SERVO_ANGLE_MAX = 180
     SERVO_CENTER_ANGLE = 90
-    MAX_ANGLE_SPEED = 30
-    ACCELERATION = 0.3
-    DEAD_ZONE = 20
+    MAX_ANGLE_SPEED = 30  # 降低到30度/秒（原60）
+    ACCELERATION = 0.05  # 降低加速度
+    DEAD_ZONE = 50  # 增加死区到50像素
 
-    # PID控制参数
-    PID_PAN_Kp = 0.2
-    PID_PAN_Ki = 0.005
-    PID_PAN_Kd = 0.02
-    PID_TILT_Kp = 0.2
-    PID_TILT_Ki = 0.005
-    PID_TILT_Kd = 0.02
+    # PID控制参数 - 大幅降低增益
+    PID_PAN_Kp = 0.08  # 大幅降低（原0.15）
+    PID_PAN_Ki = 0.001  # 大幅降低（原0.003）
+    PID_PAN_Kd = 0.005  # 大幅降低（原0.01）
+    PID_TILT_Kp = 0.08  # 大幅降低
+    PID_TILT_Ki = 0.001  # 大幅降低
+    PID_TILT_Kd = 0.005  # 大幅降低
 
     # 图像中心点
     IMAGE_CENTER_X = CAMERA_RESOLUTION[0] // 2

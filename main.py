@@ -1,4 +1,4 @@
-# main.py - 完整修复版
+# main.py - 完整修复版（舵机初始化静止，点击后开始追踪）
 import cv2
 import time
 import sys
@@ -50,8 +50,9 @@ class PersonDetectionApp:
         self.last_servo_update = 0
 
         # 添加明确的追踪状态
-        self.is_tracking = False
-        self.tracked_person_center = None
+        self.is_tracking = False  # 是否正在追踪人物
+        self.tracked_person_center = None  # 被追踪人物的中心点
+        self.has_clicked = False  # 是否已经点击选择人物
 
         # 降低 YOLO 检测频率的变量
         self.detect_skip = Config.YOLO_FRAME_SKIP
@@ -154,6 +155,7 @@ class PersonDetectionApp:
 
                 # 设置追踪标志
                 self.is_tracking = True
+                self.has_clicked = True
 
                 print(f"📸 已保存人物图像到数据集，开始追踪")
                 print(f"💡 提示：按 'c' 键可停止追踪")
@@ -217,15 +219,18 @@ class PersonDetectionApp:
                 if self.show_detections:
                     display_frame = self.detector.draw_detections(display_frame, self.detections)
 
-                # 4. 获取追踪目标
+                # 4. 获取追踪目标（只有在追踪模式下才获取）
                 target_center = None
                 if hasattr(self.detector, 'is_selecting_mode') and self.detector.is_selecting_mode:
                     if hasattr(self.detector, 'selected_person') and self.detector.selected_person is not None:
                         x1, y1, x2, y2, conf, _ = self.detector.selected_person
                         target_center = ((x1 + x2) // 2, (y1 + y2) // 2)
-                        if not self.is_tracking:
+
+                        # 确保追踪标志正确
+                        if not self.is_tracking and self.has_clicked:
                             self.is_tracking = True
                 else:
+                    # 没有选中人物时，确保舵机不追踪
                     if self.is_tracking:
                         self.is_tracking = False
                         if self.servo and hasattr(self.servo, 'enable_tracking'):
@@ -234,32 +239,46 @@ class PersonDetectionApp:
                             self.pid_controller.set_tracking_enabled(False)
                         print("⏸️ 舵机追踪已暂停（未选中人物）")
 
-                # 5. PID 控制
+                # 5. PID 控制（只在追踪模式下且舵机可用时）
                 if self.pid_controller and target_center and self.is_tracking:
+                    # 计算目标角度
                     pan_angle, tilt_angle = self.pid_controller.compute_angles(target_center[0], target_center[1])
+
+                    # 设置舵机目标（舵机内部会检查 tracking_enabled）
                     if self.servo and hasattr(self.servo, 'set_target'):
                         self.servo.set_target(pan_angle, tilt_angle)
 
-                # 6. 更新舵机位置
+                # 6. 更新舵机位置（平滑移动）- 降低更新频率
                 if self.servo and hasattr(self.servo, 'update'):
                     now = time.time()
-                    dt = now - self.last_servo_update
-                    if dt > 0.02:
-                        self.servo.update(dt)
+                    # 降低更新频率到10Hz，减少抖动
+                    if now - self.last_servo_update >= 0.1:  # 100ms
+                        self.servo.update(0.1)  # 固定dt=0.1秒
                         self.last_servo_update = now
 
                 # 7. 构建信息文本
                 detection_summary = self.detector.get_detection_summary(self.detections)
 
-                tracking_status = "TRACKING ACTIVE" if (self.is_tracking and self.servo) else "NORMAL MODE"
+                # 显示追踪状态
+                if self.is_tracking and self.servo and hasattr(self.servo,
+                                                               'tracking_enabled') and self.servo.tracking_enabled:
+                    mode_text = "[TRACKING ACTIVE]"
+                elif self.has_clicked:
+                    mode_text = "[TRACKING SELECTED - WAITING]"
+                else:
+                    mode_text = "[NORMAL MODE]"
+
                 info_lines = [
-                    f"[{tracking_status}] {detection_summary}",
+                    f"{mode_text} {detection_summary}",
                     f"conf: {self.detector.get_confidence_threshold():.2f}"
                 ]
 
                 if self.servo and hasattr(self.servo, 'get_current_angles'):
-                    pan, tilt = self.servo.get_current_angles()
-                    info_lines.append(f"Pan: {pan:.1f}° Tilt: {tilt:.1f}°")
+                    if hasattr(self.servo, 'tracking_enabled') and self.servo.tracking_enabled:
+                        pan, tilt = self.servo.get_current_angles()
+                        info_lines.append(f"Pan: {pan:.1f}° Tilt: {tilt:.1f}° [TRACKING]")
+                    else:
+                        info_lines.append(f"Servo: [STAND BY]")
 
                 if target_center and self.is_tracking:
                     h, w = self.frame.shape[:2]
@@ -280,7 +299,7 @@ class PersonDetectionApp:
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
 
                 # 9. 添加启动提示
-                if not self.is_tracking and self.servo:
+                if not self.has_clicked and self.servo:
                     cv2.putText(display_frame, "Click on a person to start tracking",
                                 (10, display_frame.shape[0] - 50),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
@@ -297,8 +316,10 @@ class PersonDetectionApp:
                 if key == ord('q') or key == 27:
                     self.running = False
                 elif key == ord('c'):
+                    # 清除追踪选择
                     self.detector.clear_selection()
                     self.is_tracking = False
+                    self.has_clicked = False
                     if self.servo and hasattr(self.servo, 'enable_tracking'):
                         self.servo.enable_tracking(False)
                     if self.pid_controller:
@@ -308,11 +329,14 @@ class PersonDetectionApp:
                             self.pid_controller.set_tracking_enabled(False)
                     print("\n🔄 已清除追踪选择，舵机追踪已停止")
                 elif key == ord('r') and self.servo:
-                    if hasattr(self.servo, 'reset_to_center'):
-                        self.servo.reset_to_center()
+                    if hasattr(self.servo, 'tracking_enabled') and self.servo.tracking_enabled:
+                        if hasattr(self.servo, 'reset_to_center'):
+                            self.servo.reset_to_center()
                         if self.pid_controller and hasattr(self.pid_controller, 'reset'):
                             self.pid_controller.reset()
                         print("\n🔄 云台已重置到中心")
+                    else:
+                        print("\n⚠️ 舵机未启用追踪，无需重置")
                 elif key == ord('s'):
                     self._save_frame(display_frame)
                 elif key == ord('a'):
@@ -370,10 +394,12 @@ class PersonDetectionApp:
             self.camera.release()
 
         if self.servo:
+            # 先禁用追踪
             try:
                 if hasattr(self.servo, 'enable_tracking'):
                     self.servo.enable_tracking(False)
                 print("🔄 舵机追踪已禁用")
+                # 舵机回中
                 if hasattr(self.servo, 'reset_to_center'):
                     print("🔄 舵机正在回中...")
                     self.servo.reset_to_center()
