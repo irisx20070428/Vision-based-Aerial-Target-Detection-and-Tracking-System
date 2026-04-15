@@ -1,4 +1,4 @@
-# servo_controller.py - 添加 target 角度属性访问
+# servo_controller.py - 简化版，只负责执行角度指令
 import time
 import threading
 from gpiozero import Servo
@@ -6,7 +6,7 @@ from config import Config
 
 
 class ServoController:
-    """舵机控制器 - 使用 gpiozero - 防抽搐优化版"""
+    """舵机控制器 - 简化版，只负责执行角度指令"""
 
     def __init__(self):
         self.pan_pin = Config.SERVO_PAN_PIN
@@ -23,7 +23,7 @@ class ServoController:
         self.tilt_servo = None
 
         # 速度限制
-        self.max_angle_change = 1.0
+        self.max_angle_change = 5.0  # 单次最大5度
         self.last_update_time = time.time()
 
         # 追踪使能标志
@@ -37,22 +37,18 @@ class ServoController:
         print("初始化舵机...")
 
         try:
+            # SG90 标准脉冲范围
             self.pan_servo = Servo(
                 self.pan_pin,
-                min_pulse_width=0.6 / 1000,
-                max_pulse_width=2.4 / 1000
+                min_pulse_width=0.5 / 1000,
+                max_pulse_width=2.5 / 1000
             )
 
             self.tilt_servo = Servo(
                 self.tilt_pin,
-                min_pulse_width=0.6 / 1000,
-                max_pulse_width=2.4 / 1000
+                min_pulse_width=0.5 / 1000,
+                max_pulse_width=2.5 / 1000
             )
-
-            # 先禁用舵机输出
-            self.pan_servo.detach()
-            self.tilt_servo.detach()
-            time.sleep(0.1)
 
             # 设置到中心位置
             pan_value = self._angle_to_value(Config.SERVO_CENTER_ANGLE)
@@ -73,8 +69,7 @@ class ServoController:
             print(f"✅ 舵机控制器初始化成功")
             print(f"   - 水平舵机: GPIO{self.pan_pin}")
             print(f"   - 垂直舵机: GPIO{self.tilt_pin}")
-            print(f"   - 最大转动速度: {Config.MAX_ANGLE_SPEED}°/秒")
-            print(f"   - 初始位置: 中心 ({Config.SERVO_CENTER_ANGLE}°)")
+            print(f"   - 脉冲范围: 0.5ms - 2.5ms")
 
         except Exception as e:
             print(f"❌ 舵机初始化失败: {e}")
@@ -102,15 +97,16 @@ class ServoController:
             self.target_tilt = tilt_angle
 
     def update(self, dt=None):
-        """更新舵机位置"""
+        """
+        更新舵机位置 - 线性插值移动到目标角度
+        """
         if not self.initialized or not self.tracking_enabled:
             return
 
-        # 计算时间间隔
         current_time = time.time()
         if dt is None:
             dt = min(0.1, current_time - self.last_update_time)
-            dt = max(0.05, dt)
+            dt = max(0.02, dt)
 
         self.last_update_time = current_time
 
@@ -119,8 +115,8 @@ class ServoController:
             pan_diff = self.target_pan - self.current_pan
             tilt_diff = self.target_tilt - self.current_tilt
 
-            # 死区处理
-            deadband = 1.0
+            # 死区
+            deadband = 0.5
             if abs(pan_diff) < deadband:
                 pan_diff = 0
             if abs(tilt_diff) < deadband:
@@ -129,34 +125,14 @@ class ServoController:
             if pan_diff == 0 and tilt_diff == 0:
                 return
 
-            # 计算最大移动步长
+            # 计算移动步长（按最大速度限制）
             max_speed = Config.MAX_ANGLE_SPEED
             max_step = max_speed * dt
             max_step = min(max_step, self.max_angle_change)
 
-            # 移动
-            pan_move = 0
-            tilt_move = 0
-
-            if pan_diff != 0:
-                if abs(pan_diff) > 10:
-                    speed_factor = 0.8
-                elif abs(pan_diff) > 5:
-                    speed_factor = 0.5
-                else:
-                    speed_factor = 0.3
-                pan_move = pan_diff * speed_factor * dt
-                pan_move = max(-max_step, min(max_step, pan_move))
-
-            if tilt_diff != 0:
-                if abs(tilt_diff) > 10:
-                    speed_factor = 0.8
-                elif abs(tilt_diff) > 5:
-                    speed_factor = 0.5
-                else:
-                    speed_factor = 0.3
-                tilt_move = tilt_diff * speed_factor * dt
-                tilt_move = max(-max_step, min(max_step, tilt_move))
+            # 直接移动，不做过多的速度调节
+            pan_move = max(-max_step, min(max_step, pan_diff))
+            tilt_move = max(-max_step, min(max_step, tilt_diff))
 
             if abs(pan_move) > 0.1 or abs(tilt_move) > 0.1:
                 new_pan = self.current_pan + pan_move
@@ -164,7 +140,8 @@ class ServoController:
                 self._set_angle_immediate(new_pan, new_tilt)
 
     def _angle_to_value(self, angle):
-        """将角度转换为 gpiozero 的 value (-1 到 1)"""
+        """角度转value"""
+        angle = max(0, min(180, angle))
         value = (angle - 90) / 90
         return max(-1, min(1, value))
 
@@ -187,11 +164,9 @@ class ServoController:
         """重置到中心"""
         if self.tracking_enabled:
             self.set_target(Config.SERVO_CENTER_ANGLE, Config.SERVO_CENTER_ANGLE)
-            print("🔄 云台重置到中心位置")
 
     def cleanup(self):
         """清理资源"""
-        print("🔄 正在关闭舵机...")
         if self.pan_servo:
             self.pan_servo.detach()
         if self.tilt_servo:
