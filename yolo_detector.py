@@ -140,30 +140,36 @@ class YOLOPersonDetector:
             return frame
 
         # ========== 追踪模式 ==========
+        # ========== 追踪模式 ==========
         if self.is_selecting_mode and self.tracker is not None:
+            # 更新追踪器
             success, bbox = self.tracker.update(frame)
             h, w = frame.shape[:2]
             lost = False
+            print(f"[DEBUG] tracker.update success={success}, bbox={bbox}")  # 新增
 
             if success:
                 x, y, bw, bh = [int(v) for v in bbox]
                 x1, y1, x2, y2 = x, y, x + bw, y + bh
+                print(f"[DEBUG] bbox: ({x1},{y1})-({x2},{y2}), area={bw * bh}, aspect={bw / bh if bh > 0 else 0}")  # 新增
 
                 # 有效性检查1：超出边界
                 margin = 20
-                if (x2 < -margin or x1 > w + margin or
-                        y2 < -margin or y1 > h + margin):
+                if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin):
                     lost = True
+                    print("[DEBUG] lost due to out of bounds")  # 新增
                 # 有效性检查2：面积太小
                 elif bw * bh < 100:
                     lost = True
+                    print("[DEBUG] lost due to small area")  # 新增
                 # 有效性检查3：宽高比异常
                 else:
                     aspect = bw / bh if bh > 0 else 0
                     if aspect < 0.2 or aspect > 1.2:
                         lost = True
+                        print(f"[DEBUG] lost due to bad aspect ratio: {aspect:.2f}")  # 新增
 
-                # 有效性检查4：与YOLO检测结果的最大IoU（如果当前帧有检测结果）
+                # 有效性检查4：与YOLO检测结果的最大IoU
                 if not lost and len(detections) > 0:
                     best_iou = 0
                     for det in detections:
@@ -171,30 +177,33 @@ class YOLOPersonDetector:
                         iou = self._compute_iou((x1, y1, x2, y2), (dx1, dy1, dx2, dy2))
                         if iou > best_iou:
                             best_iou = iou
+                    print(f"[DEBUG] best IoU with YOLO detections: {best_iou:.2f}")  # 新增
                     if best_iou < 0.1:
                         lost = True
-
+                        print("[DEBUG] lost due to low IoU")  # 新增
             else:
                 lost = True
+                print("[DEBUG] tracker.update failed")  # 新增
 
             if not lost:
-                # 追踪成功：更新位置
+                # 追踪成功
                 self.prev_track_bbox = (x1, y1, x2, y2)
-                # 关键修复：同步更新 selected_person，使舵机能获取最新位置
+                # 更新 selected_person 坐标
                 if self.selected_person is not None:
-                    # 更新 selected_person 的坐标和置信度（置信度保持不变）
                     self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
+                    print(f"[DEBUG] updated selected_person to: {self.selected_person[:4]}")  # 新增
                 # 绘制绿色追踪框
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
                 cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             else:
-                # 追踪失败：立即清除
+                # 追踪失败
                 cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 self.clear_selection()
                 self.tracker = None
                 self.prev_track_bbox = None
+                print("[DEBUG] tracking lost, cleared state")  # 新增
             return frame
 
         # ========== 普通模式（未选中任何人） ==========
