@@ -59,7 +59,7 @@ class YOLOPersonDetector:
 
         # 丢失容忍
         self.lost_frame_count = 0
-        self.max_lost_frames = 5
+        self.max_lost_frames = 10
 
         print(f"\n✅ YOLO模型配置完成")
         print(f"   - 置信度阈值: {conf_threshold}")
