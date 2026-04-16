@@ -23,7 +23,7 @@ class ServoController:
         self.tilt_servo = None
 
         # 速度限制
-        self.max_angle_change = 5.0  # 单次最大5度
+        self.max_angle_change = 180 # 单次最大180度
         self.last_update_time = time.time()
 
         # 追踪使能标志

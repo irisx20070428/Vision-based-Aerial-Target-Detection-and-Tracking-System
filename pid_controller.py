@@ -78,17 +78,16 @@ class PanTiltController:
     def __init__(self):
         # PID控制器（输入已经是角度误差）
         self.pid_pan = PIDController(
-            Kp=Config.PID_PAN_Kp,
+            Kp=1.5,  # 临时增大
             Ki=Config.PID_PAN_Ki,
             Kd=Config.PID_PAN_Kd,
-            max_output=15
+            max_output=20
         )
-
         self.pid_tilt = PIDController(
-            Kp=Config.PID_TILT_Kp,
+            Kp=1.5,
             Ki=Config.PID_TILT_Ki,
             Kd=Config.PID_TILT_Kd,
-            max_output=15
+            max_output=20
         )
 
         # 图像尺寸和中心
@@ -212,6 +211,9 @@ class PanTiltController:
         control_x = self.pid_pan.update(angle_error_x)  # 水平控制量
         control_y = self.pid_tilt.update(angle_error_y)  # 垂直控制量
 
+        if self.debug_counter % 30 == 0:
+            print(f"PID输出: control_x={control_x:+.2f}, control_y={control_y:+.2f}, angle_error=({angle_error_x:+.2f},{angle_error_y:+.2f})")
+
         # 限制单次变化量
         control_x = max(-self.max_angle_change, min(self.max_angle_change, control_x))
         control_y = max(-self.max_angle_change, min(self.max_angle_change, control_y))
@@ -234,7 +236,7 @@ class PanTiltController:
         self.current_pan = self.servo_pan_init
         self.current_tilt = self.servo_tilt_init
         self.first_update = True
-        print("🔄 PID控制器已重置，角度已回中")
+        print("🔄 PID控制器已重置，角度已回初始位置")
 
     def set_tracking_enabled(self, enabled):
         """设置追踪启用状态"""
