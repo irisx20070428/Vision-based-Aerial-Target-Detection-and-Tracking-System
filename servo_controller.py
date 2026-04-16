@@ -12,10 +12,10 @@ class ServoController:
         self.pan_pin = Config.SERVO_PAN_PIN
         self.tilt_pin = Config.SERVO_TILT_PIN
 
-        self.current_pan = Config.SERVO_CENTER_ANGLE
-        self.current_tilt = Config.SERVO_CENTER_ANGLE
-        self.target_pan = Config.SERVO_CENTER_ANGLE
-        self.target_tilt = Config.SERVO_CENTER_ANGLE
+        self.current_pan = Config.SERVO_PAN_INIT_ANGLE
+        self.current_tilt = Config.SERVO_TILT_INIT_ANGLE
+        self.target_pan = Config.SERVO_PAN_INIT_ANGLE
+        self.target_tilt = Config.SERVO_TILT_INIT_ANGLE
 
         self.move_lock = threading.Lock()
 
