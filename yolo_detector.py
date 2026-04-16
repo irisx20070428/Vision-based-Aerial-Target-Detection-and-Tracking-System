@@ -184,7 +184,7 @@ class YOLOPersonDetector:
                     self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
                 # 绘制绿色框
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10), ...)
+                cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             else:
                 # 追踪失败：增加计数
                 self.lost_frame_count += 1

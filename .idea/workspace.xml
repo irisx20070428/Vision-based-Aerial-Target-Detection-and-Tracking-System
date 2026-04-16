@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="修改yolo模型">
+    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="1">
       <change beforePath="$PROJECT_DIR$/yolo_detector.py" beforeDir="false" afterPath="$PROJECT_DIR$/yolo_detector.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -357,7 +357,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776330851828</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="1">
+      <option name="closed" value="true" />
+      <created>1776331761519</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1776331761519</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -395,6 +403,7 @@
     <MESSAGE value="提升画面流畅度，修改退出bug" />
     <MESSAGE value="忘了" />
     <MESSAGE value="修改yolo模型" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改yolo模型" />
+    <MESSAGE value="1" />
+    <option name="LAST_COMMIT_MESSAGE" value="1" />
   </component>
 </project>
