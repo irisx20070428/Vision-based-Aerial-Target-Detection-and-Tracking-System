@@ -168,6 +168,12 @@ class ServoController:
         if self.tracking_enabled:
             self.set_target(Config.SERVO_PAN_INIT_ANGLE, Config.SERVO_TILT_INIT_ANGLE)
 
+    def set_angle_immediate(self, pan_angle, tilt_angle):
+        """立即设置角度，不经过速度限制（用于归位）"""
+        pan_angle = max(Config.SERVO_ANGLE_MIN, min(Config.SERVO_ANGLE_MAX, pan_angle))
+        tilt_angle = max(Config.SERVO_ANGLE_MIN, min(Config.SERVO_ANGLE_MAX, tilt_angle))
+        self._set_angle_immediate(pan_angle, tilt_angle)
+
     def cleanup(self):
         """清理资源"""
         if self.pan_servo:

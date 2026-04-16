@@ -466,22 +466,14 @@ class PersonDetectionApp:
         # 在释放舵机前，将舵机移动到初始位置（或保持当前位置）
         if self.servo:
             try:
-                # 启用追踪（如果已禁用），然后设置目标角度为初始角度
-                if hasattr(self.servo, 'enable_tracking'):
-                    self.servo.enable_tracking(True)
-                # 设置到初始角度（水平0，垂直90，根据您的配置）
-                self.servo.set_target(Config.SERVO_PAN_INIT_ANGLE, Config.SERVO_TILT_INIT_ANGLE)
-                # 等待舵机移动到目标位置（给足够时间）
-                time.sleep(0.5)
-                # 可以调用一次 update 确保位置更新
-                self.servo.update(0.1)
-                time.sleep(0.5)
-                # 禁用追踪
-                self.servo.enable_tracking(False)
+                # 直接跳转到初始角度
+                self.servo.set_angle_immediate(Config.SERVO_PAN_INIT_ANGLE, Config.SERVO_TILT_INIT_ANGLE)
+                print(
+                    f"🔄 舵机已设置为初始位置: pan={Config.SERVO_PAN_INIT_ANGLE}°, tilt={Config.SERVO_TILT_INIT_ANGLE}°")
+                time.sleep(0.3)  # 等待舵机实际转动（物理时间）
             except Exception as e:
                 print(f"⚠️ 设置舵机初始位置时出错: {e}")
-
-            # 然后清理舵机
+            # 清理舵机资源
             if hasattr(self.servo, 'cleanup'):
                 self.servo.cleanup()
 
