@@ -19,7 +19,7 @@ class Config:
     YOLO_CONF_THRESHOLD = 0.5
     YOLO_MODEL = 'yolov5n'
     YOLO_TARGET_CLASSES = [0]
-    YOLO_FRAME_SKIP = 3
+    YOLO_FRAME_SKIP = 4
     YOLO_IMAGE_SIZE = 320
 
     # 舵机配置

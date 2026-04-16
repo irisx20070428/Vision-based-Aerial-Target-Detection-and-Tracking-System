@@ -385,6 +385,8 @@ class PersonDetectionApp:
                 # 12. 显示画面
                 cv2.imshow(self.window_name, display_frame)
 
+                time.sleep(0.005)  # 每帧休眠 5ms，释放 CPU
+
                 # 13. 按键处理
                 key = cv2.waitKey(1) & 0xFF
                 if key == ord('q') or key == 27:

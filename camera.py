@@ -66,7 +66,7 @@ class CameraManager:
 
             # 启动采集线程
             self.running = True
-            self.capture_thread = threading.Thread(target=self._picamera2_capture_loop)
+            self.capture_thread = threading.Thread(target=self._usb_camera_capture_loop, daemon=True)
             self.capture_thread.start()
 
         except Exception as e:
@@ -107,7 +107,7 @@ class CameraManager:
         print(f"   - 分辨率: {actual_width} x {actual_height}")
 
         self.running = True
-        self.capture_thread = threading.Thread(target=self._usb_camera_capture_loop)
+        self.capture_thread = threading.Thread(target=self._usb_camera_capture_loop, daemon=True)
         self.capture_thread.start()
 
     def _picamera2_capture_loop(self):
@@ -176,10 +176,7 @@ class CameraManager:
 
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # 创建半透明背景
-        overlay = frame.copy()
-        cv2.rectangle(overlay, (0, 0), (w, 90), (0, 0, 0), -1)
-        frame = cv2.addWeighted(overlay, 0.6, frame, 0.4, 0)
+        cv2.rectangle(frame, (0, 0), (w, 90), (0, 0, 0), -1)   # 直接绘制不透明黑色条，更快
 
         # 显示帧率（用不同标签区分）
         # 显示FPS（可选择性显示）

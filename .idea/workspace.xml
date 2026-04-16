@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="修正退出之后的舵机位置">
-      <change beforePath="$PROJECT_DIR$/servo_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/servo_controller.py" afterDir="false" />
+    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="修改舵机初始位置，yolo检测异常问题修复">
+      <change beforePath="$PROJECT_DIR$/yolo_detector.py" beforeDir="false" afterPath="$PROJECT_DIR$/yolo_detector.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -285,7 +285,39 @@
       <option name="project" value="LOCAL" />
       <updated>1776323788774</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="修改舵机初始值bug">
+      <option name="closed" value="true" />
+      <created>1776324374563</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1776324374563</updated>
+    </task>
+    <task id="LOCAL-00022" summary="修改舵机初始值">
+      <option name="closed" value="true" />
+      <created>1776324457787</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1776324457787</updated>
+    </task>
+    <task id="LOCAL-00023" summary="修改Kp和pid_controller中reset（）函数的舵机初始位置角度设置">
+      <option name="closed" value="true" />
+      <created>1776325326790</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1776325326790</updated>
+    </task>
+    <task id="LOCAL-00024" summary="修改舵机初始位置，yolo检测异常问题修复">
+      <option name="closed" value="true" />
+      <created>1776326841994</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1776326841994</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -315,6 +347,10 @@
     <MESSAGE value="优化yolo跟踪逻辑" />
     <MESSAGE value="修改舵机设置和初始位置" />
     <MESSAGE value="修正退出之后的舵机位置" />
-    <option name="LAST_COMMIT_MESSAGE" value="修正退出之后的舵机位置" />
+    <MESSAGE value="修改舵机初始值bug" />
+    <MESSAGE value="修改舵机初始值" />
+    <MESSAGE value="修改Kp和pid_controller中reset（）函数的舵机初始位置角度设置" />
+    <MESSAGE value="修改舵机初始位置，yolo检测异常问题修复" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改舵机初始位置，yolo检测异常问题修复" />
   </component>
 </project>
