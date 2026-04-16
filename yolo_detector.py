@@ -143,126 +143,102 @@ class YOLOPersonDetector:
             return frame
 
         # ========== 追踪模式 ==========
-        if self.is_selecting_mode and self.tracker is not None:
-            success, bbox = self.tracker.update(frame)
-            h, w = frame.shape[:2]
-            lost_this_frame = False
+        if self.is_selecting_mode:
+            if self.tracker is not None:
+                success, bbox = self.tracker.update(frame)
+                h, w = frame.shape[:2]
+                lost_this_frame = False
 
-            if success:
-                x, y, bw, bh = [int(v) for v in bbox]
-                x1, y1, x2, y2 = x, y, x + bw, y + bh
+                if success:
+                    x, y, bw, bh = [int(v) for v in bbox]
+                    x1, y1, x2, y2 = x, y, x + bw, y + bh
 
-                # ---- 放宽的有效性检查 ----
-                margin = 50
-                if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
-                        x1 < -margin or y1 < -margin):
-                    lost_this_frame = True
-                elif bw * bh < 30:  # 放宽面积阈值
-                    lost_this_frame = True
-                else:
-                    aspect = bw / bh if bh > 0 else 0
-                    if aspect < 0.1 or aspect > 2.0:  # 放宽宽高比
+                    margin = 50
+                    if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
+                            x1 < -margin or y1 < -margin):
                         lost_this_frame = True
-
-                # IoU 检查：只在有检测结果的帧进行，且降低阈值
-                # if not lost_this_frame and len(detections) > 0:
-                #     best_iou = 0
-                #     for det in detections:
-                #         dx1, dy1, dx2, dy2, _, _ = det
-                #         iou = self._compute_iou((x1, y1, x2, y2), (dx1, dy1, dx2, dy2))
-                #         if iou > best_iou:
-                #             best_iou = iou
-                #     if best_iou < 0.05:  # 降低阈值，更宽容
-                #         lost_this_frame = True
-
-            else:
-                lost_this_frame = True
-
-            # ---- 丢失计数逻辑 ----
-            if not lost_this_frame:
-                self.lost_frame_count = 0
-                self.prev_track_bbox = (x1, y1, x2, y2)
-                # 新增：计算中心点并更新速度
-                cx = (x1 + x2) // 2
-                cy = (y1 + y2) // 2
-                if hasattr(self, 'last_center') and self.last_center is not None:
-                    vx = cx - self.last_center[0]
-                    vy = cy - self.last_center[1]
-                    self.last_velocity = (vx, vy)
+                    elif bw * bh < 30:
+                        lost_this_frame = True
+                    else:
+                        aspect = bw / bh if bh > 0 else 0
+                        if aspect < 0.1 or aspect > 2.0:
+                            lost_this_frame = True
+                    # IoU 检查已注释
                 else:
-                    self.last_velocity = (0, 0)
-                self.last_center = (cx, cy)
-                # 更新 selected_person
-                if self.selected_person is not None:
-                    self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
-                # 绘制
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            else:
-                self.lost_frame_count += 1
-                # 在容忍帧数内，尝试显示预测框（带速度外推）
-                if self.lost_frame_count <= self.max_lost_frames:
-                    if self.prev_track_bbox is not None:
-                        # 尝试使用速度外推
-                        if hasattr(self, 'last_center') and self.last_center is not None and self.last_velocity != (
-                        0, 0):
-                            w = self.prev_track_bbox[2] - self.prev_track_bbox[0]
-                            h = self.prev_track_bbox[3] - self.prev_track_bbox[1]
-                            pred_cx = self.last_center[0] + self.last_velocity[0]
-                            pred_cy = self.last_center[1] + self.last_velocity[1]
-                            pred_x1 = pred_cx - w // 2
-                            pred_y1 = pred_cy - h // 2
-                            pred_x2 = pred_cx + w // 2
-                            pred_y2 = pred_cy + h // 2
-                            cv2.rectangle(frame, (pred_x1, pred_y1), (pred_x2, pred_y2), (128, 128, 128), 2)
-                            cv2.putText(frame, "predicting...", (pred_x1, pred_y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                                        (128, 128, 128), 1)
-                        else:
-                            # 无速度信息，直接沿用上一帧位置
-                            x1, y1, x2, y2 = self.prev_track_bbox
-                            cv2.rectangle(frame, (x1, y1), (x2, y2), (128, 128, 128), 2)
-                            cv2.putText(frame, "predicting...", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                                        (128, 128, 128), 1)
-                else:
-                    # 超过容忍帧数，真正清除
-                    self.clear_selection()
-                    self.tracker = None
-                    self.prev_track_bbox = None
+                    lost_this_frame = True
+
+                if not lost_this_frame:
                     self.lost_frame_count = 0
-                    cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                    self.prev_track_bbox = (x1, y1, x2, y2)
+                    cx = (x1 + x2) // 2
+                    cy = (y1 + y2) // 2
+                    if hasattr(self, 'last_center') and self.last_center is not None:
+                        vx = cx - self.last_center[0]
+                        vy = cy - self.last_center[1]
+                        self.last_velocity = (vx, vy)
+                    else:
+                        self.last_velocity = (0, 0)
+                    self.last_center = (cx, cy)
+                    if self.selected_person is not None:
+                        self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+                    cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                else:
+                    self.lost_frame_count += 1
+                    if self.lost_frame_count <= self.max_lost_frames:
+                        if self.prev_track_bbox is not None:
+                            if hasattr(self, 'last_center') and self.last_center is not None and self.last_velocity != (
+                            0, 0):
+                                w_box = self.prev_track_bbox[2] - self.prev_track_bbox[0]
+                                h_box = self.prev_track_bbox[3] - self.prev_track_bbox[1]
+                                pred_cx = self.last_center[0] + self.last_velocity[0]
+                                pred_cy = self.last_center[1] + self.last_velocity[1]
+                                pred_x1 = pred_cx - w_box // 2
+                                pred_y1 = pred_cy - h_box // 2
+                                pred_x2 = pred_cx + w_box // 2
+                                pred_y2 = pred_cy + h_box // 2
+                                cv2.rectangle(frame, (pred_x1, pred_y1), (pred_x2, pred_y2), (128, 128, 128), 2)
+                                cv2.putText(frame, "predicting...", (pred_x1, pred_y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                                            0.5,
+                                            (128, 128, 128), 1)
+                            else:
+                                x1, y1, x2, y2 = self.prev_track_bbox
+                                cv2.rectangle(frame, (x1, y1), (x2, y2), (128, 128, 128), 2)
+                                cv2.putText(frame, "predicting...", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                                            (128, 128, 128), 1)
+                    else:
+                        self.clear_selection()
+                        self.tracker = None
+                        self.prev_track_bbox = None
+                        self.lost_frame_count = 0
+                        cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                return frame
+            else:
+                # 异常：追踪器丢失但状态未清除
+                self.clear_selection()
 
         # ========== 普通模式（未选中任何人） ==========
-        # 找出鼠标悬停的人物索引
         self.hovered_person_index = self.find_hovered_person(detections)
-
         for i, det in enumerate(detections):
             x1, y1, x2, y2, conf, _ = det
-
-            # 根据状态选择颜色
             if i == self.hovered_person_index:
-                color = (0, 0, 0)  # 黑色 - 鼠标悬停
+                color = (0, 0, 0)
                 thickness = 3
                 label = f"CLICK to track: {conf:.2f}"
             else:
                 if conf > 0.7:
-                    color = (0, 255, 0)  # 绿色
+                    color = (0, 255, 0)
                 elif conf > 0.5:
-                    color = (0, 255, 255)  # 黄色
+                    color = (0, 255, 255)
                 else:
-                    color = (0, 165, 255)  # 橙色
+                    color = (0, 165, 255)
                 thickness = 2
                 label = f"person: {conf:.2f}"
-
-            # 绘制边界框
             cv2.rectangle(frame, (x1, y1), (x2, y2), color, thickness)
-
-            # 绘制标签背景和文字
             (label_w, label_h), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
             cv2.rectangle(frame, (x1, y1 - label_h - 10), (x1 + label_w, y1), color, -1)
-            cv2.putText(frame, label, (x1, y1 - 5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-
+            cv2.putText(frame, label, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         return frame
 
     def clear_selection(self):
