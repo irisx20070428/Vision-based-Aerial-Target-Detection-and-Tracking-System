@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="修改舵机初始位置，yolo检测异常问题修复">
+    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="提升画面流畅度，修改退出bug">
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/yolo_detector.py" beforeDir="false" afterPath="$PROJECT_DIR$/yolo_detector.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -317,7 +318,23 @@
       <option name="project" value="LOCAL" />
       <updated>1776326841994</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="修改yolo追踪逻辑">
+      <option name="closed" value="true" />
+      <created>1776327866745</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1776327866745</updated>
+    </task>
+    <task id="LOCAL-00026" summary="提升画面流畅度，修改退出bug">
+      <option name="closed" value="true" />
+      <created>1776328797043</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1776328797043</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -351,6 +368,8 @@
     <MESSAGE value="修改舵机初始值" />
     <MESSAGE value="修改Kp和pid_controller中reset（）函数的舵机初始位置角度设置" />
     <MESSAGE value="修改舵机初始位置，yolo检测异常问题修复" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改舵机初始位置，yolo检测异常问题修复" />
+    <MESSAGE value="修改yolo追踪逻辑" />
+    <MESSAGE value="提升画面流畅度，修改退出bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="提升画面流畅度，修改退出bug" />
   </component>
 </project>
