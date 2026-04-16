@@ -193,14 +193,14 @@ class YOLOPersonDetector:
                     if self.prev_track_bbox is not None:
                         x1, y1, x2, y2 = self.prev_track_bbox
                         cv2.rectangle(frame, (x1, y1), (x2, y2), (128, 128, 128), 2)
-                        cv2.putText(frame, "predicting...", (x1, y1 - 10), ...)
+                        cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 else:
                     # 超过容忍帧数，真正清除
                     self.clear_selection()
                     self.tracker = None
                     self.prev_track_bbox = None
                     self.lost_frame_count = 0
-                    cv2.putText(frame, "⚠️ TRACKING LOST", ...)
+                    cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
             return frame
 
         # ========== 普通模式（未选中任何人） ==========
