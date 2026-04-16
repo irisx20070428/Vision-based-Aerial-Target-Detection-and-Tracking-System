@@ -134,51 +134,68 @@ class YOLOPersonDetector:
             print(f"🎯 已选中人物并启动追踪器")
             print(f"   位置: ({x1}, {y1}) -> ({x2}, {y2})")
             print(f"   置信度: {conf:.2f}")
+
     def draw_detections(self, frame, detections):
         if frame is None:
             return frame
 
         # ========== 追踪模式 ==========
         if self.is_selecting_mode and self.tracker is not None:
-            # 更新追踪器
             success, bbox = self.tracker.update(frame)
             h, w = frame.shape[:2]
+            lost = False
 
             if success:
                 x, y, bw, bh = [int(v) for v in bbox]
                 x1, y1, x2, y2 = x, y, x + bw, y + bh
 
-                # ===== 新增：有效性检查 =====
-                # 1. 检查框是否超出画面边界（允许少量超出，但超出太多则无效）
+                # 有效性检查1：超出边界
                 margin = 20
                 if (x2 < -margin or x1 > w + margin or
                         y2 < -margin or y1 > h + margin):
-                    success = False
-                # 2. 检查框面积是否合理（避免漂移到极小区域）
-                elif bw * bh < 100:  # 面积太小，认为丢失
-                    success = False
-                # 3. 可选：检查框中心是否离画面中心太远（如果人物完全离开）
-                # center_x = (x1 + x2) // 2
-                # center_y = (y1 + y2) // 2
-                # if center_x < -50 or center_x > w+50 or center_y < -50 or center_y > h+50:
-                #     success = False
-                # ===========================
+                    lost = True
+                # 有效性检查2：面积太小
+                elif bw * bh < 100:
+                    lost = True
+                # 有效性检查3：宽高比异常
+                else:
+                    aspect = bw / bh if bh > 0 else 0
+                    if aspect < 0.2 or aspect > 1.2:
+                        lost = True
 
-            if success:
-                # 更新上一帧位置
+                # 有效性检查4：与YOLO检测结果的最大IoU（如果当前帧有检测结果）
+                if not lost and len(detections) > 0:
+                    best_iou = 0
+                    for det in detections:
+                        dx1, dy1, dx2, dy2, _, _ = det
+                        iou = self._compute_iou((x1, y1, x2, y2), (dx1, dy1, dx2, dy2))
+                        if iou > best_iou:
+                            best_iou = iou
+                    if best_iou < 0.1:
+                        lost = True
+
+            else:
+                lost = True
+
+            if not lost:
+                # 追踪成功：更新位置
                 self.prev_track_bbox = (x1, y1, x2, y2)
+                # 关键修复：同步更新 selected_person，使舵机能获取最新位置
+                if self.selected_person is not None:
+                    # 更新 selected_person 的坐标和置信度（置信度保持不变）
+                    self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
                 # 绘制绿色追踪框
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
                 cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
             else:
-                # 追踪失败：立即清除追踪状态
+                # 追踪失败：立即清除
                 cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                self.clear_selection()  # 退出追踪模式
-                self.tracker = None  # 释放追踪器
-                self.prev_track_bbox = None  # 清除上一帧位置
-            return frame  # 追踪模式下不画普通检测框
+                self.clear_selection()
+                self.tracker = None
+                self.prev_track_bbox = None
+            return frame
 
         # ========== 普通模式（未选中任何人） ==========
         # 找出鼠标悬停的人物索引
