@@ -59,7 +59,7 @@ class YOLOPersonDetector:
 
         # 丢失容忍
         self.lost_frame_count = 0
-        self.max_lost_frames = 3
+        self.max_lost_frames = 5
 
         print(f"\n✅ YOLO模型配置完成")
         print(f"   - 置信度阈值: {conf_threshold}")
@@ -140,71 +140,67 @@ class YOLOPersonDetector:
             return frame
 
         # ========== 追踪模式 ==========
-        # ========== 追踪模式 ==========
         if self.is_selecting_mode and self.tracker is not None:
-            # 更新追踪器
             success, bbox = self.tracker.update(frame)
             h, w = frame.shape[:2]
-            lost = False
-            print(f"[DEBUG] tracker.update success={success}, bbox={bbox}")  # 新增
+            lost_this_frame = False
 
             if success:
                 x, y, bw, bh = [int(v) for v in bbox]
                 x1, y1, x2, y2 = x, y, x + bw, y + bh
-                print(f"[DEBUG] bbox: ({x1},{y1})-({x2},{y2}), area={bw * bh}, aspect={bw / bh if bh > 0 else 0}")  # 新增
 
-                # 有效性检查1：超出边界
-                margin = 20
-                margin = 20
-                # 检查所有方向超出
-                if x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or x1 < -margin or y1 < -margin:  # 增加左边界和上边界超出
-                    lost = True
-                    print("[DEBUG] lost due to out of bounds")
-                elif bw * bh < 100:
-                    lost = True
-                    print("[DEBUG] lost due to small area")  # 新增
-                # 有效性检查3：宽高比异常
+                # ---- 放宽的有效性检查 ----
+                margin = 30
+                if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
+                        x1 < -margin or y1 < -margin):
+                    lost_this_frame = True
+                elif bw * bh < 50:  # 放宽面积阈值
+                    lost_this_frame = True
                 else:
                     aspect = bw / bh if bh > 0 else 0
-                    if aspect < 0.2 or aspect > 1.2:
-                        lost = True
-                        print(f"[DEBUG] lost due to bad aspect ratio: {aspect:.2f}")  # 新增
+                    if aspect < 0.15 or aspect > 1.5:  # 放宽宽高比
+                        lost_this_frame = True
 
-                # 有效性检查4：与YOLO检测结果的最大IoU
-                if not lost and len(detections) > 0:
-                    best_iou = 0
-                    for det in detections:
-                        dx1, dy1, dx2, dy2, _, _ = det
-                        iou = self._compute_iou((x1, y1, x2, y2), (dx1, dy1, dx2, dy2))
-                        if iou > best_iou:
-                            best_iou = iou
-                    print(f"[DEBUG] best IoU with YOLO detections: {best_iou:.2f}")  # 新增
-                    if best_iou < 0.1:
-                        lost = True
-                        print("[DEBUG] lost due to low IoU")  # 新增
+                # IoU 检查：只在有检测结果的帧进行，且降低阈值
+                # if not lost_this_frame and len(detections) > 0:
+                #     best_iou = 0
+                #     for det in detections:
+                #         dx1, dy1, dx2, dy2, _, _ = det
+                #         iou = self._compute_iou((x1, y1, x2, y2), (dx1, dy1, dx2, dy2))
+                #         if iou > best_iou:
+                #             best_iou = iou
+                #     if best_iou < 0.05:  # 降低阈值，更宽容
+                #         lost_this_frame = True
+
             else:
-                lost = True
-                print("[DEBUG] tracker.update failed")  # 新增
+                lost_this_frame = True
 
-            if not lost:
-                # 追踪成功
+            # ---- 丢失计数逻辑 ----
+            if not lost_this_frame:
+                # 追踪成功：重置计数，更新框，绘制
+                self.lost_frame_count = 0
                 self.prev_track_bbox = (x1, y1, x2, y2)
-                # 更新 selected_person 坐标
                 if self.selected_person is not None:
                     self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
-                    print(f"[DEBUG] updated selected_person to: {self.selected_person[:4]}")  # 新增
-                # 绘制绿色追踪框
+                # 绘制绿色框
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10), ...)
             else:
-                # 追踪失败
-                cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                self.clear_selection()
-                self.tracker = None
-                self.prev_track_bbox = None
-                print("[DEBUG] tracking lost, cleared state")  # 新增
+                # 追踪失败：增加计数
+                self.lost_frame_count += 1
+                if self.lost_frame_count <= self.max_lost_frames:
+                    # 在容忍期内，可以显示预测框（上一帧位置）或什么都不显示
+                    if self.prev_track_bbox is not None:
+                        x1, y1, x2, y2 = self.prev_track_bbox
+                        cv2.rectangle(frame, (x1, y1), (x2, y2), (128, 128, 128), 2)
+                        cv2.putText(frame, "predicting...", (x1, y1 - 10), ...)
+                else:
+                    # 超过容忍帧数，真正清除
+                    self.clear_selection()
+                    self.tracker = None
+                    self.prev_track_bbox = None
+                    self.lost_frame_count = 0
+                    cv2.putText(frame, "⚠️ TRACKING LOST", ...)
             return frame
 
         # ========== 普通模式（未选中任何人） ==========

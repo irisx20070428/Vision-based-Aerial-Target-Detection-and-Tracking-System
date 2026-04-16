@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="提升画面流畅度，修改退出bug">
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="修改yolo模型">
       <change beforePath="$PROJECT_DIR$/yolo_detector.py" beforeDir="false" afterPath="$PROJECT_DIR$/yolo_detector.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -334,7 +333,31 @@
       <option name="project" value="LOCAL" />
       <updated>1776328797043</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="忘了">
+      <option name="closed" value="true" />
+      <created>1776329940423</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1776329940423</updated>
+    </task>
+    <task id="LOCAL-00028" summary="忘了">
+      <option name="closed" value="true" />
+      <created>1776329944524</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1776329944524</updated>
+    </task>
+    <task id="LOCAL-00029" summary="修改yolo模型">
+      <option name="closed" value="true" />
+      <created>1776330851828</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1776330851828</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -370,6 +393,8 @@
     <MESSAGE value="修改舵机初始位置，yolo检测异常问题修复" />
     <MESSAGE value="修改yolo追踪逻辑" />
     <MESSAGE value="提升画面流畅度，修改退出bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="提升画面流畅度，修改退出bug" />
+    <MESSAGE value="忘了" />
+    <MESSAGE value="修改yolo模型" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改yolo模型" />
   </component>
 </project>
