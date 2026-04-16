@@ -220,8 +220,8 @@ class PanTiltController:
 
         # 更新角度（注意：舵机控制方向可能需要取反）
         # 如果目标在右侧（正误差），舵机应该向右转（增加角度）
-        self.current_pan += control_x
-        self.current_tilt += control_y
+        self.current_pan -= control_x
+        self.current_tilt -= control_y
 
         # 限制角度范围
         self.current_pan = max(self.servo_min, min(self.servo_max, self.current_pan))
