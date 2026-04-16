@@ -36,6 +36,8 @@ class ServoController:
         """初始化舵机并回正"""
         print("初始化舵机...")
 
+
+
         try:
             # SG90 标准脉冲范围
             self.pan_servo = Servo(
@@ -51,18 +53,19 @@ class ServoController:
             )
 
             # 设置到中心位置
-            pan_value = self._angle_to_value(Config.SERVO_CENTER_ANGLE)
-            tilt_value = self._angle_to_value(Config.SERVO_CENTER_ANGLE)
+            # 设置到初始位置（使用独立的水平和垂直初始角度）
+            pan_value = self._angle_to_value(Config.SERVO_PAN_INIT_ANGLE)
+            tilt_value = self._angle_to_value(Config.SERVO_TILT_INIT_ANGLE)
 
             self.pan_servo.value = pan_value
             self.tilt_servo.value = tilt_value
 
             time.sleep(0.5)
 
-            self.current_pan = Config.SERVO_CENTER_ANGLE
-            self.current_tilt = Config.SERVO_CENTER_ANGLE
-            self.target_pan = Config.SERVO_CENTER_ANGLE
-            self.target_tilt = Config.SERVO_CENTER_ANGLE
+            self.current_pan = Config.SERVO_PAN_INIT_ANGLE
+            self.current_tilt = Config.SERVO_TILT_INIT_ANGLE
+            self.target_pan = Config.SERVO_PAN_INIT_ANGLE
+            self.target_tilt = Config.SERVO_TILT_INIT_ANGLE
 
             self.initialized = True
 
@@ -163,7 +166,7 @@ class ServoController:
     def reset_to_center(self):
         """重置到中心"""
         if self.tracking_enabled:
-            self.set_target(Config.SERVO_CENTER_ANGLE, Config.SERVO_CENTER_ANGLE)
+            self.set_target(Config.SERVO_PAN_INIT_ANGLE, Config.SERVO_TILT_INIT_ANGLE)
 
     def cleanup(self):
         """清理资源"""

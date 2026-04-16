@@ -1,4 +1,4 @@
-# feature_tracker.py (最终版 - 支持 IoU 辅助匹配和 prev_bbox)
+# feature_tracker.py (最终版 ）
 import cv2
 import numpy as np
 import os

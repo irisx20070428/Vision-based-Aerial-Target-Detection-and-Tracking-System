@@ -106,14 +106,18 @@ class PanTiltController:
         self.degrees_per_pixel_x = self.horizontal_fov / self.image_width
         self.degrees_per_pixel_y = self.vertical_fov / self.image_height
 
-        # 当前舵机角度
-        self.current_pan = Config.SERVO_CENTER_ANGLE
-        self.current_tilt = Config.SERVO_CENTER_ANGLE
 
+
+        # 当前舵机角度
+        self.servo_pan_init = Config.SERVO_PAN_INIT_ANGLE
+        self.servo_tilt_init = Config.SERVO_TILT_INIT_ANGLE
+
+        self.current_pan = self.servo_pan_init
+        self.current_tilt = self.servo_tilt_init
         # 舵机角度范围
         self.servo_min = Config.SERVO_ANGLE_MIN
         self.servo_max = Config.SERVO_ANGLE_MAX
-        self.servo_center = Config.SERVO_CENTER_ANGLE
+
 
         # 死区（像素）
         self.dead_zone_pixels = Config.DEAD_ZONE
@@ -227,8 +231,8 @@ class PanTiltController:
         """重置PID控制器和角度"""
         self.pid_pan.reset()
         self.pid_tilt.reset()
-        self.current_pan = self.servo_center
-        self.current_tilt = self.servo_center
+        self.current_pan = self.servo_pan_init
+        self.current_tilt = self.servo_tilt_init
         self.first_update = True
         print("🔄 PID控制器已重置，角度已回中")
 

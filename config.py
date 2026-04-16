@@ -28,7 +28,8 @@ class Config:
     SERVO_FREQUENCY = 50
     SERVO_ANGLE_MIN = 0
     SERVO_ANGLE_MAX = 180
-    SERVO_CENTER_ANGLE = 90
+    SERVO_PAN_INIT_ANGLE = 0  # 水平初始角度，例如 0 度（最左）
+    SERVO_TILT_INIT_ANGLE = 90  # 垂直初始角度，例如 90 度（水平）
 
     # 最大转动速度（度/秒）
     MAX_ANGLE_SPEED = 60  # 60度/秒
