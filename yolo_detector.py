@@ -21,6 +21,9 @@ class YOLOPersonDetector:
         print("🎯 YOLO人物检测器初始化")
         print("=" * 50)
 
+        self.last_center = None
+        self.last_velocity = (0, 0)
+
         self.device = torch.device(device)
         self.conf_threshold = conf_threshold or Config.YOLO_CONF_THRESHOLD
 
@@ -150,15 +153,15 @@ class YOLOPersonDetector:
                 x1, y1, x2, y2 = x, y, x + bw, y + bh
 
                 # ---- 放宽的有效性检查 ----
-                margin = 30
+                margin = 50
                 if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
                         x1 < -margin or y1 < -margin):
                     lost_this_frame = True
-                elif bw * bh < 50:  # 放宽面积阈值
+                elif bw * bh < 30:  # 放宽面积阈值
                     lost_this_frame = True
                 else:
                     aspect = bw / bh if bh > 0 else 0
-                    if aspect < 0.15 or aspect > 1.5:  # 放宽宽高比
+                    if aspect < 0.1 or aspect > 2.0:  # 放宽宽高比
                         lost_this_frame = True
 
                 # IoU 检查：只在有检测结果的帧进行，且降低阈值
@@ -177,31 +180,57 @@ class YOLOPersonDetector:
 
             # ---- 丢失计数逻辑 ----
             if not lost_this_frame:
-                # 追踪成功：重置计数，更新框，绘制
                 self.lost_frame_count = 0
                 self.prev_track_bbox = (x1, y1, x2, y2)
+                # 新增：计算中心点并更新速度
+                cx = (x1 + x2) // 2
+                cy = (y1 + y2) // 2
+                if hasattr(self, 'last_center') and self.last_center is not None:
+                    vx = cx - self.last_center[0]
+                    vy = cy - self.last_center[1]
+                    self.last_velocity = (vx, vy)
+                else:
+                    self.last_velocity = (0, 0)
+                self.last_center = (cx, cy)
+                # 更新 selected_person
                 if self.selected_person is not None:
                     self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
-                # 绘制绿色框
+                # 绘制
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
                 cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            else:
-                # 追踪失败：增加计数
+                else:
                 self.lost_frame_count += 1
+                # 在容忍帧数内，尝试显示预测框（带速度外推）
                 if self.lost_frame_count <= self.max_lost_frames:
-                    # 在容忍期内，可以显示预测框（上一帧位置）或什么都不显示
                     if self.prev_track_bbox is not None:
-                        x1, y1, x2, y2 = self.prev_track_bbox
-                        cv2.rectangle(frame, (x1, y1), (x2, y2), (128, 128, 128), 2)
-                        cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                        # 尝试使用速度外推
+                        if hasattr(self, 'last_center') and self.last_center is not None and self.last_velocity != (
+                        0, 0):
+                            w = self.prev_track_bbox[2] - self.prev_track_bbox[0]
+                            h = self.prev_track_bbox[3] - self.prev_track_bbox[1]
+                            pred_cx = self.last_center[0] + self.last_velocity[0]
+                            pred_cy = self.last_center[1] + self.last_velocity[1]
+                            pred_x1 = pred_cx - w // 2
+                            pred_y1 = pred_cy - h // 2
+                            pred_x2 = pred_cx + w // 2
+                            pred_y2 = pred_cy + h // 2
+                            cv2.rectangle(frame, (pred_x1, pred_y1), (pred_x2, pred_y2), (128, 128, 128), 2)
+                            cv2.putText(frame, "predicting...", (pred_x1, pred_y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                                        (128, 128, 128), 1)
+                        else:
+                            # 无速度信息，直接沿用上一帧位置
+                            x1, y1, x2, y2 = self.prev_track_bbox
+                            cv2.rectangle(frame, (x1, y1), (x2, y2), (128, 128, 128), 2)
+                            cv2.putText(frame, "predicting...", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                                        (128, 128, 128), 1)
                 else:
                     # 超过容忍帧数，真正清除
                     self.clear_selection()
                     self.tracker = None
                     self.prev_track_bbox = None
                     self.lost_frame_count = 0
-                    cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            return frame
+                    cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
         # ========== 普通模式（未选中任何人） ==========
         # 找出鼠标悬停的人物索引
