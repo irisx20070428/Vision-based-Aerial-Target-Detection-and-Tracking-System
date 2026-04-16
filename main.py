@@ -138,33 +138,29 @@ class PersonDetectionApp:
         print("=" * 70)
 
     def mouse_callback(self, event, x, y, flags, param):
-        """鼠标回调函数 - 点击开始追踪"""
         if self.detector is None:
             return
-
         self.detector.update_mouse_position(x, y)
 
         if event == cv2.EVENT_LBUTTONDOWN:
-            hovered_index = self.detector.hovered_person_index
-            if hovered_index >= 0 and self.frame is not None:
-                # 选择人物开始追踪
-                self.detector.select_hovered_person(self.detections, hovered_index, self.frame)
-
-                # 重要：启用舵机追踪（只有点击后才启用）
-                if self.servo and hasattr(self.servo, 'enable_tracking'):
-                    self.servo.enable_tracking(True)
-                    print("🎯 舵机追踪已启用")
-                    self.current_servo_command = "舵机已启用"
-
-                if self.pid_controller and hasattr(self.pid_controller, 'set_tracking_enabled'):
-                    self.pid_controller.set_tracking_enabled(True)
-
-                # 设置追踪标志
-                self.is_tracking = True
-                self.has_clicked = True
-
-                print(f"📸 已保存人物图像到数据集，开始追踪")
-                print(f"💡 提示：按 'c' 键可停止追踪")
+            # 强制检测当前帧，获取最新检测结果
+            if self.frame is not None:
+                detections, _ = self.detector.detect(self.frame)
+                # 使用最新检测结果寻找悬停人物
+                hovered_index = self.detector.find_hovered_person(detections)
+                if hovered_index >= 0:
+                    self.detector.select_hovered_person(detections, hovered_index, self.frame)
+                    # 启用舵机等后续操作（保持原有代码）
+                    if self.servo and hasattr(self.servo, 'enable_tracking'):
+                        self.servo.enable_tracking(True)
+                        print("🎯 舵机追踪已启用")
+                        self.current_servo_command = "舵机已启用"
+                    if self.pid_controller and hasattr(self.pid_controller, 'set_tracking_enabled'):
+                        self.pid_controller.set_tracking_enabled(True)
+                    self.is_tracking = True
+                    self.has_clicked = True
+                    print(f"📸 已保存人物图像到数据集，开始追踪")
+                    print(f"💡 提示：按 'c' 键可停止追踪")
 
     def draw_dataset_info(self, frame):
         """绘制数据集信息"""
@@ -380,7 +376,7 @@ class PersonDetectionApp:
                 display_frame = self.draw_dataset_info(display_frame)
 
                 # 11. 绘制舵机指令面板（新增）
-                display_frame = self.draw_servo_command_panel(display_frame)
+                # display_frame = self.draw_servo_command_panel(display_frame)
 
                 # 12. 显示画面
                 cv2.imshow(self.window_name, display_frame)

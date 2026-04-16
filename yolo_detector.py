@@ -155,10 +155,11 @@ class YOLOPersonDetector:
 
                 # 有效性检查1：超出边界
                 margin = 20
-                if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin):
+                margin = 20
+                # 检查所有方向超出
+                if x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or x1 < -margin or y1 < -margin:  # 增加左边界和上边界超出
                     lost = True
-                    print("[DEBUG] lost due to out of bounds")  # 新增
-                # 有效性检查2：面积太小
+                    print("[DEBUG] lost due to out of bounds")
                 elif bw * bh < 100:
                     lost = True
                     print("[DEBUG] lost due to small area")  # 新增
