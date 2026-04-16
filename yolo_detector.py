@@ -198,7 +198,7 @@ class YOLOPersonDetector:
                 # 绘制
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
                 cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-                else:
+            else:
                 self.lost_frame_count += 1
                 # 在容忍帧数内，尝试显示预测框（带速度外推）
                 if self.lost_frame_count <= self.max_lost_frames:
