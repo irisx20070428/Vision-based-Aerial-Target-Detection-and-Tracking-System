@@ -463,27 +463,29 @@ class PersonDetectionApp:
             print(f"\n❌ 保存失败: {e}")
 
     def cleanup(self):
-        """清理资源"""
         print("\n正在关闭系统...")
 
-        if self.camera:
-            self.camera.release()
-
+        # 在释放舵机前，将舵机移动到初始位置（或保持当前位置）
         if self.servo:
-            # 先禁用追踪
             try:
+                # 启用追踪（如果已禁用），然后设置目标角度为初始角度
                 if hasattr(self.servo, 'enable_tracking'):
-                    self.servo.enable_tracking(False)
-                print("🔄 舵机追踪已禁用")
-                # 舵机回中
-                if hasattr(self.servo, 'reset_to_center'):
-                    print("🔄 舵机正在回中...")
-                    self.servo.reset_to_center()
-                    time.sleep(0.5)
-                if hasattr(self.servo, 'cleanup'):
-                    self.servo.cleanup()
+                    self.servo.enable_tracking(True)
+                # 设置到初始角度（水平0，垂直90，根据您的配置）
+                self.servo.set_target(Config.SERVO_PAN_INIT_ANGLE, Config.SERVO_TILT_INIT_ANGLE)
+                # 等待舵机移动到目标位置（给足够时间）
+                time.sleep(0.5)
+                # 可以调用一次 update 确保位置更新
+                self.servo.update(0.1)
+                time.sleep(0.5)
+                # 禁用追踪
+                self.servo.enable_tracking(False)
             except Exception as e:
-                print(f"⚠️ 舵机关闭时出错: {e}")
+                print(f"⚠️ 设置舵机初始位置时出错: {e}")
+
+            # 然后清理舵机
+            if hasattr(self.servo, 'cleanup'):
+                self.servo.cleanup()
 
         cv2.destroyAllWindows()
 
