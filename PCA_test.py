@@ -28,7 +28,7 @@ for angle in [0, 45, 90, 135, 180, 135, 90, 45, 90]:
 
 # 归位
 pca.channels[1].duty_cycle = angle_to_duty(90)
-pca.channels[3].duty_cycle = angle_to_duty(90)
+pca.channels[3].duty_cycle = angle_to_duty(0)
 print("归位完成")
 
 pca.deinit()
