@@ -21,7 +21,7 @@ for angle in [0, 45, 90, 135, 180, 135, 90, 45, 0]:
     time.sleep(0.5)
 
 print("测试垂直舵机 (CH3)")
-for angle in [0, 45, 90, 135, 180, 135, 90, 45, 0]:
+for angle in [0, 45, 90, 135, 180, 135, 90, 45, 90]:
     print(f"  转到 {angle} 度")
     pca.channels[3].duty_cycle = angle_to_duty(angle)
     time.sleep(0.5)
