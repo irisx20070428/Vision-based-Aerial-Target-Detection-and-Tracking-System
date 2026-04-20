@@ -139,7 +139,11 @@ class YOLOPersonDetector:
             bbox = (x1, y1, x2 - x1, y2 - y1)
 
             # 初始化 CSRT 追踪器
-            self.tracker = cv2.TrackerCSRT_create()
+            # select_hovered_person 中
+            if self.tracker_type == 'CSRT':
+                self.tracker = cv2.TrackerCSRT_create()
+            else:
+                self.tracker = cv2.TrackerKCF_create()
             self.tracker.init(frame, bbox)
 
             # 设置追踪状态
@@ -240,7 +244,7 @@ class YOLOPersonDetector:
                                     x1, y1, x2, y2, conf, _ = best_match
                                     bbox = (x1, y1, x2 - x1, y2 - y1)
                                     # 重新初始化追踪器
-                                    self.tracker = cv2.TrackerCSRT_create()
+                                    self.tracker = cv2.TrackerKCFcreate()
                                     self.tracker.init(frame, bbox)
                                     self.selected_person = [x1, y1, x2, y2, conf, 0]
                                     self.prev_track_bbox = (x1, y1, x2, y2)

@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="debug">
-      <change beforePath="$PROJECT_DIR$/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/camera.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,30 +125,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773758464264</updated>
-    </task>
-    <task id="LOCAL-00024" summary="修改舵机初始位置，yolo检测异常问题修复">
-      <option name="closed" value="true" />
-      <created>1776326841994</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1776326841994</updated>
-    </task>
-    <task id="LOCAL-00025" summary="修改yolo追踪逻辑">
-      <option name="closed" value="true" />
-      <created>1776327866745</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1776327866745</updated>
-    </task>
-    <task id="LOCAL-00026" summary="提升画面流畅度，修改退出bug">
-      <option name="closed" value="true" />
-      <created>1776328797043</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1776328797043</updated>
     </task>
     <task id="LOCAL-00027" summary="忘了">
       <option name="closed" value="true" />
@@ -518,7 +494,31 @@
       <option name="project" value="LOCAL" />
       <updated>1776687193610</updated>
     </task>
-    <option name="localTasksCounter" value="73" />
+    <task id="LOCAL-00073" summary="debug">
+      <option name="closed" value="true" />
+      <created>1776687299544</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1776687299544</updated>
+    </task>
+    <task id="LOCAL-00074" summary="debug">
+      <option name="closed" value="true" />
+      <created>1776687419329</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1776687419329</updated>
+    </task>
+    <task id="LOCAL-00075" summary="debug">
+      <option name="closed" value="true" />
+      <created>1776687607692</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1776687607692</updated>
+    </task>
+    <option name="localTasksCounter" value="76" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
