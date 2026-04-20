@@ -291,15 +291,15 @@ class PersonDetectionApp:
                     continue
 
                     # 2. 提交帧到异步检测（非阻塞）
-                    self.detector.update_frame_for_detection(self.frame)
+                self.detector.update_frame_for_detection(self.frame)
 
-                    # 3. 获取最新检测结果（非阻塞，立即返回）
-                    self.detections = self.detector.get_latest_detections()
+                # 3. 获取最新检测结果（非阻塞，立即返回）
+                self.detections = self.detector.get_latest_detections()
 
-                    # 4. 绘制检测框
-                    display_frame = self.frame.copy()
-                    if self.show_detections:
-                        display_frame = self.detector.draw_detections(display_frame, self.detections)
+                # 4. 绘制检测框
+                display_frame = self.frame.copy()
+                if self.show_detections:
+                    display_frame = self.detector.draw_detections(display_frame, self.detections)
 
                 # 4. 获取追踪目标（只有在追踪模式下才获取）
                 target_center = None
