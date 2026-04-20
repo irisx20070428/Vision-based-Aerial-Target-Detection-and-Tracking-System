@@ -78,13 +78,13 @@ class PanTiltController:
     def __init__(self):
         # PID控制器（输入已经是角度误差）
         self.pid_pan = PIDController(
-            Kp=1.5,  # 临时增大
+            Kp=Config.PID_PAN_Kp,  # 0.25
             Ki=Config.PID_PAN_Ki,
             Kd=Config.PID_PAN_Kd,
             max_output=20
         )
         self.pid_tilt = PIDController(
-            Kp=1.5,
+            Kp=Config.PID_TILT_Kp,
             Ki=Config.PID_TILT_Ki,
             Kd=Config.PID_TILT_Kd,
             max_output=20
@@ -211,7 +211,9 @@ class PanTiltController:
                   f"当前角度:({self.current_pan:.1f}°,{self.current_tilt:.1f}°)")
 
         # 如果角度误差很小，不移动
-        if abs(angle_error_x) < 0.3 and abs(angle_error_y) < 0.3:
+        if abs(angle_error_x) < 1.0 and abs(angle_error_y) < 1.0:
+            self.pid_pan.integral = 0
+            self.pid_tilt.integral = 0
             return self.current_pan, self.current_tilt
 
         # PID计算（输入已经是角度误差）
@@ -227,6 +229,11 @@ class PanTiltController:
 
         control_x = max(-max_out, min(max_out, control_x))
         control_y = max(-max_out, min(max_out, control_y))
+
+        if abs(control_x) < 0.5:
+            control_x = 0
+        if abs(control_y) < 0.5:
+            control_y = 0
 
         if self.debug_counter % 30 == 0:
             print(f"PID输出: control_x={control_x:+.2f}, control_y={control_y:+.2f}, angle_error=({angle_error_x:+.2f},{angle_error_y:+.2f})")

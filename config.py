@@ -35,7 +35,7 @@ class Config:
     MAX_ANGLE_SPEED = 60  # 60度/秒
 
     ACCELERATION = 0.05
-    DEAD_ZONE = 10  # 像素死区
+    DEAD_ZONE = 15  # 像素死区
 
     # PID控制参数
     PID_PAN_Kp = 0.25  # 比例增益
