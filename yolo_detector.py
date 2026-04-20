@@ -204,7 +204,6 @@ class YOLOPersonDetector:
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
                     cv2.putText(frame, "TRACKING (DETECTION)", (x1, y1 - 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-                    return frame
                 else:
                     lost_this_frame = True
             else:
