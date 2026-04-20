@@ -38,12 +38,12 @@ class Config:
     DEAD_ZONE = 15  # 像素死区
 
     # PID控制参数
-    PID_PAN_Kp = 0.6  # 比例增益
+    PID_PAN_Kp = 0.25  # 比例增益
     PID_PAN_Ki = 0.01  # 积分增益
     PID_PAN_Kd = 0.01  # 微分增益
-    PID_TILT_Kp = 0.6
+    PID_TILT_Kp = 0.25
     PID_TILT_Ki = 0.01
-    PID_TILT_Kd = 0.1
+    PID_TILT_Kd = 0.01
 
     # 图像中心点
     IMAGE_CENTER_X = CAMERA_RESOLUTION[0] // 2  # 320
