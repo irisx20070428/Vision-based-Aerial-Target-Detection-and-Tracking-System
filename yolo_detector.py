@@ -128,24 +128,27 @@ class YOLOPersonDetector:
         return -1
 
     def select_hovered_person(self, detections, index, frame):
-        """选择悬停的人物开始追踪"""
+        """选择悬停的人物开始追踪（不初始化追踪器，避免卡顿）"""
         if 0 <= index < len(detections):
             det = detections[index]
             x1, y1, x2, y2, conf, _ = det
             bbox = (x1, y1, x2 - x1, y2 - y1)
 
-            # 初始化追踪器
-            if self.tracker_type == 'CSRT':
-                self.tracker = cv2.TrackerCSRT_create()
-            else:
-                self.tracker = cv2.TrackerKCF_create()
-            self.tracker.init(frame, bbox)
-
-            # 设置追踪状态
+            # 不再创建 OpenCV 追踪器，避免 init 卡顿
+            # 直接设置追踪状态，后续靠检测结果更新
             self.is_selecting_mode = True
-            self.selected_person = det  # 保存完整检测信息
+            self.selected_person = det
+            self.prev_track_bbox = (x1, y1, x2, y2)
+            self.lost_frame_count = 0
+            self.is_lost = False
 
-            print(f"🎯 已选中人物并启动追踪器")
+            # 初始化运动预测中心点
+            cx = (x1 + x2) // 2
+            cy = (y1 + y2) // 2
+            self.last_center = (cx, cy)
+            self.last_velocity = (0, 0)
+
+            print(f"🎯 已选中人物，开始追踪（基于检测）")
             print(f"   位置: ({x1}, {y1}) -> ({x2}, {y2})")
             print(f"   置信度: {conf:.2f}")
 
@@ -153,78 +156,39 @@ class YOLOPersonDetector:
         if frame is None:
             return frame
 
-        # ========== 追踪模式 ==========
+        # ========== 追踪模式（使用检测结果，无追踪器） ==========
         if self.is_selecting_mode:
-            if self.tracker is not None:
-                success, bbox = self.tracker.update(frame)
-                h, w = frame.shape[:2]
-                lost_this_frame = False
+            h, w = frame.shape[:2]
+            lost_this_frame = False
+            best_match = None
 
-                if success:
-                    x, y, bw, bh = [int(v) for v in bbox]
-                    x1, y1, x2, y2 = x, y, x + bw, y + bh
-                    # print(f"[TRACK] bbox = ({x1},{y1},{x2},{y2}), lost_this_frame = {lost_this_frame}")
-
-                    margin = 50
-                    if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
-                            x1 < -margin or y1 < -margin):
-                        lost_this_frame = True
-
-                        if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
-                                x1 < -margin or y1 < -margin):
-                            lost_this_frame = True
-                            # print("[TRACK] lost due to out of bounds")
-                        elif bw * bh < 30:
-                            lost_this_frame = True
-                            # print(f"[TRACK] lost due to small area: {bw * bh}")
-                        else:
-                            aspect = bw / bh if bh > 0 else 0
-                            if aspect < 0.1 or aspect > 2.0:
-                                lost_this_frame = True
-                                # print(f"[TRACK] lost due to bad aspect: {aspect:.2f}")
-
-                    elif bw * bh < 30:
-                        lost_this_frame = True
-
-                        if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
-                                x1 < -margin or y1 < -margin):
-                            lost_this_frame = True
-                            # print("[TRACK] lost due to out of bounds")
-                        elif bw * bh < 30:
-                            lost_this_frame = True
-                            # print(f"[TRACK] lost due to small area: {bw * bh}")
-                        else:
-                            aspect = bw / bh if bh > 0 else 0
-                            if aspect < 0.1 or aspect > 2.0:
-                                lost_this_frame = True
-                                # print(f"[TRACK] lost due to bad aspect: {aspect:.2f}")
-
-                    else:
-                        aspect = bw / bh if bh > 0 else 0
-                        if aspect < 0.1 or aspect > 2.0:
-                            lost_this_frame = True
-
-                            if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
-                                    x1 < -margin or y1 < -margin):
-                                lost_this_frame = True
-                                # print("[TRACK] lost due to out of bounds")
-                            elif bw * bh < 30:
-                                lost_this_frame = True
-                                # print(f"[TRACK] lost due to small area: {bw * bh}")
-                            else:
-                                aspect = bw / bh if bh > 0 else 0
-                                if aspect < 0.1 or aspect > 2.0:
-                                    lost_this_frame = True
-                                    # print(f"[TRACK] lost due to bad aspect: {aspect:.2f}")
-
-                    # IoU 检查已注释
+            # 1. 尝试从当前检测结果中找到最佳匹配
+            if detections and len(detections) > 0:
+                best_match = None
+                best_dist = float('inf')
+                if self.prev_track_bbox is not None:
+                    # 计算上一帧中心
+                    prev_cx = (self.prev_track_bbox[0] + self.prev_track_bbox[2]) // 2
+                    prev_cy = (self.prev_track_bbox[1] + self.prev_track_bbox[3]) // 2
+                    for det in detections:
+                        cx = (det[0] + det[2]) // 2
+                        cy = (det[1] + det[3]) // 2
+                        dist = (cx - prev_cx) ** 2 + (cy - prev_cy) ** 2
+                        if dist < best_dist:
+                            best_dist = dist
+                            best_match = det
                 else:
-                    lost_this_frame = True
+                    # 没有历史框，取第一个检测框
+                    best_match = detections[0]
 
-                if not lost_this_frame:
-                    # ----- 成功追踪 -----
+            # 2. 判断是否找到有效匹配（距离阈值）
+            if best_match is not None:
+                # 简单阈值：如果距离小于 5000 像素平方（约70像素），认为有效
+                if best_dist < 5000 or self.prev_track_bbox is None:
+                    x1, y1, x2, y2, conf, _ = best_match
+                    # 更新追踪信息
                     self.lost_frame_count = 0
-                    self.is_lost = False  # 新增：清除丢失标志
+                    self.is_lost = False
                     self.prev_track_bbox = (x1, y1, x2, y2)
                     cx = (x1 + x2) // 2
                     cy = (y1 + y2) // 2
@@ -235,51 +199,52 @@ class YOLOPersonDetector:
                     else:
                         self.last_velocity = (0, 0)
                     self.last_center = (cx, cy)
-                    if self.selected_person is not None:
-                        self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
-                        # print(f"[TRACK] updated selected_person to: {self.selected_person[:4]}")
+                    self.selected_person = [x1, y1, x2, y2, conf, 0]
+                    # 绘制绿色追踪框
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                    cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                    cv2.putText(frame, "TRACKING (DETECTION)", (x1, y1 - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                    return frame
                 else:
-                    # ----- 追踪丢失 -----
-                    self.lost_frame_count += 1
-                    if self.lost_frame_count <= self.max_lost_frames:
-                        self.is_lost = True  # 新增：标记为丢失状态
-                        # print(f"[TRACK] predicting, lost_count={self.lost_frame_count}")
-
-                        if self.prev_track_bbox is not None:
-                            if hasattr(self, 'last_center') and self.last_center is not None and self.last_velocity != (
-                            0, 0):
-                                w_box = self.prev_track_bbox[2] - self.prev_track_bbox[0]
-                                h_box = self.prev_track_bbox[3] - self.prev_track_bbox[1]
-                                pred_cx = self.last_center[0] + self.last_velocity[0]
-                                pred_cy = self.last_center[1] + self.last_velocity[1]
-                                pred_x1 = pred_cx - w_box // 2
-                                pred_y1 = pred_cy - h_box // 2
-                                pred_x2 = pred_cx + w_box // 2
-                                pred_y2 = pred_cy + h_box // 2
-                                cv2.rectangle(frame, (pred_x1, pred_y1), (pred_x2, pred_y2), (128, 128, 128), 2)
-                                cv2.putText(frame, "predicting...", (pred_x1, pred_y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                                            0.5,
-                                            (128, 128, 128), 1)
-                            else:
-                                x1, y1, x2, y2 = self.prev_track_bbox
-                                cv2.rectangle(frame, (x1, y1), (x2, y2), (128, 128, 128), 2)
-                                cv2.putText(frame, "predicting...", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                                            (128, 128, 128), 1)
-                    else:
-                        # 彻底丢失，清除追踪状态
-                        self.clear_selection()
-                        self.tracker = None
-                        self.prev_track_bbox = None
-                        self.lost_frame_count = 0
-                        self.is_lost = False  # 新增：清除丢失标志
-                        cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                return frame
+                    lost_this_frame = True
             else:
-                # 异常：追踪器丢失但状态未清除
-                self.clear_selection()
+                lost_this_frame = True
+
+            # 3. 如果丢失，进入预测模式
+            if lost_this_frame:
+                self.lost_frame_count += 1
+                if self.lost_frame_count <= self.max_lost_frames:
+                    self.is_lost = True
+                    if self.prev_track_bbox is not None:
+                        # 使用运动速度预测位置
+                        if hasattr(self, 'last_center') and self.last_center is not None and self.last_velocity != (
+                        0, 0):
+                            w_box = self.prev_track_bbox[2] - self.prev_track_bbox[0]
+                            h_box = self.prev_track_bbox[3] - self.prev_track_bbox[1]
+                            pred_cx = self.last_center[0] + self.last_velocity[0]
+                            pred_cy = self.last_center[1] + self.last_velocity[1]
+                            pred_x1 = pred_cx - w_box // 2
+                            pred_y1 = pred_cy - h_box // 2
+                            pred_x2 = pred_cx + w_box // 2
+                            pred_y2 = pred_cy + h_box // 2
+                            cv2.rectangle(frame, (pred_x1, pred_y1), (pred_x2, pred_y2), (128, 128, 128), 2)
+                            cv2.putText(frame, "predicting...", (pred_x1, pred_y1 - 10),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 128), 1)
+                        else:
+                            x1, y1, x2, y2 = self.prev_track_bbox
+                            cv2.rectangle(frame, (x1, y1), (x2, y2), (128, 128, 128), 2)
+                            cv2.putText(frame, "predicting...", (x1, y1 - 10),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 128), 1)
+                else:
+                    # 彻底丢失，清除追踪状态
+                    self.clear_selection()
+                    self.tracker = None
+                    self.prev_track_bbox = None
+                    self.lost_frame_count = 0
+                    self.is_lost = False
+                    cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            return frame
 
         # ========== 普通模式（未选中任何人） ==========
         self.hovered_person_index = self.find_hovered_person(detections)
