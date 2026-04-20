@@ -152,7 +152,7 @@ class PersonDetectionApp:
                 if hovered_index >= 0:
                     self.detector.select_hovered_person(detections, hovered_index, self.frame)
                     # 启用舵机等后续操作（保持原有代码）
-                    self.detector.stop_async_detection()
+                    # self.detector.stop_async_detection()
                     if self.servo and hasattr(self.servo, 'enable_tracking'):
                         self.servo.enable_tracking(True)
                         print("🎯 舵机追踪已启用")
@@ -309,7 +309,7 @@ class PersonDetectionApp:
                         x1, y1, x2, y2, conf, _ = self.detector.selected_person
                         target_center = ((x1 + x2) // 2, (y1 + y2) // 2)
 
-                        print(f"[MAIN] target_center = {target_center}")
+                        # print(f"[MAIN] target_center = {target_center}")
 
                         # 确保追踪标志正确
                         if not self.is_tracking and self.has_clicked:
@@ -370,8 +370,8 @@ class PersonDetectionApp:
                 if self.servo and hasattr(self.servo, 'update'):
                     now = time.time()
                     # 更新频率10Hz
-                    if now - self.last_servo_update >= 0.05:
-                        self.servo.update(0.05)
+                    if now - self.last_servo_update >= 0.1:
+                        self.servo.update(0.1)
                         self.last_servo_update = now
 
                 # 7. 构建信息文本

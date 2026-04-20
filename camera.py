@@ -131,7 +131,6 @@ class CameraManager:
             if ret:
                 with self.frame_lock:
                     self.frame = frame
-            time.sleep(0.001)
     def get_frame(self):
         """获取最新帧"""
         with self.frame_lock:
