@@ -145,10 +145,9 @@ class PersonDetectionApp:
         self.detector.update_mouse_position(x, y)
 
         if event == cv2.EVENT_LBUTTONDOWN:
-            # 强制检测当前帧，获取最新检测结果
-            if self.frame is not None:
-                detections, _ = self.detector.detect(self.frame)
-                # 使用最新检测结果寻找悬停人物
+            # 使用主循环已更新的最新检测结果（异步获取，无阻塞）
+            if self.frame is not None and self.detections:
+                detections = self.detections  # 直接使用已缓存的结果
                 hovered_index = self.detector.find_hovered_person(detections)
                 if hovered_index >= 0:
                     self.detector.select_hovered_person(detections, hovered_index, self.frame)
