@@ -18,7 +18,7 @@ class YOLOPersonDetector:
     def __init__(self, conf_threshold=0.5, device='cpu'):
 
         self.tracker = None  # OpenCV 追踪器
-        self.tracker_type = 'CSRT'  # 或 'KCF'（更快但稍弱）
+        self.tracker_type = 'KCF'  # 或 'KCF'（更快但稍弱）
 
         print("=" * 50)
         print("🎯 YOLO人物检测器初始化")
