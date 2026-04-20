@@ -1,6 +1,7 @@
 # yolo_detector.py (最终版 - 集成帧跳过、丢失容忍、IoU辅助)
 import cv2
 import torch
+import numpy as np
 import time
 import ssl
 import warnings
@@ -131,18 +132,14 @@ class YOLOPersonDetector:
         return -1
 
     def select_hovered_person(self, detections, index, frame):
-        """选择悬停的人物开始追踪（使用KCF追踪器）"""
+        """选择悬停的人物开始追踪（使用CSRT追踪器）"""
         if 0 <= index < len(detections):
             det = detections[index]
             x1, y1, x2, y2, conf, _ = det
             bbox = (x1, y1, x2 - x1, y2 - y1)
 
-            # 初始化 KCF 追踪器
-            # 在 select_hovered_person 中
-            if self.tracker_type == 'CSRT':
-                self.tracker = cv2.TrackerCSRT_create()
-            else:
-                self.tracker = cv2.TrackerKCF_create()
+            # 初始化 CSRT 追踪器
+            self.tracker = cv2.TrackerCSRT_create()
             self.tracker.init(frame, bbox)
 
             # 设置追踪状态
@@ -209,7 +206,7 @@ class YOLOPersonDetector:
                         self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
                     # 绘制绿色追踪框
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                    cv2.putText(frame, "TRACKING (KCF)", (x1, y1 - 10),
+                    cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                     return frame
 
@@ -243,7 +240,7 @@ class YOLOPersonDetector:
                                     x1, y1, x2, y2, conf, _ = best_match
                                     bbox = (x1, y1, x2 - x1, y2 - y1)
                                     # 重新初始化追踪器
-                                    self.tracker = cv2.TrackerKCF_create()
+                                    self.tracker = cv2.TrackerCSRT_create()
                                     self.tracker.init(frame, bbox)
                                     self.selected_person = [x1, y1, x2, y2, conf, 0]
                                     self.prev_track_bbox = (x1, y1, x2, y2)
