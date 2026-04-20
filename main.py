@@ -152,6 +152,7 @@ class PersonDetectionApp:
                 if hovered_index >= 0:
                     self.detector.select_hovered_person(detections, hovered_index, self.frame)
                     # 启用舵机等后续操作（保持原有代码）
+                    self.detector.stop_async_detection()
                     if self.servo and hasattr(self.servo, 'enable_tracking'):
                         self.servo.enable_tracking(True)
                         print("🎯 舵机追踪已启用")
@@ -443,6 +444,8 @@ class PersonDetectionApp:
                             self.pid_controller.reset()
                         if hasattr(self.pid_controller, 'set_tracking_enabled'):
                             self.pid_controller.set_tracking_enabled(False)
+                    if self.detector:
+                        self.detector.start_async_detection()
                     print("\n🔄 已清除追踪选择，舵机追踪已停止")
                 elif key == ord('r') and self.servo:
                     if hasattr(self.servo, 'tracking_enabled') and self.servo.tracking_enabled:
