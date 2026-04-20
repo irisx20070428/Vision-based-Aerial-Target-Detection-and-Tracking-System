@@ -127,14 +127,6 @@
       <option name="presentableId" value="Default" />
       <updated>1773758464264</updated>
     </task>
-    <task id="LOCAL-00011" summary="修改main.py">
-      <option name="closed" value="true" />
-      <created>1775039582519</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1775039582519</updated>
-    </task>
     <task id="LOCAL-00012" summary="修改feature_tracker">
       <option name="closed" value="true" />
       <created>1775040130598</created>
@@ -519,7 +511,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776676829204</updated>
     </task>
-    <option name="localTasksCounter" value="60" />
+    <task id="LOCAL-00060" summary="debug">
+      <option name="closed" value="true" />
+      <created>1776677811882</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1776677811883</updated>
+    </task>
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
