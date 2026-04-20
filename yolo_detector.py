@@ -152,20 +152,65 @@ class YOLOPersonDetector:
                 if success:
                     x, y, bw, bh = [int(v) for v in bbox]
                     x1, y1, x2, y2 = x, y, x + bw, y + bh
+                    print(f"[TRACK] bbox = ({x1},{y1},{x2},{y2}), lost_this_frame = {lost_this_frame}")
 
                     margin = 50
                     if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
                             x1 < -margin or y1 < -margin):
                         lost_this_frame = True
+
+                        if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
+                            x1 < -margin or y1 < -margin):
+                            lost_this_frame = True
+                            print("[TRACK] lost due to out of bounds")
+                        elif bw * bh < 30:
+                            lost_this_frame = True
+                            print(f"[TRACK] lost due to small area: {bw * bh}")
+                        else:
+                            aspect = bw / bh if bh > 0 else 0
+                            if aspect < 0.1 or aspect > 2.0:
+                                lost_this_frame = True
+                                print(f"[TRACK] lost due to bad aspect: {aspect:.2f}")
+
                     elif bw * bh < 30:
                         lost_this_frame = True
+
+                        if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
+                            x1 < -margin or y1 < -margin):
+                            lost_this_frame = True
+                            print("[TRACK] lost due to out of bounds")
+                        elif bw * bh < 30:
+                            lost_this_frame = True
+                            print(f"[TRACK] lost due to small area: {bw * bh}")
+                        else:
+                            aspect = bw / bh if bh > 0 else 0
+                            if aspect < 0.1 or aspect > 2.0:
+                                lost_this_frame = True
+                                print(f"[TRACK] lost due to bad aspect: {aspect:.2f}")
+
                     else:
                         aspect = bw / bh if bh > 0 else 0
                         if aspect < 0.1 or aspect > 2.0:
                             lost_this_frame = True
+
+                            if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
+                                    x1 < -margin or y1 < -margin):
+                                lost_this_frame = True
+                                print("[TRACK] lost due to out of bounds")
+                            elif bw * bh < 30:
+                                lost_this_frame = True
+                                print(f"[TRACK] lost due to small area: {bw * bh}")
+                            else:
+                                aspect = bw / bh if bh > 0 else 0
+                                if aspect < 0.1 or aspect > 2.0:
+                                    lost_this_frame = True
+                                    print(f"[TRACK] lost due to bad aspect: {aspect:.2f}")
+
                     # IoU 检查已注释
                 else:
                     lost_this_frame = True
+
+
 
                 if not lost_this_frame:
                     self.lost_frame_count = 0
@@ -181,11 +226,15 @@ class YOLOPersonDetector:
                     self.last_center = (cx, cy)
                     if self.selected_person is not None:
                         self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
+                        print(f"[TRACK] updated selected_person to: {self.selected_person[:4]}")
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
                     cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                 else:
                     self.lost_frame_count += 1
                     if self.lost_frame_count <= self.max_lost_frames:
+
+                        print(f"[TRACK] predicting, lost_count={self.lost_frame_count}")
+
                         if self.prev_track_bbox is not None:
                             if hasattr(self, 'last_center') and self.last_center is not None and self.last_velocity != (
                             0, 0):

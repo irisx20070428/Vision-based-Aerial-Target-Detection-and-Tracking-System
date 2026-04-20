@@ -299,6 +299,8 @@ class PersonDetectionApp:
                         x1, y1, x2, y2, conf, _ = self.detector.selected_person
                         target_center = ((x1 + x2) // 2, (y1 + y2) // 2)
 
+                        print(f"[MAIN] target_center = {target_center}")
+
                         # 确保追踪标志正确
                         if not self.is_tracking and self.has_clicked:
                             self.is_tracking = True
@@ -316,7 +318,9 @@ class PersonDetectionApp:
                 # 5. PID 控制（只在追踪模式下且舵机可用时）
                 if self.pid_controller and target_center and self.is_tracking:
                     # 计算目标角度
+                    print(f"[MAIN] before PID, target_center={target_center}")
                     pan_angle, tilt_angle = self.pid_controller.compute_angles(target_center[0], target_center[1])
+                    print(f"[MAIN] after PID, pan={pan_angle:.1f}, tilt={tilt_angle:.1f}")
 
                     # 更新舵机指令显示
                     if abs(pan_angle - self.last_pan_target) > 0.5 or abs(tilt_angle - self.last_tilt_target) > 0.5:

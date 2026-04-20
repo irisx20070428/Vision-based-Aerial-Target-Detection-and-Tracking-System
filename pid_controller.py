@@ -183,6 +183,8 @@ class PanTiltController:
         #     print(f"   - 图像中心: ({self.image_center_x}, {self.image_center_y})")
         #     return self.current_pan, self.current_tilt
 
+        print(f"[PID] target=({target_x},{target_y}), current_angle=({self.current_pan:.1f},{self.current_tilt:.1f})")
+
         # 计算像素误差
         error_pixels_x = target_x - self.image_center_x  # 正：目标在右侧
         error_pixels_y = target_y - self.image_center_y  # 正：目标在下侧
@@ -227,6 +229,9 @@ class PanTiltController:
         self.current_pan = max(self.servo_min, min(self.servo_max, self.current_pan))
         self.current_tilt = max(self.servo_min, min(self.servo_max, self.current_tilt))
 
+        print(f"[PID] error_pixels=({error_pixels_x},{error_pixels_y}), angle_error=({angle_error_x:.2f},{angle_error_y:.2f})")
+        print(f"[PID] control=({control_x:.2f},{control_y:.2f})")
+
         return self.current_pan, self.current_tilt
 
     def reset(self):
@@ -246,6 +251,8 @@ class PanTiltController:
             print(f"🎯 PID追踪已启用，当前角度: pan={self.current_pan:.1f}°, tilt={self.current_tilt:.1f}°")
         else:
             print(f"🎯 PID追踪已禁用")
+
+        print(f"[PID] set_tracking_enabled({enabled}), initial_angles={initial_angles}")
 
     def update_image_center(self, width, height):
         """更新图像中心坐标"""

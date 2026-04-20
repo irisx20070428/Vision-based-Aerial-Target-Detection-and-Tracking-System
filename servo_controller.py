@@ -54,6 +54,8 @@ class ServoController:
         self.current_pan = pan_angle
         self.current_tilt = tilt_angle
 
+        print(f"[SERVO] set_target({pan_angle}, {tilt_angle}), tracking_enabled={self.tracking_enabled}")
+
     def get_current_angles(self):
         """获取当前角度"""
         return self.current_pan, self.current_tilt
