@@ -2,10 +2,13 @@
 import cv2
 import torch
 import numpy as np
+import time
 import ssl
 import warnings
 from feature_tracker import SmartTracker
 from config import Config
+import threading
+import queue
 
 ssl._create_default_https_context = ssl._create_unverified_context
 warnings.filterwarnings('ignore')
@@ -64,6 +67,13 @@ class YOLOPersonDetector:
         self.is_lost = False
         self.lost_frame_count = 0
         self.max_lost_frames = 10
+
+        self.detect_frame_queue = queue.Queue(maxsize=1)  # 存放待检测帧（最多1帧，丢弃旧帧）
+        self.detect_result_queue = queue.Queue(maxsize=1)  # 存放检测结果（最多1组，丢弃旧结果）
+        self.detect_thread_running = False
+        self.detect_thread = None
+        self._latest_detections = []  # 缓存最新检测结果
+        self._detection_lock = threading.Lock()
 
         print(f"\n✅ YOLO模型配置完成")
         print(f"   - 置信度阈值: {conf_threshold}")
@@ -337,3 +347,68 @@ class YOLOPersonDetector:
         area2 = (box2[2] - box2[0]) * (box2[3] - box2[1])
         union = area1 + area2 - inter
         return inter / union if union > 0 else 0
+
+def start_async_detection(self):
+    """启动后台检测线程"""
+    if self.detect_thread_running:
+        return
+    self.detect_thread_running = True
+    self.detect_thread = threading.Thread(target=self._detection_loop, daemon=True)
+    self.detect_thread.start()
+    print("✅ 异步检测线程已启动")
+
+def stop_async_detection(self):
+    """停止后台检测线程"""
+    self.detect_thread_running = False
+    if self.detect_thread:
+        self.detect_thread.join(timeout=1)
+
+def _detection_loop(self):
+    """后台检测主循环"""
+    while self.detect_thread_running:
+        try:
+            # 等待一帧（超时0.1秒，以便检查运行标志）
+            frame = self.detect_frame_queue.get(timeout=0.1)
+            if frame is not None:
+                # 执行检测
+                detections, _ = self.detect(frame)
+                # 将结果放入队列（丢弃旧结果）
+                try:
+                    self.detect_result_queue.put_nowait((detections, time.time()))
+                except queue.Full:
+                    # 队列满，先取出再放入（保留最新结果）
+                    try:
+                        self.detect_result_queue.get_nowait()
+                    except queue.Empty:
+                        pass
+                    self.detect_result_queue.put_nowait((detections, time.time()))
+                # 更新缓存（线程安全）
+                with self._detection_lock:
+                    self._latest_detections = detections
+        except queue.Empty:
+            continue
+        except Exception as e:
+            print(f"⚠️ 检测线程错误: {e}")
+            time.sleep(0.01)
+
+def update_frame_for_detection(self, frame):
+    """主线程调用：提交一帧进行异步检测（非阻塞）"""
+    if frame is not None and self.detect_thread_running:
+        try:
+            # 只保留最新帧，丢弃旧帧
+            self.detect_frame_queue.put_nowait(frame.copy())
+        except queue.Full:
+            try:
+                self.detect_frame_queue.get_nowait()
+            except queue.Empty:
+                pass
+            self.detect_frame_queue.put_nowait(frame.copy())
+
+def get_latest_detections(self):
+    """获取最新检测结果（非阻塞），如果没有新结果则返回缓存"""
+    try:
+        detections, _ = self.detect_result_queue.get_nowait()
+        return detections
+    except queue.Empty:
+        with self._detection_lock:
+            return self._latest_detections

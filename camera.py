@@ -97,6 +97,7 @@ class CameraManager:
         # 设置分辨率、帧率
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
+        self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # 减少缓冲，降低延迟
         self.cap.set(cv2.CAP_PROP_FPS, self.fps_target)
 
         actual_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))

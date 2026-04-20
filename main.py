@@ -59,11 +59,6 @@ class PersonDetectionApp:
         self.last_pan_target = 90  # 上次水平目标角度
         self.last_tilt_target = 90  # 上次垂直目标角度
 
-        # 降低 YOLO 检测频率的变量
-        self.detect_skip = Config.YOLO_FRAME_SKIP
-        self.detect_counter = 0
-        self.last_detections = []
-
         # 初始化所有模块
         self._init_modules(conf_threshold)
 
@@ -79,6 +74,8 @@ class PersonDetectionApp:
             if conf_threshold is None:
                 conf_threshold = Config.YOLO_CONF_THRESHOLD
             self.detector = YOLOPersonDetector(conf_threshold=conf_threshold)
+            # 启动异步检测线程
+            self.detector.start_async_detection()
 
             # 3. 舵机和PID（如果未禁用）
             if not self.no_servo and SERVO_AVAILABLE:
@@ -271,25 +268,38 @@ class PersonDetectionApp:
         print("\n开始检测...")
         print("💡 提示：鼠标悬停人物框，点击左键开始追踪")
 
+        # 实时帧率计算相关
+        last_frame_time = time.time()
+        fps_smooth = 0.0
+        fps_alpha = 0.1  # 平滑系数，值越小越平滑
+
         try:
             while self.running:
                 # 1. 获取摄像头画面
                 self.frame = self.camera.get_frame()
+
+                # 计算实时帧率
+                now = time.time()
+                dt = now - last_frame_time
+                if dt > 0:
+                    instant_fps = 1.0 / dt
+                    fps_smooth = fps_smooth * (1 - fps_alpha) + instant_fps * fps_alpha
+                last_frame_time = now
+
                 if self.frame is None:
+                    time.sleep(0.001)
                     continue
 
-                # 2. 降低 YOLO 检测频率
-                self.detect_counter += 1
-                if self.detect_counter % self.detect_skip == 0:
-                    self.detections, _ = self.detector.detect(self.frame)
-                    self.last_detections = self.detections
-                else:
-                    self.detections = self.last_detections
+                    # 2. 提交帧到异步检测（非阻塞）
+                    self.detector.update_frame_for_detection(self.frame)
 
-                # 3. 绘制检测框
-                display_frame = self.frame.copy()
-                if self.show_detections:
-                    display_frame = self.detector.draw_detections(display_frame, self.detections)
+                    # 3. 获取最新检测结果（非阻塞，立即返回）
+                    self.detections = self.detector.get_latest_detections()
+
+                    # 4. 绘制检测框
+                    display_frame = self.frame.copy()
+                    if self.show_detections:
+                        display_frame = self.detector.draw_detections(display_frame, self.detections)
 
                 # 4. 获取追踪目标（只有在追踪模式下才获取）
                 target_center = None
@@ -405,7 +415,7 @@ class PersonDetectionApp:
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
 
                 # 10. 摄像头信息绘制
-                display_frame = self.camera.draw_info(display_frame, info_text, show_fps=False)
+                display_frame = self.camera.draw_info(display_frame, info_text, show_fps=True, display_fps=fps_smooth)
                 display_frame = self.draw_dataset_info(display_frame)
 
                 # 11. 绘制舵机指令面板（新增）
@@ -511,6 +521,9 @@ class PersonDetectionApp:
                 self.servo.cleanup()
 
         cv2.destroyAllWindows()
+
+        if self.detector:
+            self.detector.stop_async_detection()
 
         if self.detector and hasattr(self.detector, 'smart_tracker'):
             dataset = self.detector.smart_tracker.dataset
