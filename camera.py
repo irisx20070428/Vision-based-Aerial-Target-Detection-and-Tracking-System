@@ -183,7 +183,7 @@ class CameraManager:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
         # 显示分辨率
-        cv2.putText(frame, f"{w}x{h}", (120, 25),
+        cv2.putText(frame, f"{w}x{h}", (180, 25),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
 
         # 显示时间
