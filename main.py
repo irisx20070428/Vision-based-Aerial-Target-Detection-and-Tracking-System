@@ -276,7 +276,6 @@ class PersonDetectionApp:
                 # 1. 获取摄像头画面
                 self.frame = self.camera.get_frame()
                 if self.frame is None:
-                    time.sleep(0.01)
                     continue
 
                 # 2. 降低 YOLO 检测频率
@@ -342,9 +341,9 @@ class PersonDetectionApp:
                         if frame_count % 30 == 0:
                             print("⚠️ 目标丢失，暂停 PID 控制（舵机保持不动）")
                     else:
-                        print(f"[MAIN] before PID, target_center={target_center}")
+                        # print(f"[MAIN] before PID, target_center={target_center}")
                         pan_angle, tilt_angle = self.pid_controller.compute_angles(target_center[0], target_center[1])
-                        print(f"[MAIN] after PID, pan={pan_angle:.1f}, tilt={tilt_angle:.1f}")
+                        # print(f"[MAIN] after PID, pan={pan_angle:.1f}, tilt={tilt_angle:.1f}")
 
                         # 更新舵机指令显示
                         if abs(pan_angle - self.last_pan_target) > 0.5 or abs(tilt_angle - self.last_tilt_target) > 0.5:
@@ -360,8 +359,8 @@ class PersonDetectionApp:
                 if self.servo and hasattr(self.servo, 'update'):
                     now = time.time()
                     # 更新频率10Hz
-                    if now - self.last_servo_update >= 0.1:
-                        self.servo.update(0.1)
+                    if now - self.last_servo_update >= 0.05:
+                        self.servo.update(0.05)
                         self.last_servo_update = now
 
                 # 7. 构建信息文本
@@ -413,9 +412,18 @@ class PersonDetectionApp:
                 # display_frame = self.draw_servo_command_panel(display_frame)
 
                 # 12. 显示画面
-                cv2.imshow(self.window_name, display_frame)
+                # 在循环开头添加显示计数器
+                if not hasattr(self, '_disp_counter'):
+                    self._disp_counter = 0
+                self._disp_counter += 1
 
-                time.sleep(0.005)  # 每帧休眠 5ms，释放 CPU
+                if self._disp_counter % 2 == 0:
+                    cv2.imshow(self.window_name, display_frame)
+                    cv2.waitKey(1)
+                else:
+                    cv2.waitKey(1)  # 仍然处理按键
+
+                # time.sleep(0.005)  # 每帧休眠 5ms，释放 CPU
 
                 # 13. 按键处理
                 key = cv2.waitKey(1) & 0xFF
@@ -504,7 +512,7 @@ class PersonDetectionApp:
                 self.servo.set_angle_immediate(Config.SERVO_PAN_INIT_ANGLE, Config.SERVO_TILT_INIT_ANGLE)
                 print(
                     f"🔄 舵机已设置为初始位置: pan={Config.SERVO_PAN_INIT_ANGLE}°, tilt={Config.SERVO_TILT_INIT_ANGLE}°")
-                time.sleep(0.3)  # 等待舵机实际转动（物理时间）
+                # time.sleep(0.3)  # 等待舵机实际转动（物理时间）
             except Exception as e:
                 print(f"⚠️ 设置舵机初始位置时出错: {e}")
             # 清理舵机资源

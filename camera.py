@@ -16,7 +16,6 @@ class CameraManager:
         self.height = Config.CAMERA_RESOLUTION[1]
         self.fps_target = Config.CAMERA_FPS
 
-        self.fps_target = 15
 
         self.cap = None
         self.picam2 = None
@@ -58,7 +57,7 @@ class CameraManager:
 
             # 启动摄像头
             self.picam2.start()
-            time.sleep(2)  # 等待摄像头稳定
+            # time.sleep(2)  # 等待摄像头稳定
 
             print(f"✅ Picamera2初始化成功")
             print(f"   - 分辨率: {self.width} x {self.height}")
@@ -119,7 +118,7 @@ class CameraManager:
                 frame_bgr = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
                 with self.frame_lock:
                     self.frame = frame_bgr
-                time.sleep(frame_time)
+                # time.sleep(frame_time)
             except Exception as e:
                 print(f"采集错误: {e}")
 
@@ -131,8 +130,7 @@ class CameraManager:
             if ret:
                 with self.frame_lock:
                     self.frame = frame
-            time.sleep(frame_time)  # 关键：控制采集速度
-
+            time.sleep(0.001)
     def get_frame(self):
         """获取最新帧"""
         with self.frame_lock:
