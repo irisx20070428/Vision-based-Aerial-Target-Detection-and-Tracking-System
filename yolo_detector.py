@@ -21,7 +21,7 @@ class YOLOPersonDetector:
         self.tracker_type = 'KCF'  # 或 'KCF'（更快但稍弱）
 
         # 追踪模式下的检测帧间隔（值越大越省CPU）
-        self.tracking_detect_interval = 3  # 每3帧检测一次
+        self.tracking_detect_interval = 10  # 每3帧检测一次
         self.tracking_frame_counter = 0
 
         print("=" * 50)
@@ -189,7 +189,7 @@ class YOLOPersonDetector:
                     lost_this_frame = True
 
                 if not lost_this_frame:
-                    # 成功追踪
+                    # ----- 成功追踪 -----
                     self.lost_frame_count = 0
                     self.is_lost = False
                     self.prev_track_bbox = (x1, y1, x2, y2)
@@ -204,15 +204,61 @@ class YOLOPersonDetector:
                     self.last_center = (cx, cy)
                     if self.selected_person is not None:
                         self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
-                    # 绘制绿色追踪框de
+                    # 绘制绿色追踪框
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
                     cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                    return frame
+
                 else:
-                    # 追踪丢失
+                    # ----- 追踪丢失，尝试找回 -----
                     self.lost_frame_count += 1
                     if self.lost_frame_count <= self.max_lost_frames:
                         self.is_lost = True
+
+                        # 尝试用异步检测结果找回（每3帧才尝试一次，避免过于频繁）
+                        if self.lost_frame_count % 3 == 1:  # 丢失后的第1,4,7...帧尝试
+                            latest_dets = self.get_latest_detections()
+                            if latest_dets and len(latest_dets) > 0:
+                                best_match = None
+                                best_dist = float('inf')
+                                if self.prev_track_bbox is not None:
+                                    px = (self.prev_track_bbox[0] + self.prev_track_bbox[2]) // 2
+                                    py = (self.prev_track_bbox[1] + self.prev_track_bbox[3]) // 2
+                                    for det in latest_dets:
+                                        cx = (det[0] + det[2]) // 2
+                                        cy = (det[1] + det[3]) // 2
+                                        dist = (cx - px) ** 2 + (cy - py) ** 2
+                                        if dist < best_dist:
+                                            best_dist = dist
+                                            best_match = det
+                                else:
+                                    best_match = latest_dets[0]
+
+                                # 距离阈值：像素平方 2500 ≈ 50 像素
+                                if best_match and best_dist < 2500:
+                                    x1, y1, x2, y2, conf, _ = best_match
+                                    bbox = (x1, y1, x2 - x1, y2 - y1)
+                                    # 重新初始化追踪器
+                                    self.tracker = cv2.TrackerCSRT_create()
+                                    self.tracker.init(frame, bbox)
+                                    self.selected_person = [x1, y1, x2, y2, conf, 0]
+                                    self.prev_track_bbox = (x1, y1, x2, y2)
+                                    self.lost_frame_count = 0
+                                    self.is_lost = False
+                                    # 重新初始化运动预测中心
+                                    cx = (x1 + x2) // 2
+                                    cy = (y1 + y2) // 2
+                                    self.last_center = (cx, cy)
+                                    self.last_velocity = (0, 0)
+                                    print("✅ 追踪器已通过检测结果重新初始化")
+                                    # 绘制绿色框并返回
+                                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+                                    cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
+                                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                                    return frame
+
+                        # 如果未找回，显示预测框
                         if self.prev_track_bbox is not None:
                             if hasattr(self, 'last_center') and self.last_center is not None and self.last_velocity != (
                             0, 0):
@@ -233,7 +279,7 @@ class YOLOPersonDetector:
                                 cv2.putText(frame, "predicting...", (x1, y1 - 10),
                                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (128, 128, 128), 1)
                     else:
-                        # 彻底丢失
+                        # 彻底丢失，清除追踪状态
                         self.clear_selection()
                         self.tracker = None
                         self.prev_track_bbox = None
@@ -241,7 +287,7 @@ class YOLOPersonDetector:
                         self.is_lost = False
                         cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
                                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                return frame
+                    return frame
             else:
                 # 异常：追踪器丢失但状态未清除
                 self.clear_selection()
