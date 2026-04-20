@@ -20,6 +20,10 @@ class YOLOPersonDetector:
         self.tracker = None  # OpenCV 追踪器
         self.tracker_type = 'CSRT'  # 或 'KCF'（更快但稍弱）
 
+        # 追踪模式下的检测帧间隔（值越大越省CPU）
+        self.tracking_detect_interval = 3  # 每3帧检测一次
+        self.tracking_frame_counter = 0
+
         print("=" * 50)
         print("🎯 YOLO人物检测器初始化")
         print("=" * 50)
@@ -352,18 +356,26 @@ class YOLOPersonDetector:
                 print(f"⚠️ 检测线程错误: {e}")
                 time.sleep(0.01)
 
-    def update_frame_for_detection(self, frame):
-        """主线程调用：提交一帧进行异步检测（非阻塞）"""
-        if frame is not None and self.detect_thread_running:
+    def update_frame_for_detection(self, frame, is_tracking=False):
+        """提交帧到异步检测，追踪模式下降低频率"""
+        if frame is None or not self.detect_thread_running:
+            return
+
+        if is_tracking:
+            self.tracking_frame_counter += 1
+            if self.tracking_frame_counter % self.tracking_detect_interval != 0:
+                # 跳过本次检测，直接返回
+                return
+
+        # 正常提交检测
+        try:
+            self.detect_frame_queue.put_nowait(frame.copy())
+        except queue.Full:
             try:
-                # 只保留最新帧，丢弃旧帧
-                self.detect_frame_queue.put_nowait(frame.copy())
-            except queue.Full:
-                try:
-                    self.detect_frame_queue.get_nowait()
-                except queue.Empty:
-                    pass
-                self.detect_frame_queue.put_nowait(frame.copy())
+                self.detect_frame_queue.get_nowait()
+            except queue.Empty:
+                pass
+            self.detect_frame_queue.put_nowait(frame.copy())
 
     def get_latest_detections(self):
         """获取最新检测结果（非阻塞），如果没有新结果则返回缓存"""

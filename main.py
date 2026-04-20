@@ -290,7 +290,8 @@ class PersonDetectionApp:
                     continue
 
                     # 2. 提交帧到异步检测（非阻塞）
-                self.detector.update_frame_for_detection(self.frame)
+                # 2. 提交帧到异步检测（非阻塞），追踪模式下降低检测频率
+                self.detector.update_frame_for_detection(self.frame, is_tracking=self.is_tracking)
 
                 # 3. 获取最新检测结果（非阻塞，立即返回）
                 self.detections = self.detector.get_latest_detections()
