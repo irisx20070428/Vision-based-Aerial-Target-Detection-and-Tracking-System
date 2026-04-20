@@ -32,13 +32,13 @@ class Config:
     SERVO_TILT_INIT_ANGLE = 40  # 垂直初始角度，例如 0 度（水平）
 
     # 最大转动速度（度/秒）
-    MAX_ANGLE_SPEED = 60  # 60度/秒
+    MAX_ANGLE_SPEED = 180 # 60度/秒
 
     ACCELERATION = 0.05
     DEAD_ZONE = 15  # 像素死区
 
     # PID控制参数
-    PID_PAN_Kp = 0.25  # 比例增益
+    PID_PAN_Kp = 0.5  # 比例增益
     PID_PAN_Ki = 0.01  # 积分增益
     PID_PAN_Kd = 0.05  # 微分增益
     PID_TILT_Kp = 0.25

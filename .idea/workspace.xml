@@ -124,14 +124,6 @@
       <option name="presentableId" value="Default" />
       <updated>1773758464264</updated>
     </task>
-    <task id="LOCAL-00016" summary="修改yolo模型（s到n）">
-      <option name="closed" value="true" />
-      <created>1775471457972</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1775471457972</updated>
-    </task>
     <task id="LOCAL-00017" summary="优化截取检测逻辑">
       <option name="closed" value="true" />
       <created>1775472706374</created>
@@ -516,7 +508,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776682318949</updated>
     </task>
-    <option name="localTasksCounter" value="65" />
+    <task id="LOCAL-00065" summary="debug">
+      <option name="closed" value="true" />
+      <created>1776682973516</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1776682973517</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
