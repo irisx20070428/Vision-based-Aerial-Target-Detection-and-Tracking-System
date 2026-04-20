@@ -174,7 +174,7 @@ class CameraManager:
 
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        cv2.rectangle(frame, (0, 0), (w, 90), (0, 0, 0), -1)   # 直接绘制不透明黑色条，更快
+        # cv2.rectangle(frame, (0, 0), (w, 90), (0, 0, 0), -1)   # 直接绘制不透明黑色条，更快
 
         # 显示帧率（用不同标签区分）
         # 显示FPS（可选择性显示）
