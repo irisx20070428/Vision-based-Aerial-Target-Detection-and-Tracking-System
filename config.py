@@ -8,7 +8,7 @@ class Config:
     # 摄像头配置
     CAMERA_TYPE = "usb"
     CAMERA_RESOLUTION = (640, 480)
-    CAMERA_FPS = 30
+    CAMERA_FPS = 15
 
     # 摄像头视野角度（根据实际摄像头调整）
     # 常见USB摄像头水平视野约60-70度，垂直约40-50度

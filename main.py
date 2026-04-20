@@ -412,16 +412,7 @@ class PersonDetectionApp:
                 # display_frame = self.draw_servo_command_panel(display_frame)
 
                 # 12. 显示画面
-                # 在循环开头添加显示计数器
-                if not hasattr(self, '_disp_counter'):
-                    self._disp_counter = 0
-                self._disp_counter += 1
-
-                if self._disp_counter % 2 == 0:
-                    cv2.imshow(self.window_name, display_frame)
-                    cv2.waitKey(1)
-                else:
-                    cv2.waitKey(1)  # 仍然处理按键
+                cv2.imshow(self.window_name, display_frame)
 
                 # time.sleep(0.005)  # 每帧休眠 5ms，释放 CPU
 
