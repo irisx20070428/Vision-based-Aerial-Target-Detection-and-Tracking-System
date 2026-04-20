@@ -87,6 +87,11 @@ class PersonDetectionApp:
                 print("\n🎛️ 初始化PID控制器...")
                 self.pid_controller = PanTiltController()
 
+                if self.pid_controller and self.servo:
+                    pan_actual, tilt_actual = self.servo.get_current_angles()
+                    self.pid_controller.current_pan = pan_actual
+                    self.pid_controller.current_tilt = tilt_actual
+
                 # 重要：初始化时禁用舵机追踪
                 if hasattr(self.servo, 'enable_tracking'):
                     self.servo.enable_tracking(False)
@@ -156,7 +161,8 @@ class PersonDetectionApp:
                         print("🎯 舵机追踪已启用")
                         self.current_servo_command = "舵机已启用"
                     if self.pid_controller and hasattr(self.pid_controller, 'set_tracking_enabled'):
-                        self.pid_controller.set_tracking_enabled(True)
+                        pan_actual, tilt_actual = self.servo.get_current_angles()
+                        self.pid_controller.set_tracking_enabled(True, initial_angles=(pan_actual, tilt_actual))
                     self.is_tracking = True
                     self.has_clicked = True
                     print(f"📸 已保存人物图像到数据集，开始追踪")

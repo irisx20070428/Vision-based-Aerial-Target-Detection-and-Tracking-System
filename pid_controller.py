@@ -127,8 +127,8 @@ class PanTiltController:
         # 角度变化限制
         self.max_angle_change = 10  # 单次最大变化10度
 
-        # 首次更新标志
-        self.first_update = True
+        # # 首次更新标志
+        # self.first_update = True
 
         # 调试计数器
         self.debug_counter = 0
@@ -176,12 +176,12 @@ class PanTiltController:
             return self.current_pan, self.current_tilt
 
         # 首次更新时，不产生任何输出
-        if self.first_update:
-            self.first_update = False
-            print(f"🎯 PID控制器首次激活")
-            print(f"   - 目标位置: ({target_x}, {target_y})")
-            print(f"   - 图像中心: ({self.image_center_x}, {self.image_center_y})")
-            return self.current_pan, self.current_tilt
+        # if self.first_update:
+        #     self.first_update = False
+        #     print(f"🎯 PID控制器首次激活")
+        #     print(f"   - 目标位置: ({target_x}, {target_y})")
+        #     print(f"   - 图像中心: ({self.image_center_x}, {self.image_center_y})")
+        #     return self.current_pan, self.current_tilt
 
         # 计算像素误差
         error_pixels_x = target_x - self.image_center_x  # 正：目标在右侧
@@ -238,12 +238,12 @@ class PanTiltController:
         self.first_update = True
         print("🔄 PID控制器已重置，角度已回初始位置")
 
-    def set_tracking_enabled(self, enabled):
-        """设置追踪启用状态"""
+    def set_tracking_enabled(self, enabled, initial_angles=None):
         self.tracking_enabled = enabled
         if enabled:
-            self.first_update = True
-            print(f"🎯 PID追踪已启用")
+            if initial_angles is not None:
+                self.current_pan, self.current_tilt = initial_angles
+            print(f"🎯 PID追踪已启用，当前角度: pan={self.current_pan:.1f}°, tilt={self.current_tilt:.1f}°")
         else:
             print(f"🎯 PID追踪已禁用")
 
