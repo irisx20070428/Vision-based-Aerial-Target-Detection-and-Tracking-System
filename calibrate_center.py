@@ -1,122 +1,114 @@
-# calibrate_center.py - 交互式舵机中值校准工具
+#!/usr/bin/env python3
+# servo_calibrate_pan.py - 仅校准水平舵机中点 (PCA9685 CH1)
+
 import time
 import sys
-from gpiozero import Servo
+import board
+import busio
+from adafruit_pca9685 import PCA9685
 
+def angle_to_duty(angle):
+    """角度转占空比 (0-180度 -> 0.5-2.5ms脉冲)"""
+    pulse = 0.5 + (angle / 180.0) * 2.0
+    return int(pulse / 20.0 * 65535)
 
-def calibrate_center():
-    """交互式校准舵机中值"""
-    print("=" * 60)
-    print("舵机中值校准工具")
-    print("=" * 60)
-    print("\n操作说明：")
-    print("  w/s - 调整水平舵机 (左/右)")
-    print("  i/k - 调整垂直舵机 (上/下)")
-    print("  r   - 重置到90度")
-    print("  q   - 保存并退出")
-    print("  x   - 不保存退出")
-    print("\n当前舵机角度会实时显示")
+def save_pan_offset(offset):
+    """将水平偏移量写入 config.py"""
+    config_path = "config.py"
+    try:
+        with open(config_path, 'r') as f:
+            lines = f.readlines()
+        new_lines = []
+        found = False
+        for line in lines:
+            if line.strip().startswith('SERVO_PAN_OFFSET'):
+                new_lines.append(f"SERVO_PAN_OFFSET = {offset}\n")
+                found = True
+            else:
+                new_lines.append(line)
+        if not found:
+            new_lines.append(f"SERVO_PAN_OFFSET = {offset}\n")
+        with open(config_path, 'w') as f:
+            f.writelines(new_lines)
+        print(f"✅ 已保存 SERVO_PAN_OFFSET = {offset} 到 config.py")
+    except Exception as e:
+        print(f"❌ 保存失败: {e}")
+
+def main():
+    print("=" * 50)
+    print("水平舵机中点校准 (PCA9685 CH1)")
+    print("=" * 50)
+    print("说明：将云台/舵机臂调整到您认为的\"正前方\"")
+    print("使用键盘 w/s 微调角度，按 q 保存并退出\n")
+
+    # 初始化 I2C 和 PCA9685
+    try:
+        i2c = busio.I2C(board.SCL, board.SDA)
+        pca = PCA9685(i2c)
+        pca.frequency = 50
+        print("✅ PCA9685 初始化成功")
+    except Exception as e:
+        print(f"❌ 初始化失败: {e}")
+        return
+
+    pan_ch = 1          # 水平舵机通道 (CH1)
+    angle = 90          # 起始角度 90°
+    offset = 0
+    step = 1
+
+    # 设置初始角度
+    pca.channels[pan_ch].duty_cycle = angle_to_duty(angle)
+    time.sleep(0.5)
+
+    print(f"当前角度: {angle}° (偏移: {offset:+d}°)  步进: {step}°")
+    print("操作: w/s 增加/减小角度 | r 重置90° | +/- 步进 | q 保存退出 | x 不保存退出")
+
+    import tty, termios
+
+    def get_key():
+        fd = sys.stdin.fileno()
+        old = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old)
+        return ch
 
     try:
-        # 初始化舵机
-        pan_servo = Servo(18, min_pulse_width=0.5 / 1000, max_pulse_width=2.5 / 1000)
-        tilt_servo = Servo(27, min_pulse_width=0.5 / 1000, max_pulse_width=2.5 / 1000)
-
-        # 当前角度
-        pan_angle = 90
-        tilt_angle = 90
-        pan_offset = 0
-        tilt_offset = 0
-
-        # 步进值
-        step = 1
-
-        def update_servo():
-            """更新舵机位置"""
-            pan_value = (pan_angle - 90) / 90
-            tilt_value = (tilt_angle - 90) / 90
-            pan_servo.value = pan_value
-            tilt_servo.value = tilt_value
-
-        # 初始位置
-        update_servo()
-        time.sleep(0.5)
-
-        print(f"\n初始位置: Pan={pan_angle}°, Tilt={tilt_angle}°")
-        print("请调整舵机到您认为的\"正前方\"位置")
-
-        import sys
-        import tty
-        import termios
-
-        def get_key():
-            """获取键盘输入（无需回车）"""
-            fd = sys.stdin.fileno()
-            old_settings = termios.tcgetattr(fd)
-            try:
-                tty.setraw(sys.stdin.fileno())
-                ch = sys.stdin.read(1)
-            finally:
-                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-            return ch
-
         while True:
-            # 显示当前状态
-            print(
-                f"\rPan: {pan_angle:3d}° (偏移:{pan_offset:+3d}°) | Tilt: {tilt_angle:3d}° (偏移:{tilt_offset:+3d}°)   ",
-                end="")
-
+            print(f"\r角度: {angle:3d}° (偏移 {offset:+3d}°) | 步进: {step}°   ", end="")
             key = get_key()
 
             if key == 'w':
-                pan_angle = min(180, pan_angle + step)
-                pan_offset = pan_angle - 90
-                update_servo()
+                angle = min(180, angle + step)
+                offset = angle - 90
+                pca.channels[pan_ch].duty_cycle = angle_to_duty(angle)
             elif key == 's':
-                pan_angle = max(0, pan_angle - step)
-                pan_offset = pan_angle - 90
-                update_servo()
-            elif key == 'i':
-                tilt_angle = min(180, tilt_angle + step)
-                tilt_offset = tilt_angle - 90
-                update_servo()
-            elif key == 'k':
-                tilt_angle = max(0, tilt_angle - step)
-                tilt_offset = tilt_angle - 90
-                update_servo()
+                angle = max(0, angle - step)
+                offset = angle - 90
+                pca.channels[pan_ch].duty_cycle = angle_to_duty(angle)
             elif key == 'r':
-                pan_angle = 90
-                tilt_angle = 90
-                pan_offset = 0
-                tilt_offset = 0
-                update_servo()
-                print("\n🔄 已重置到90度")
-            elif key == 'q':
-                print(f"\n\n✅ 保存校准参数:")
-                print(f"   PAN_OFFSET = {pan_offset}")
-                print(f"   TILT_OFFSET = {tilt_offset}")
-                print("\n请将以下配置添加到 config.py 中：")
-                print(f"   SERVO_PAN_OFFSET = {pan_offset}   # 水平偏移")
-                print(f"   SERVO_TILT_OFFSET = {tilt_offset}  # 垂直偏移")
-                break
-            elif key == 'x':
-                print("\n\n❌ 未保存，退出校准")
-                break
+                angle = 90
+                offset = 0
+                pca.channels[pan_ch].duty_cycle = angle_to_duty(angle)
+                print("\n🔄 重置到 90°")
             elif key == '+':
                 step = min(10, step + 1)
                 print(f"\n步进值: {step}°", end="")
             elif key == '-':
                 step = max(1, step - 1)
                 print(f"\n步进值: {step}°", end="")
-
-        pan_servo.detach()
-        tilt_servo.detach()
-
-    except Exception as e:
-        print(f"\n❌ 错误: {e}")
+            elif key == 'q':
+                print(f"\n\n✅ 保存偏移量 {offset} 到 config.py")
+                save_pan_offset(offset)
+                break
+            elif key == 'x':
+                print("\n\n❌ 未保存，退出")
+                break
     finally:
-        print("\n校准完成")
-
+        pca.deinit()
+        print("舵机已释放")
 
 if __name__ == "__main__":
-    calibrate_center()
+    main()
