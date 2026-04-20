@@ -189,66 +189,26 @@ class YOLOPersonDetector:
                     lost_this_frame = True
 
                 if not lost_this_frame:
-                    # 用异步检测结果校验追踪框是否真实
-                    latest_dets = self.get_latest_detections()
-                    need_correction = False
-                    if latest_dets:
-                        best_det = None
-                        best_dist = float('inf')
-                        # 找到与追踪框最近的检测框
-                        for det in latest_dets:
-                            det_cx = (det[0] + det[2]) // 2
-                            det_cy = (det[1] + det[3]) // 2
-                            dist = (det_cx - (x1 + x2) // 2) ** 2 + (det_cy - (y1 + y2) // 2) ** 2
-                            if dist < best_dist:
-                                best_dist = dist
-                                best_det = det
-                        # 如果最近检测框距离超过 3600（约60像素），认为追踪器漂移
-                        if best_det and best_dist > 3600:
-                            need_correction = True
-                            x1, y1, x2, y2, conf, _ = best_det
-
-                    if need_correction:
-                        # 用检测结果重新初始化追踪器
-                        bbox = (x1, y1, x2 - x1, y2 - y1)
-                        self.tracker = cv2.TrackerCSRT_create()
-                        self.tracker.init(frame, bbox)
-                        self.selected_person = [x1, y1, x2, y2, conf, 0]
-                        self.prev_track_bbox = (x1, y1, x2, y2)
-                        self.lost_frame_count = 0
-                        self.is_lost = False
-                        # 重置运动预测中心
-                        cx = (x1 + x2) // 2
-                        cy = (y1 + y2) // 2
-                        self.last_center = (cx, cy)
-                        self.last_velocity = (0, 0)
-                        print("✅ 追踪器漂移修正：使用检测结果重新初始化")
-                        # 绘制绿色框返回
-                        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                        cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-                        return frame
+                    # ----- 成功追踪 -----
+                    self.lost_frame_count = 0
+                    self.is_lost = False
+                    self.prev_track_bbox = (x1, y1, x2, y2)
+                    cx = (x1 + x2) // 2
+                    cy = (y1 + y2) // 2
+                    if hasattr(self, 'last_center') and self.last_center is not None:
+                        vx = cx - self.last_center[0]
+                        vy = cy - self.last_center[1]
+                        self.last_velocity = (vx, vy)
                     else:
-                        # 正常追踪，更新状态
-                        self.lost_frame_count = 0
-                        self.is_lost = False
-                        self.prev_track_bbox = (x1, y1, x2, y2)
-                        cx = (x1 + x2) // 2
-                        cy = (y1 + y2) // 2
-                        if hasattr(self, 'last_center') and self.last_center is not None:
-                            vx = cx - self.last_center[0]
-                            vy = cy - self.last_center[1]
-                            self.last_velocity = (vx, vy)
-                        else:
-                            self.last_velocity = (0, 0)
-                        self.last_center = (cx, cy)
-                        if self.selected_person is not None:
-                            self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
-                        # 绘制绿色追踪框
-                        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                        cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-                        return frame
+                        self.last_velocity = (0, 0)
+                    self.last_center = (cx, cy)
+                    if self.selected_person is not None:
+                        self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
+                    # 绘制绿色追踪框
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
+                    cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                    return frame
 
 
                 else:
