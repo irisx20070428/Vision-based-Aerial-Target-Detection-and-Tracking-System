@@ -87,7 +87,7 @@ class YOLOPersonDetector:
         try:
             h, w = frame.shape[:2]
             # 设置检测时的目标尺寸（宽度不超过 320，保持宽高比）
-            target_width = 320
+            target_width = 240
             scale = target_width / w
             if scale < 1:  # 只有当原图宽度大于 target_width 时才缩小
                 new_w = target_width
