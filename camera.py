@@ -181,7 +181,7 @@ class CameraManager:
         # 显示FPS（可选择性显示）
         if show_fps:  # 增加参数 show_fps 默认为 True
             cv2.putText(frame, f"{fps_label}: {current_fps:.1f}", (10, 25),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.2, (0, 255, 0), 2)
 
         # 显示分辨率
         cv2.putText(frame, f"{w}x{h}", (120, 25),
