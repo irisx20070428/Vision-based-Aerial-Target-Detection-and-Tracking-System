@@ -124,22 +124,6 @@
       <option name="presentableId" value="Default" />
       <updated>1773758464264</updated>
     </task>
-    <task id="LOCAL-00028" summary="忘了">
-      <option name="closed" value="true" />
-      <created>1776329944524</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1776329944524</updated>
-    </task>
-    <task id="LOCAL-00029" summary="修改yolo模型">
-      <option name="closed" value="true" />
-      <created>1776330851828</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1776330851828</updated>
-    </task>
     <task id="LOCAL-00030" summary="1">
       <option name="closed" value="true" />
       <created>1776331761519</created>
@@ -516,7 +500,23 @@
       <option name="project" value="LOCAL" />
       <updated>1776688019721</updated>
     </task>
-    <option name="localTasksCounter" value="77" />
+    <task id="LOCAL-00077" summary="debug">
+      <option name="closed" value="true" />
+      <created>1776688386485</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1776688386485</updated>
+    </task>
+    <task id="LOCAL-00078" summary="debug">
+      <option name="closed" value="true" />
+      <created>1776688550277</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1776688550277</updated>
+    </task>
+    <option name="localTasksCounter" value="79" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
