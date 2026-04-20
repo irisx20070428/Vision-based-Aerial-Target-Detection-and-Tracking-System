@@ -18,7 +18,7 @@ class YOLOPersonDetector:
     def __init__(self, conf_threshold=0.5, device='cpu'):
 
         self.tracker = None  # OpenCV 追踪器
-        self.tracker_type = 'KCF'  # 或 'KCF'（更快但稍弱）
+        self.tracker_type = 'CSRT'  # 或 'KCF'（更快但稍弱）
 
         # 追踪模式下的检测帧间隔（值越大越省CPU）
         self.tracking_detect_interval = 10  # 每3帧检测一次
@@ -139,11 +139,7 @@ class YOLOPersonDetector:
             bbox = (x1, y1, x2 - x1, y2 - y1)
 
             # 初始化 CSRT 追踪器
-            # select_hovered_person 中
-            if self.tracker_type == 'CSRT':
-                self.tracker = cv2.TrackerCSRT_create()
-            else:
-                self.tracker = cv2.TrackerKCF_create()
+            self.tracker = cv2.TrackerCSRT_create()
             self.tracker.init(frame, bbox)
 
             # 设置追踪状态
@@ -159,7 +155,7 @@ class YOLOPersonDetector:
             self.last_center = (cx, cy)
             self.last_velocity = (0, 0)
 
-            print(f"🎯 已选中人物并启动KCF追踪器")
+            print(f"🎯 已选中人物并启动CSRT追踪器")
             print(f"   位置: ({x1}, {y1}) -> ({x2}, {y2})")
             print(f"   置信度: {conf:.2f}")
 
@@ -210,7 +206,7 @@ class YOLOPersonDetector:
                         self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
                     # 绘制绿色追踪框
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                    cv2.putText(frame, "TRACKING (KCF)", (x1, y1 - 10),
+                    cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                     return frame
 
@@ -244,7 +240,7 @@ class YOLOPersonDetector:
                                     x1, y1, x2, y2, conf, _ = best_match
                                     bbox = (x1, y1, x2 - x1, y2 - y1)
                                     # 重新初始化追踪器
-                                    self.tracker = cv2.TrackerKCF_create()
+                                    self.tracker = cv2.TrackerCSRT_create()
                                     self.tracker.init(frame, bbox)
                                     self.selected_person = [x1, y1, x2, y2, conf, 0]
                                     self.prev_track_bbox = (x1, y1, x2, y2)
@@ -258,7 +254,7 @@ class YOLOPersonDetector:
                                     print("✅ 追踪器已通过检测结果重新初始化")
                                     # 绘制绿色框并返回
                                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                                    cv2.putText(frame, "TRACKING (KCF)", (x1, y1 - 10),
+                                    cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
                                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                                     return frame
 
