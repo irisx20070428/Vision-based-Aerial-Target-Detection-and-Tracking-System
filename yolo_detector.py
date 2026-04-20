@@ -18,7 +18,7 @@ class YOLOPersonDetector:
     def __init__(self, conf_threshold=0.5, device='cpu'):
 
         self.tracker = None  # OpenCV 追踪器
-        self.tracker_type = 'CSRT'  # 或 'KCF'（更快但稍弱）
+        self.tracker_type = 'KCF'  # 或 'KCF'（更快但稍弱）
 
         # 追踪模式下的检测帧间隔（值越大越省CPU）
         self.tracking_detect_interval = 3  # 每3帧检测一次
@@ -204,7 +204,7 @@ class YOLOPersonDetector:
                     self.last_center = (cx, cy)
                     if self.selected_person is not None:
                         self.selected_person = [x1, y1, x2, y2, self.selected_person[4], 0]
-                    # 绘制绿色追踪框
+                    # 绘制绿色追踪框de
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
                     cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
