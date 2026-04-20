@@ -61,6 +61,7 @@ class YOLOPersonDetector:
         self.prev_track_bbox = None
 
         # 丢失容忍
+        self.is_lost = False
         self.lost_frame_count = 0
         self.max_lost_frames = 10
 
@@ -160,7 +161,7 @@ class YOLOPersonDetector:
                         lost_this_frame = True
 
                         if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
-                            x1 < -margin or y1 < -margin):
+                                x1 < -margin or y1 < -margin):
                             lost_this_frame = True
                             print("[TRACK] lost due to out of bounds")
                         elif bw * bh < 30:
@@ -176,7 +177,7 @@ class YOLOPersonDetector:
                         lost_this_frame = True
 
                         if (x2 < -margin or x1 > w + margin or y2 < -margin or y1 > h + margin or
-                            x1 < -margin or y1 < -margin):
+                                x1 < -margin or y1 < -margin):
                             lost_this_frame = True
                             print("[TRACK] lost due to out of bounds")
                         elif bw * bh < 30:
@@ -210,10 +211,10 @@ class YOLOPersonDetector:
                 else:
                     lost_this_frame = True
 
-
-
                 if not lost_this_frame:
+                    # ----- 成功追踪 -----
                     self.lost_frame_count = 0
+                    self.is_lost = False  # 新增：清除丢失标志
                     self.prev_track_bbox = (x1, y1, x2, y2)
                     cx = (x1 + x2) // 2
                     cy = (y1 + y2) // 2
@@ -230,9 +231,10 @@ class YOLOPersonDetector:
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 3)
                     cv2.putText(frame, "TRACKING (CSRT)", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                 else:
+                    # ----- 追踪丢失 -----
                     self.lost_frame_count += 1
                     if self.lost_frame_count <= self.max_lost_frames:
-
+                        self.is_lost = True  # 新增：标记为丢失状态
                         print(f"[TRACK] predicting, lost_count={self.lost_frame_count}")
 
                         if self.prev_track_bbox is not None:
@@ -256,10 +258,12 @@ class YOLOPersonDetector:
                                 cv2.putText(frame, "predicting...", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                                             (128, 128, 128), 1)
                     else:
+                        # 彻底丢失，清除追踪状态
                         self.clear_selection()
                         self.tracker = None
                         self.prev_track_bbox = None
                         self.lost_frame_count = 0
+                        self.is_lost = False  # 新增：清除丢失标志
                         cv2.putText(frame, "⚠️ TRACKING LOST", (frame.shape[1] // 2 - 150, frame.shape[0] // 2),
                                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 return frame

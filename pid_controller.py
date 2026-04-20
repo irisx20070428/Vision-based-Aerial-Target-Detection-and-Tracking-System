@@ -133,6 +133,11 @@ class PanTiltController:
         # 调试计数器
         self.debug_counter = 0
 
+        self.recovery_frames = 0  # 恢复后的帧计数
+        self.recovery_limit = 5  # 前5帧降低输出
+        self.normal_max_output = 20
+        self.recovery_max_output = 5
+
         print(f"✅ 云台PID控制器初始化成功")
         print(f"   - 图像分辨率: {self.image_width}x{self.image_height}")
         print(f"   - 图像中心: ({self.image_center_x}, {self.image_center_y})")
@@ -213,12 +218,23 @@ class PanTiltController:
         control_x = self.pid_pan.update(angle_error_x)  # 水平控制量
         control_y = self.pid_tilt.update(angle_error_y)  # 垂直控制量
 
+        # 在计算 control_x, control_y 之后，应用输出限制之前
+        if self.recovery_frames > 0:
+            max_out = self.recovery_max_output
+            self.recovery_frames -= 1
+        else:
+            max_out = self.normal_max_output
+
+        control_x = max(-max_out, min(max_out, control_x))
+        control_y = max(-max_out, min(max_out, control_y))
+
         if self.debug_counter % 30 == 0:
             print(f"PID输出: control_x={control_x:+.2f}, control_y={control_y:+.2f}, angle_error=({angle_error_x:+.2f},{angle_error_y:+.2f})")
 
         # 限制单次变化量
-        control_x = max(-self.max_angle_change, min(self.max_angle_change, control_x))
-        control_y = max(-self.max_angle_change, min(self.max_angle_change, control_y))
+        limit = min(self.max_angle_change, max_out) if self.recovery_frames > 0 else self.max_angle_change
+        control_x = max(-limit, min(limit, control_x))
+        control_y = max(-limit, min(limit, control_y))
 
         # 更新角度（注意：舵机控制方向可能需要取反）
         # 如果目标在右侧（正误差），舵机应该向右转（增加角度）

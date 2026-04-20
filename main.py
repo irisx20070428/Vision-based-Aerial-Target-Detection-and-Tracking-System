@@ -315,22 +315,46 @@ class PersonDetectionApp:
                         self.current_servo_command = "追踪已停止"
                         print("⏸️ 舵机追踪已暂停（未选中人物）")
 
-                # 5. PID 控制（只在追踪模式下且舵机可用时）
+                #丢失时清除 target_center
+                if target_center is not None and hasattr(self.detector, 'is_lost') and self.detector.is_lost:
+                    target_center = None
+                    print("🚫 目标丢失，清除 target_center")
+
+                # 检测丢失状态变化，重置 PID
+                if hasattr(self.detector, 'is_lost'):
+                    if not hasattr(self, '_prev_lost'):
+                        self._prev_lost = False
+                    if self._prev_lost and not self.detector.is_lost:
+                        # 刚从丢失中恢复，重置 PID 积分并启用软启动
+                        if self.pid_controller:
+                            self.pid_controller.pid_pan.reset()
+                            self.pid_controller.pid_tilt.reset()
+                            # 新增：设置恢复模式帧数
+                            if hasattr(self.pid_controller, 'recovery_frames'):
+                                self.pid_controller.recovery_frames = getattr(self.pid_controller, 'recovery_limit', 5)
+                            print("🔄 目标重新出现，PID 积分已重置，启用软启动")
+                    self._prev_lost = self.detector.is_lost
+
+                # 5. PID 控制（只在追踪模式下且舵机可用时，且未丢失）
                 if self.pid_controller and target_center and self.is_tracking:
-                    # 计算目标角度
-                    print(f"[MAIN] before PID, target_center={target_center}")
-                    pan_angle, tilt_angle = self.pid_controller.compute_angles(target_center[0], target_center[1])
-                    print(f"[MAIN] after PID, pan={pan_angle:.1f}, tilt={tilt_angle:.1f}")
+                    # 检查是否处于丢失状态
+                    if hasattr(self.detector, 'is_lost') and self.detector.is_lost:
+                        if frame_count % 30 == 0:
+                            print("⚠️ 目标丢失，暂停 PID 控制（舵机保持不动）")
+                    else:
+                        print(f"[MAIN] before PID, target_center={target_center}")
+                        pan_angle, tilt_angle = self.pid_controller.compute_angles(target_center[0], target_center[1])
+                        print(f"[MAIN] after PID, pan={pan_angle:.1f}, tilt={tilt_angle:.1f}")
 
-                    # 更新舵机指令显示
-                    if abs(pan_angle - self.last_pan_target) > 0.5 or abs(tilt_angle - self.last_tilt_target) > 0.5:
-                        self.last_pan_target = pan_angle
-                        self.last_tilt_target = tilt_angle
-                        self.current_servo_command = f"Pan:{pan_angle:.1f}° Tilt:{tilt_angle:.1f}°"
+                        # 更新舵机指令显示
+                        if abs(pan_angle - self.last_pan_target) > 0.5 or abs(tilt_angle - self.last_tilt_target) > 0.5:
+                            self.last_pan_target = pan_angle
+                            self.last_tilt_target = tilt_angle
+                            self.current_servo_command = f"Pan:{pan_angle:.1f}° Tilt:{tilt_angle:.1f}°"
 
-                    # 设置舵机目标（舵机内部会检查 tracking_enabled）
-                    if self.servo and hasattr(self.servo, 'set_target'):
-                        self.servo.set_target(pan_angle, tilt_angle)
+                        # 设置舵机目标（舵机内部会检查 tracking_enabled）
+                        if self.servo and hasattr(self.servo, 'set_target'):
+                            self.servo.set_target(pan_angle, tilt_angle)
 
                 # 6. 更新舵机位置（平滑移动）
                 if self.servo and hasattr(self.servo, 'update'):
