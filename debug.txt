@@ -1,0 +1,992 @@
+[PID] target=(627,239), current_angle=(83.9,0.0)
+[PID] error_pixels=(307,0), angle_error=(31.18,0.00)
+[PID] control=(10.00,0.00)
+[MAIN] after PID, pan=73.9, tilt=0.0
+[SERVO] set_target(73.92533811090416, 0), tracking_enabled=True
+[TRACK] bbox = (210,-9,618,499), lost_this_frame = False
+[TRACK] updated selected_person to: [210, -9, 618, 499]
+[MAIN] target_center = (414, 245)
+[MAIN] before PID, target_center=(414, 245)
+[PID] target=(414,245), current_angle=(73.9,0.0)
+[PID] error_pixels=(94,0), angle_error=(9.55,0.00)
+[PID] control=(10.00,0.00)
+[MAIN] after PID, pan=63.9, tilt=0.0
+[SERVO] set_target(63.925338110904164, 0), tracking_enabled=True
+[TRACK] bbox = (177,-3,577,495), lost_this_frame = False
+[TRACK] updated selected_person to: [177, -3, 577, 495]
+[MAIN] target_center = (377, 246)
+[MAIN] before PID, target_center=(377, 246)
+[PID] target=(377,246), current_angle=(63.9,0.0)
+📊 角度计算 - 像素误差:(+57,+0)px → 角度误差:(+5.8°,+0.0°) 当前角度:(63.9°,0.0°)
+[PID] error_pixels=(57,0), angle_error=(5.79,0.00)
+[PID] control=(10.00,0.00)
+[MAIN] after PID, pan=53.9, tilt=0.0
+[SERVO] set_target(53.925338110904164, 0), tracking_enabled=True
+[TRACK] bbox = (102,-4,502,494), lost_this_frame = False
+[TRACK] updated selected_person to: [102, -4, 502, 494]
+[MAIN] target_center = (302, 245)
+[MAIN] before PID, target_center=(302, 245)
+[PID] target=(302,245), current_angle=(53.9,0.0)
+[PID] error_pixels=(-18,0), angle_error=(-1.83,0.00)
+[PID] control=(8.73,0.00)
+[MAIN] after PID, pan=45.2, tilt=0.0
+[SERVO] set_target(45.193285709659506, 0), tracking_enabled=True
+[TRACK] bbox = (34,-4,434,494), lost_this_frame = False
+[TRACK] updated selected_person to: [34, -4, 434, 494]
+[MAIN] target_center = (234, 245)
+[MAIN] before PID, target_center=(234, 245)
+[PID] target=(234,245), current_angle=(45.2,0.0)
+[PID] error_pixels=(-86,0), angle_error=(-8.73,0.00)
+[PID] control=(2.13,0.00)
+[MAIN] after PID, pan=43.1, tilt=0.0
+[SERVO] set_target(43.060653992394165, 0), tracking_enabled=True
+[TRACK] bbox = (-204,-13,204,495), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=1
+[MAIN] target_center = (234, 245)
+[MAIN] before PID, target_center=(234, 245)
+[PID] target=(234,245), current_angle=(43.1,0.0)
+[PID] error_pixels=(-86,0), angle_error=(-8.73,0.00)
+[PID] control=(-2.17,0.00)
+[MAIN] after PID, pan=45.2, tilt=0.0
+[SERVO] set_target(45.232622084569634, 0), tracking_enabled=True
+[TRACK] bbox = (-208,-11,208,507), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=2
+[MAIN] target_center = (234, 245)
+[MAIN] before PID, target_center=(234, 245)
+[PID] target=(234,245), current_angle=(45.2,0.0)
+[PID] error_pixels=(-86,0), angle_error=(-8.73,0.00)
+[PID] control=(-5.19,0.00)
+[MAIN] after PID, pan=50.4, tilt=0.0
+[SERVO] set_target(50.422707498516964, 0), tracking_enabled=True
+[TRACK] bbox = (-204,1,204,509), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=3
+[MAIN] target_center = (234, 245)
+[MAIN] before PID, target_center=(234, 245)
+[PID] target=(234,245), current_angle=(50.4,0.0)
+[PID] error_pixels=(-86,0), angle_error=(-8.73,0.00)
+[PID] control=(-7.31,0.00)
+[MAIN] after PID, pan=57.7, tilt=0.0
+[SERVO] set_target(57.730302198115176, 0), tracking_enabled=True
+[TRACK] bbox = (-200,10,200,508), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=4
+[MAIN] target_center = (234, 245)
+[MAIN] before PID, target_center=(234, 245)
+[PID] target=(234,245), current_angle=(57.7,0.0)
+[PID] error_pixels=(-86,0), angle_error=(-8.73,0.00)
+[PID] control=(-8.80,0.00)
+[MAIN] after PID, pan=66.5, tilt=0.0
+[SERVO] set_target(66.52892814696293, 0), tracking_enabled=True
+[TRACK] bbox = (-204,-6,204,502), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=5
+[MAIN] target_center = (234, 245)
+[MAIN] before PID, target_center=(234, 245)
+[PID] target=(234,245), current_angle=(66.5,0.0)
+[PID] error_pixels=(-86,0), angle_error=(-8.73,0.00)
+[PID] control=(-9.85,0.00)
+[MAIN] after PID, pan=76.4, tilt=0.0
+[SERVO] set_target(76.37605903716904, 0), tracking_enabled=True
+[TRACK] bbox = (-195,-13,213,495), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=6
+[MAIN] target_center = (234, 245)
+[MAIN] before PID, target_center=(234, 245)
+[PID] target=(234,245), current_angle=(76.4,0.0)
+[PID] error_pixels=(-86,0), angle_error=(-8.73,0.00)
+[PID] control=(-10.00,0.00)
+[MAIN] after PID, pan=86.4, tilt=0.0
+[SERVO] set_target(86.37605903716904, 0), tracking_enabled=True
+[TRACK] bbox = (-91,-10,317,498), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=7
+[MAIN] target_center = (234, 245)
+[MAIN] before PID, target_center=(234, 245)
+[PID] target=(234,245), current_angle=(86.4,0.0)
+[PID] error_pixels=(-86,0), angle_error=(-8.73,0.00)
+[PID] control=(-10.00,0.00)
+[MAIN] after PID, pan=96.4, tilt=0.0
+[SERVO] set_target(96.37605903716904, 0), tracking_enabled=True
+[TRACK] bbox = (16,-13,432,505), lost_this_frame = False
+[TRACK] updated selected_person to: [16, -13, 432, 505]
+[MAIN] target_center = (224, 246)
+[MAIN] before PID, target_center=(224, 246)
+[PID] target=(224,246), current_angle=(96.4,0.0)
+PID输出: control_x=-11.99, control_y=+0.00, angle_error=(-9.75,+0.00)
+[PID] error_pixels=(-96,0), angle_error=(-9.75,0.00)
+[PID] control=(-10.00,0.00)
+[MAIN] after PID, pan=106.4, tilt=0.0
+[SERVO] set_target(106.37605903716904, 0), tracking_enabled=True
+[TRACK] bbox = (212,-10,620,498), lost_this_frame = False
+[TRACK] updated selected_person to: [212, -10, 620, 498]
+[MAIN] target_center = (416, 244)
+[MAIN] before PID, target_center=(416, 244)
+[PID] target=(416,244), current_angle=(106.4,0.0)
+[PID] error_pixels=(96,0), angle_error=(9.75,0.00)
+[PID] control=(-2.13,0.00)
+[MAIN] after PID, pan=108.5, tilt=0.0
+[SERVO] set_target(108.50595970022506, 0), tracking_enabled=True
+[TRACK] bbox = (285,-7,685,491), lost_this_frame = False
+[TRACK] updated selected_person to: [285, -7, 685, 491]
+[MAIN] target_center = (485, 242)
+[MAIN] before PID, target_center=(485, 242)
+[PID] target=(485,242), current_angle=(108.5,0.0)
+[PID] error_pixels=(165,0), angle_error=(16.76,0.00)
+[PID] control=(6.89,0.00)
+[MAIN] after PID, pan=101.6, tilt=0.0
+[SERVO] set_target(101.61336910635939, 0), tracking_enabled=True
+[TRACK] bbox = (305,-21,721,497), lost_this_frame = False
+[TRACK] updated selected_person to: [305, -21, 721, 497]
+[MAIN] target_center = (513, 238)
+[MAIN] before PID, target_center=(513, 238)
+[PID] target=(513,238), current_angle=(101.6,0.0)
+[PID] error_pixels=(193,0), angle_error=(19.60,0.00)
+[PID] control=(10.00,0.00)
+[MAIN] after PID, pan=91.6, tilt=0.0
+[SERVO] set_target(91.61336910635939, 0), tracking_enabled=True
+[TRACK] bbox = (413,-18,829,500), lost_this_frame = False
+[TRACK] updated selected_person to: [413, -18, 829, 500]
+[MAIN] target_center = (621, 241)
+[MAIN] before PID, target_center=(621, 241)
+[PID] target=(621,241), current_angle=(91.6,0.0)
+[PID] error_pixels=(301,0), angle_error=(30.57,0.00)
+[PID] control=(10.00,0.00)
+[MAIN] after PID, pan=81.6, tilt=0.0
+[SERVO] set_target(81.61336910635939, 0), tracking_enabled=True
+[TRACK] bbox = (339,9,755,527), lost_this_frame = False
+[TRACK] updated selected_person to: [339, 9, 755, 527]
+[MAIN] target_center = (547, 268)
+[MAIN] before PID, target_center=(547, 268)
+[PID] target=(547,268), current_angle=(81.6,0.0)
+[PID] error_pixels=(227,28), angle_error=(23.05,2.80)
+[PID] control=(10.00,1.49)
+[MAIN] after PID, pan=71.6, tilt=0.0
+[SERVO] set_target(71.61336910635939, 0), tracking_enabled=True
+[TRACK] bbox = (281,8,706,536), lost_this_frame = False
+[TRACK] updated selected_person to: [281, 8, 706, 536]
+[MAIN] target_center = (493, 272)
+[MAIN] before PID, target_center=(493, 272)
+[PID] target=(493,272), current_angle=(71.6,0.0)
+[PID] error_pixels=(173,32), angle_error=(17.57,3.20)
+[PID] control=(10.00,2.52)
+[MAIN] after PID, pan=61.6, tilt=0.0
+[SERVO] set_target(61.613369106359386, 0), tracking_enabled=True
+[TRACK] bbox = (171,-14,587,504), lost_this_frame = False
+[TRACK] updated selected_person to: [171, -14, 587, 504]
+[MAIN] target_center = (379, 245)
+[MAIN] before PID, target_center=(379, 245)
+[PID] target=(379,245), current_angle=(61.6,0.0)
+[PID] error_pixels=(59,0), angle_error=(5.99,0.00)
+[PID] control=(10.00,1.49)
+[MAIN] after PID, pan=51.6, tilt=0.0
+[SERVO] set_target(51.613369106359386, 0), tracking_enabled=True
+[TRACK] bbox = (54,-30,479,498), lost_this_frame = False
+[TRACK] updated selected_person to: [54, -30, 479, 498]
+[MAIN] target_center = (266, 234)
+[MAIN] before PID, target_center=(266, 234)
+[PID] target=(266,234), current_angle=(51.6,0.0)
+[PID] error_pixels=(-54,0), angle_error=(-5.48,0.00)
+[PID] control=(8.53,1.05)
+[MAIN] after PID, pan=43.1, tilt=0.0
+[SERVO] set_target(43.07950162176459, 0), tracking_enabled=True
+[TRACK] bbox = (-116,-14,300,504), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=1
+[MAIN] target_center = (266, 234)
+[MAIN] before PID, target_center=(266, 234)
+[PID] target=(266,234), current_angle=(43.1,0.0)
+[PID] error_pixels=(-54,0), angle_error=(-5.48,0.00)
+[PID] control=(3.80,0.74)
+[MAIN] after PID, pan=39.3, tilt=0.0
+[SERVO] set_target(39.28243405413469, 0), tracking_enabled=True
+[TRACK] bbox = (-154,-21,271,507), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=2
+[MAIN] target_center = (266, 234)
+[MAIN] before PID, target_center=(266, 234)
+[PID] target=(266,234), current_angle=(39.3,0.0)
+[PID] error_pixels=(-54,0), angle_error=(-5.48,0.00)
+[PID] control=(0.48,0.52)
+[MAIN] after PID, pan=38.8, tilt=0.0
+[SERVO] set_target(38.80422139620369, 0), tracking_enabled=True
+[TRACK] bbox = (-212,-52,213,476), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=3
+[MAIN] target_center = (266, 234)
+[MAIN] before PID, target_center=(266, 234)
+[PID] target=(266,234), current_angle=(38.8,0.0)
+[PID] error_pixels=(-54,0), angle_error=(-5.48,0.00)
+[PID] control=(-1.85,0.37)
+[MAIN] after PID, pan=40.7, tilt=0.0
+[SERVO] set_target(40.65257418033561, 0), tracking_enabled=True
+[TRACK] bbox = (-212,-57,213,471), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=4
+[MAIN] target_center = (266, 234)
+[MAIN] before PID, target_center=(266, 234)
+[PID] target=(266,234), current_angle=(40.7,0.0)
+[PID] error_pixels=(-54,0), angle_error=(-5.48,0.00)
+[PID] control=(-3.48,0.26)
+[MAIN] after PID, pan=44.1, tilt=0.0
+[SERVO] set_target(44.136119269212124, 0), tracking_enabled=True
+[TRACK] bbox = (-212,-29,213,499), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=5
+[MAIN] target_center = (266, 234)
+[MAIN] before PID, target_center=(266, 234)
+[PID] target=(266,234), current_angle=(44.1,0.0)
+[PID] error_pixels=(-54,0), angle_error=(-5.48,0.00)
+[PID] control=(-4.63,0.19)
+[MAIN] after PID, pan=48.8, tilt=0.0
+[SERVO] set_target(48.767695448159174, 0), tracking_enabled=True
+[TRACK] bbox = (-212,-29,213,499), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=6
+[MAIN] target_center = (266, 234)
+[MAIN] before PID, target_center=(266, 234)
+[PID] target=(266,234), current_angle=(48.8,0.0)
+[PID] error_pixels=(-54,0), angle_error=(-5.48,0.00)
+[PID] control=(-5.44,0.13)
+[MAIN] after PID, pan=54.2, tilt=0.0
+[SERVO] set_target(54.206278895027204, 0), tracking_enabled=True
+[TRACK] bbox = (-209,-25,216,503), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=7
+[MAIN] target_center = (266, 234)
+[MAIN] before PID, target_center=(266, 234)
+[PID] target=(266,234), current_angle=(54.2,0.0)
+[PID] error_pixels=(-54,0), angle_error=(-5.48,0.00)
+[PID] control=(-6.01,0.10)
+[MAIN] after PID, pan=60.2, tilt=0.0
+[SERVO] set_target(60.21296842082833, 0), tracking_enabled=True
+[TRACK] bbox = (-217,-30,216,509), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=8
+[MAIN] target_center = (266, 234)
+[MAIN] before PID, target_center=(266, 234)
+[PID] target=(266,234), current_angle=(60.2,0.0)
+[PID] error_pixels=(-54,0), angle_error=(-5.48,0.00)
+[PID] control=(-6.41,0.07)
+[MAIN] after PID, pan=66.6, tilt=0.0
+[SERVO] set_target(66.62338387304115, 0), tracking_enabled=True
+[TRACK] bbox = (-99,-27,334,512), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=9
+[MAIN] target_center = (266, 234)
+[MAIN] before PID, target_center=(266, 234)
+[PID] target=(266,234), current_angle=(66.6,0.0)
+[PID] error_pixels=(-54,0), angle_error=(-5.48,0.00)
+[PID] control=(-6.70,0.05)
+[MAIN] after PID, pan=73.3, tilt=0.0
+[SERVO] set_target(73.31969035997906, 0), tracking_enabled=True
+[TRACK] bbox = (-95,-27,338,512), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=10
+[MAIN] target_center = (266, 234)
+[MAIN] before PID, target_center=(266, 234)
+[PID] target=(266,234), current_angle=(73.3,0.0)
+[PID] error_pixels=(-54,0), angle_error=(-5.48,0.00)
+[PID] control=(-6.90,0.04)
+[MAIN] after PID, pan=80.2, tilt=0.0
+[SERVO] set_target(80.21931612178548, 0), tracking_enabled=True
+[TRACK] bbox = (-15,-24,410,504), lost_this_frame = False
+[TRACK] updated selected_person to: [-15, -24, 410, 504]
+[MAIN] target_center = (197, 240)
+[MAIN] before PID, target_center=(197, 240)
+[PID] target=(197,240), current_angle=(80.2,0.0)
+[PID] error_pixels=(-123,0), angle_error=(-12.49,0.00)
+[PID] control=(-10.00,0.03)
+[MAIN] after PID, pan=90.2, tilt=0.0
+[SERVO] set_target(90.21931612178548, 0), tracking_enabled=True
+[TRACK] bbox = (73,-24,498,504), lost_this_frame = False
+[TRACK] updated selected_person to: [73, -24, 498, 504]
+[MAIN] target_center = (285, 240)
+[MAIN] before PID, target_center=(285, 240)
+[PID] target=(285,240), current_angle=(90.2,0.0)
+[PID] error_pixels=(-35,0), angle_error=(-3.55,0.00)
+[PID] control=(-8.51,0.03)
+[MAIN] after PID, pan=98.7, tilt=0.0
+[SERVO] set_target(98.73080415632946, 0), tracking_enabled=True
+[TRACK] bbox = (263,-20,688,508), lost_this_frame = False
+[TRACK] updated selected_person to: [263, -20, 688, 508]
+[MAIN] target_center = (475, 244)
+[MAIN] before PID, target_center=(475, 244)
+[PID] target=(475,244), current_angle=(98.7,0.0)
+[PID] error_pixels=(155,0), angle_error=(15.74,0.00)
+[PID] control=(2.81,0.02)
+[MAIN] after PID, pan=95.9, tilt=0.0
+[SERVO] set_target(95.91778356008074, 0), tracking_enabled=True
+[TRACK] bbox = (264,-18,689,510), lost_this_frame = False
+[TRACK] updated selected_person to: [264, -18, 689, 510]
+[MAIN] target_center = (476, 246)
+[MAIN] before PID, target_center=(476, 246)
+[PID] target=(476,246), current_angle=(95.9,0.0)
+[PID] error_pixels=(156,0), angle_error=(15.84,0.00)
+[PID] control=(9.37,0.02)
+[MAIN] after PID, pan=86.5, tilt=0.0
+[SERVO] set_target(86.54746693311539, 0), tracking_enabled=True
+[TRACK] bbox = (359,-20,775,498), lost_this_frame = False
+[TRACK] updated selected_person to: [359, -20, 775, 498]
+[MAIN] target_center = (567, 239)
+[MAIN] before PID, target_center=(567, 239)
+[PID] target=(567,239), current_angle=(86.5,0.0)
+[PID] error_pixels=(247,0), angle_error=(25.09,0.00)
+[PID] control=(10.00,0.02)
+[MAIN] after PID, pan=76.5, tilt=0.0
+[SERVO] set_target(76.54746693311539, 0), tracking_enabled=True
+[TRACK] bbox = (372,-21,788,497), lost_this_frame = False
+[TRACK] updated selected_person to: [372, -21, 788, 497]
+[MAIN] target_center = (580, 238)
+[MAIN] before PID, target_center=(580, 238)
+[PID] target=(580,238), current_angle=(76.5,0.0)
+[PID] error_pixels=(260,0), angle_error=(26.41,0.00)
+[PID] control=(10.00,0.01)
+[MAIN] after PID, pan=66.5, tilt=0.0
+[SERVO] set_target(66.54746693311539, 0), tracking_enabled=True
+[TRACK] bbox = (164,-16,580,502), lost_this_frame = False
+[TRACK] updated selected_person to: [164, -16, 580, 502]
+[MAIN] target_center = (372, 243)
+[MAIN] before PID, target_center=(372, 243)
+[PID] target=(372,243), current_angle=(66.5,0.0)
+[PID] error_pixels=(52,0), angle_error=(5.28,0.00)
+[PID] control=(10.00,0.01)
+[MAIN] after PID, pan=56.5, tilt=0.0
+[SERVO] set_target(56.54746693311539, 0), tracking_enabled=True
+[TRACK] bbox = (156,-19,572,499), lost_this_frame = False
+[TRACK] updated selected_person to: [156, -19, 572, 499]
+[MAIN] target_center = (364, 240)
+[MAIN] before PID, target_center=(364, 240)
+[PID] target=(364,240), current_angle=(56.5,0.0)
+[PID] error_pixels=(44,0), angle_error=(4.47,0.00)
+[PID] control=(10.00,0.01)
+[MAIN] after PID, pan=46.5, tilt=0.0
+[SERVO] set_target(46.54746693311539, 0), tracking_enabled=True
+[TRACK] bbox = (47,-19,463,499), lost_this_frame = False
+[TRACK] updated selected_person to: [47, -19, 463, 499]
+[MAIN] target_center = (255, 240)
+[MAIN] before PID, target_center=(255, 240)
+[PID] target=(255,240), current_angle=(46.5,0.0)
+[PID] error_pixels=(-65,0), angle_error=(-6.60,0.00)
+[PID] control=(5.29,0.01)
+[MAIN] after PID, pan=41.3, tilt=0.0
+[SERVO] set_target(41.2602819080123, 0), tracking_enabled=True
+[TRACK] bbox = (7,-16,415,492), lost_this_frame = False
+[TRACK] updated selected_person to: [7, -16, 415, 492]
+[MAIN] target_center = (211, 238)
+[MAIN] before PID, target_center=(211, 238)
+[PID] target=(211,238), current_angle=(41.3,0.0)
+[PID] error_pixels=(-109,0), angle_error=(-11.07,0.00)
+[PID] control=(-1.19,0.01)
+[MAIN] after PID, pan=42.5, tilt=0.0
+[SERVO] set_target(42.452104598295556, 0), tracking_enabled=True
+[TRACK] bbox = (-204,-32,204,476), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=1
+[MAIN] target_center = (211, 238)
+[MAIN] before PID, target_center=(211, 238)
+[PID] target=(211,238), current_angle=(42.5,0.0)
+[PID] error_pixels=(-109,0), angle_error=(-11.07,0.00)
+[PID] control=(-5.54,0.01)
+[MAIN] after PID, pan=48.0, tilt=0.0
+[SERVO] set_target(47.98909741499386, 0), tracking_enabled=True
+[TRACK] bbox = (-204,-32,204,476), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=2
+[MAIN] target_center = (211, 238)
+[MAIN] before PID, target_center=(211, 238)
+[PID] target=(211,238), current_angle=(48.0,0.0)
+PID输出: control_x=-8.58, control_y=+0.01, angle_error=(-11.07,+0.00)
+[PID] error_pixels=(-109,0), angle_error=(-11.07,0.00)
+[PID] control=(-8.58,0.01)
+[MAIN] after PID, pan=56.6, tilt=0.0
+[SERVO] set_target(56.5739072719298, 0), tracking_enabled=True
+[TRACK] bbox = (-204,-31,204,477), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=3
+[MAIN] target_center = (211, 238)
+[MAIN] before PID, target_center=(211, 238)
+[PID] target=(211,238), current_angle=(56.6,0.0)
+[PID] error_pixels=(-109,0), angle_error=(-11.07,0.00)
+[PID] control=(-10.00,0.01)
+[MAIN] after PID, pan=66.6, tilt=0.0
+[SERVO] set_target(66.5739072719298, 0), tracking_enabled=True
+[TRACK] bbox = (-208,-27,208,491), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=4
+[MAIN] target_center = (211, 238)
+[MAIN] before PID, target_center=(211, 238)
+[PID] target=(211,238), current_angle=(66.6,0.0)
+[PID] error_pixels=(-109,0), angle_error=(-11.07,0.00)
+[PID] control=(-10.00,0.01)
+[MAIN] after PID, pan=76.6, tilt=0.0
+[SERVO] set_target(76.5739072719298, 0), tracking_enabled=True
+[TRACK] bbox = (-17,-17,391,491), lost_this_frame = False
+[TRACK] updated selected_person to: [-17, -17, 391, 491]
+[MAIN] target_center = (187, 237)
+[MAIN] before PID, target_center=(187, 237)
+[PID] target=(187,237), current_angle=(76.6,0.0)
+[PID] error_pixels=(-133,0), angle_error=(-13.51,0.00)
+[PID] control=(-10.00,0.01)
+[MAIN] after PID, pan=86.6, tilt=0.0
+[SERVO] set_target(86.5739072719298, 0), tracking_enabled=True
+[TRACK] bbox = (-13,-19,403,499), lost_this_frame = False
+[TRACK] updated selected_person to: [-13, -19, 403, 499]
+[MAIN] target_center = (195, 240)
+[MAIN] before PID, target_center=(195, 240)
+[PID] target=(195,240), current_angle=(86.6,0.0)
+[PID] error_pixels=(-125,0), angle_error=(-12.70,0.00)
+[PID] control=(-10.00,0.01)
+[MAIN] after PID, pan=96.6, tilt=0.0
+[SERVO] set_target(96.5739072719298, 0), tracking_enabled=True
+[TRACK] bbox = (116,-16,532,502), lost_this_frame = False
+[TRACK] updated selected_person to: [116, -16, 532, 502]
+[MAIN] target_center = (324, 243)
+[MAIN] before PID, target_center=(324, 243)
+[PID] target=(324,243), current_angle=(96.6,0.0)
+[MAIN] after PID, pan=96.6, tilt=0.0
+[SERVO] set_target(96.5739072719298, 0), tracking_enabled=True
+[TRACK] bbox = (224,-20,640,498), lost_this_frame = False
+[TRACK] updated selected_person to: [224, -20, 640, 498]
+[MAIN] target_center = (432, 239)
+[MAIN] before PID, target_center=(432, 239)
+[PID] target=(432,239), current_angle=(96.6,0.0)
+[PID] error_pixels=(112,0), angle_error=(11.38,0.00)
+[PID] control=(-4.91,0.01)
+[MAIN] after PID, pan=101.5, tilt=0.0
+[SERVO] set_target(101.47944874313207, 0), tracking_enabled=True
+[TRACK] bbox = (343,-19,759,499), lost_this_frame = False
+[TRACK] updated selected_person to: [343, -19, 759, 499]
+[MAIN] target_center = (551, 240)
+[MAIN] before PID, target_center=(551, 240)
+[PID] target=(551,240), current_angle=(101.5,0.0)
+[PID] error_pixels=(231,0), angle_error=(23.46,0.00)
+[PID] control=(8.37,0.01)
+[MAIN] after PID, pan=93.1, tilt=0.0
+[SERVO] set_target(93.10630833176802, 0), tracking_enabled=True
+[TRACK] bbox = (344,-18,760,500), lost_this_frame = False
+[TRACK] updated selected_person to: [344, -18, 760, 500]
+[MAIN] target_center = (552, 241)
+[MAIN] before PID, target_center=(552, 241)
+[PID] target=(552,241), current_angle=(93.1,0.0)
+[PID] error_pixels=(232,0), angle_error=(23.56,0.00)
+[PID] control=(10.00,0.01)
+[MAIN] after PID, pan=83.1, tilt=0.0
+[SERVO] set_target(83.10630833176802, 0), tracking_enabled=True
+[TRACK] bbox = (402,-18,810,490), lost_this_frame = False
+[TRACK] updated selected_person to: [402, -18, 810, 490]
+[MAIN] target_center = (606, 236)
+[MAIN] before PID, target_center=(606, 236)
+[PID] target=(606,236), current_angle=(83.1,0.0)
+[PID] error_pixels=(286,0), angle_error=(29.05,0.00)
+[PID] control=(10.00,0.01)
+[MAIN] after PID, pan=73.1, tilt=0.0
+[SERVO] set_target(73.10630833176802, 0), tracking_enabled=True
+[TRACK] bbox = (365,-18,773,490), lost_this_frame = False
+[TRACK] updated selected_person to: [365, -18, 773, 490]
+[MAIN] target_center = (569, 236)
+[MAIN] before PID, target_center=(569, 236)
+[PID] target=(569,236), current_angle=(73.1,0.0)
+📊 角度计算 - 像素误差:(+249,+0)px → 角度误差:(+25.3°,+0.0°) 当前角度:(73.1°,0.0°)
+[PID] error_pixels=(249,0), angle_error=(25.29,0.00)
+[PID] control=(10.00,0.01)
+[MAIN] after PID, pan=63.1, tilt=0.0
+[SERVO] set_target(63.10630833176802, 0), tracking_enabled=True
+[TRACK] bbox = (123,-18,539,500), lost_this_frame = False
+[TRACK] updated selected_person to: [123, -18, 539, 500]
+[MAIN] target_center = (331, 241)
+[MAIN] before PID, target_center=(331, 241)
+[PID] target=(331,241), current_angle=(63.1,0.0)
+[PID] error_pixels=(11,0), angle_error=(1.12,0.00)
+[PID] control=(10.00,0.01)
+[MAIN] after PID, pan=53.1, tilt=0.0
+[SERVO] set_target(53.10630833176802, 0), tracking_enabled=True
+[TRACK] bbox = (119,-20,535,498), lost_this_frame = False
+[TRACK] updated selected_person to: [119, -20, 535, 498]
+[MAIN] target_center = (327, 239)
+[MAIN] before PID, target_center=(327, 239)
+[PID] target=(327,239), current_angle=(53.1,0.0)
+[MAIN] after PID, pan=53.1, tilt=0.0
+[SERVO] set_target(53.10630833176802, 0), tracking_enabled=True
+[TRACK] bbox = (39,-25,464,503), lost_this_frame = False
+[TRACK] updated selected_person to: [39, -25, 464, 503]
+[MAIN] target_center = (251, 239)
+[MAIN] before PID, target_center=(251, 239)
+[PID] target=(251,239), current_angle=(53.1,0.0)
+[PID] error_pixels=(-69,0), angle_error=(-7.01,0.00)
+[PID] control=(5.88,0.01)
+[MAIN] after PID, pan=47.2, tilt=0.0
+[SERVO] set_target(47.224394350935405, 0), tracking_enabled=True
+[TRACK] bbox = (-138,-22,287,506), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=1
+[MAIN] target_center = (251, 239)
+[MAIN] before PID, target_center=(251, 239)
+[PID] target=(251,239), current_angle=(47.2,0.0)
+[PID] error_pixels=(-69,0), angle_error=(-7.01,0.00)
+[PID] control=(1.25,0.01)
+[MAIN] after PID, pan=46.0, tilt=0.0
+[SERVO] set_target(45.97733834841797, 0), tracking_enabled=True
+📊 性能: FPS=6.9, 检测人数=1, 追踪=True
+[TRACK] bbox = (-208,-23,217,505), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=2
+[MAIN] target_center = (251, 239)
+[MAIN] before PID, target_center=(251, 239)
+[PID] target=(251,239), current_angle=(46.0,0.0)
+[PID] error_pixels=(-69,0), angle_error=(-7.01,0.00)
+[PID] control=(-2.00,0.01)
+[MAIN] after PID, pan=48.0, tilt=0.0
+[SERVO] set_target(47.97895915087146, 0), tracking_enabled=True
+[TRACK] bbox = (-203,-23,222,505), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=3
+[MAIN] target_center = (251, 239)
+[MAIN] before PID, target_center=(251, 239)
+[PID] target=(251,239), current_angle=(48.0,0.0)
+[PID] error_pixels=(-69,0), angle_error=(-7.01,0.00)
+[PID] control=(-4.28,0.01)
+[MAIN] after PID, pan=52.3, tilt=0.0
+[SERVO] set_target(52.258775124644984, 0), tracking_enabled=True
+[TRACK] bbox = (-167,-26,266,513), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=4
+[MAIN] target_center = (251, 239)
+[MAIN] before PID, target_center=(251, 239)
+[PID] target=(251,239), current_angle=(52.3,0.0)
+[PID] error_pixels=(-69,0), angle_error=(-7.01,0.00)
+[PID] control=(-5.88,0.01)
+[MAIN] after PID, pan=58.1, tilt=0.0
+[SERVO] set_target(58.137507284806, 0), tracking_enabled=True
+[TRACK] bbox = (-74,-17,342,501), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=5
+[MAIN] target_center = (251, 239)
+[MAIN] before PID, target_center=(251, 239)
+[PID] target=(251,239), current_angle=(58.1,0.0)
+[PID] error_pixels=(-69,0), angle_error=(-7.01,0.00)
+[PID] control=(-7.01,0.01)
+[MAIN] after PID, pan=65.1, tilt=0.0
+[SERVO] set_target(65.14272270442359, 0), tracking_enabled=True
+[TRACK] bbox = (-6,-27,410,491), lost_this_frame = False
+[TRACK] updated selected_person to: [-6, -27, 410, 491]
+[MAIN] target_center = (202, 232)
+[MAIN] before PID, target_center=(202, 232)
+[PID] target=(202,232), current_angle=(65.1,0.0)
+[PID] error_pixels=(-118,0), angle_error=(-11.98,0.00)
+[PID] control=(-10.00,0.01)
+[MAIN] after PID, pan=75.1, tilt=0.0
+[SERVO] set_target(75.14272270442359, 0), tracking_enabled=True
+[TRACK] bbox = (61,-28,477,490), lost_this_frame = False
+[TRACK] updated selected_person to: [61, -28, 477, 490]
+[MAIN] target_center = (269, 231)
+[MAIN] before PID, target_center=(269, 231)
+[PID] target=(269,231), current_angle=(75.1,0.0)
+[PID] error_pixels=(-51,0), angle_error=(-5.18,0.00)
+[PID] control=(-8.83,0.01)
+[MAIN] after PID, pan=84.0, tilt=0.0
+[SERVO] set_target(83.97335415178733, 0), tracking_enabled=True
+[TRACK] bbox = (122,-29,538,489), lost_this_frame = False
+[TRACK] updated selected_person to: [122, -29, 538, 489]
+[MAIN] target_center = (330, 230)
+[MAIN] before PID, target_center=(330, 230)
+[PID] target=(330,230), current_angle=(84.0,0.0)
+[PID] error_pixels=(10,-10), angle_error=(1.02,-1.00)
+[PID] control=(-4.95,-0.52)
+[MAIN] after PID, pan=88.9, tilt=0.5
+[SERVO] set_target(88.92207979799753, 0.5236051609688549), tracking_enabled=True
+[TRACK] bbox = (191,-33,616,495), lost_this_frame = False
+[TRACK] updated selected_person to: [191, -33, 616, 495]
+[MAIN] target_center = (403, 231)
+[MAIN] before PID, target_center=(403, 231)
+[PID] target=(403,231), current_angle=(88.9,0.5)
+[PID] error_pixels=(83,0), angle_error=(8.43,0.00)
+[PID] control=(0.92,-0.32)
+[MAIN] after PID, pan=88.0, tilt=0.8
+[SERVO] set_target(88.00404708583977, 0.8434407104236282), tracking_enabled=True
+[TRACK] bbox = (374,-24,799,504), lost_this_frame = False
+[TRACK] updated selected_person to: [374, -24, 799, 504]
+[MAIN] target_center = (586, 240)
+[MAIN] before PID, target_center=(586, 240)
+[PID] target=(586,240), current_angle=(88.0,0.8)
+[PID] error_pixels=(266,0), angle_error=(27.02,0.00)
+[PID] control=(10.00,-0.22)
+[MAIN] after PID, pan=78.0, tilt=1.1
+[SERVO] set_target(78.00404708583977, 1.06454830121682), tracking_enabled=True
+[TRACK] bbox = (431,-16,847,502), lost_this_frame = False
+[TRACK] updated selected_person to: [431, -16, 847, 502]
+[MAIN] target_center = (639, 243)
+[MAIN] before PID, target_center=(639, 243)
+[PID] target=(639,243), current_angle=(78.0,1.1)
+[PID] error_pixels=(319,0), angle_error=(32.40,0.00)
+[PID] control=(10.00,-0.15)
+[MAIN] after PID, pan=68.0, tilt=1.2
+[SERVO] set_target(68.00404708583977, 1.2165463209469047), tracking_enabled=True
+[TRACK] bbox = (427,-26,852,502), lost_this_frame = False
+[TRACK] updated selected_person to: [427, -26, 852, 502]
+[MAIN] target_center = (639, 238)
+[MAIN] before PID, target_center=(639, 238)
+[PID] target=(639,238), current_angle=(68.0,1.2)
+[PID] error_pixels=(319,0), angle_error=(32.40,0.00)
+[PID] control=(10.00,-0.10)
+[MAIN] after PID, pan=58.0, tilt=1.3
+[SERVO] set_target(58.00404708583977, 1.3201676409328145), tracking_enabled=True
+[TRACK] bbox = (387,-17,803,501), lost_this_frame = False
+[TRACK] updated selected_person to: [387, -17, 803, 501]
+[MAIN] target_center = (595, 242)
+[MAIN] before PID, target_center=(595, 242)
+[PID] target=(595,242), current_angle=(58.0,1.3)
+[PID] error_pixels=(275,0), angle_error=(27.93,0.00)
+[PID] control=(10.00,-0.07)
+[MAIN] after PID, pan=48.0, tilt=1.4
+[SERVO] set_target(48.00404708583977, 1.3899252710978018), tracking_enabled=True
+[TRACK] bbox = (124,-1,532,507), lost_this_frame = False
+[TRACK] updated selected_person to: [124, -1, 532, 507]
+[MAIN] target_center = (328, 253)
+[MAIN] before PID, target_center=(328, 253)
+[PID] target=(328,253), current_angle=(48.0,1.4)
+[PID] error_pixels=(0,13), angle_error=(0.00,1.30)
+[PID] control=(10.00,0.65)
+[MAIN] after PID, pan=38.0, tilt=0.7
+[SERVO] set_target(38.00404708583977, 0.7413789381887604), tracking_enabled=True
+[TRACK] bbox = (114,2,522,510), lost_this_frame = False
+[TRACK] updated selected_person to: [114, 2, 522, 510]
+[MAIN] target_center = (318, 256)
+[MAIN] before PID, target_center=(318, 256)
+[PID] target=(318,256), current_angle=(38.0,0.7)
+[PID] error_pixels=(0,16), angle_error=(0.00,1.60)
+[PID] control=(8.67,1.20)
+[MAIN] after PID, pan=29.3, tilt=0.0
+[SERVO] set_target(29.331820990454325, 0), tracking_enabled=True
+[TRACK] bbox = (7,1,415,509), lost_this_frame = False
+[TRACK] updated selected_person to: [7, 1, 415, 509]
+[MAIN] target_center = (211, 255)
+[MAIN] before PID, target_center=(211, 255)
+[PID] target=(211,255), current_angle=(29.3,0.0)
+[PID] error_pixels=(-109,15), angle_error=(-11.07,1.50)
+[PID] control=(0.50,1.51)
+[MAIN] after PID, pan=28.8, tilt=0.0
+[SERVO] set_target(28.834849339405338, 0), tracking_enabled=True
+[TRACK] bbox = (-141,3,267,511), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=1
+[MAIN] target_center = (211, 255)
+[MAIN] before PID, target_center=(211, 255)
+[PID] target=(211,255), current_angle=(28.8,0.0)
+PID输出: control_x=-4.35, control_y=+1.74, angle_error=(-11.07,+1.50)
+[PID] error_pixels=(-109,15), angle_error=(-11.07,1.50)
+[PID] control=(-4.35,1.74)
+[MAIN] after PID, pan=33.2, tilt=0.0
+[SERVO] set_target(33.18646453260885, 0), tracking_enabled=True
+[TRACK] bbox = (-204,0,204,508), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=2
+[MAIN] target_center = (211, 255)
+[MAIN] before PID, target_center=(211, 255)
+[PID] target=(211,255), current_angle=(33.2,0.0)
+[PID] error_pixels=(-109,15), angle_error=(-11.07,1.50)
+[PID] control=(-7.75,1.90)
+[MAIN] after PID, pan=40.9, tilt=0.0
+[SERVO] set_target(40.9383920848521, 0), tracking_enabled=True
+[TRACK] bbox = (-204,-3,204,505), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=3
+[MAIN] target_center = (211, 255)
+[MAIN] before PID, target_center=(211, 255)
+[PID] target=(211,255), current_angle=(40.9,0.0)
+[PID] error_pixels=(-109,15), angle_error=(-11.07,1.50)
+[PID] control=(-10.00,2.01)
+[MAIN] after PID, pan=50.9, tilt=0.0
+[SERVO] set_target(50.9383920848521, 0), tracking_enabled=True
+[TRACK] bbox = (-204,-5,204,503), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=4
+[MAIN] target_center = (211, 255)
+[MAIN] before PID, target_center=(211, 255)
+[PID] target=(211,255), current_angle=(50.9,0.0)
+[PID] error_pixels=(-109,15), angle_error=(-11.07,1.50)
+[PID] control=(-10.00,2.09)
+[MAIN] after PID, pan=60.9, tilt=0.0
+[SERVO] set_target(60.9383920848521, 0), tracking_enabled=True
+[TRACK] bbox = (-194,1,214,509), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=5
+[MAIN] target_center = (211, 255)
+[MAIN] before PID, target_center=(211, 255)
+[PID] target=(211,255), current_angle=(60.9,0.0)
+[PID] error_pixels=(-109,15), angle_error=(-11.07,1.50)
+[PID] control=(-10.00,2.15)
+[MAIN] after PID, pan=70.9, tilt=0.0
+[SERVO] set_target(70.9383920848521, 0), tracking_enabled=True
+[TRACK] bbox = (98,2,506,510), lost_this_frame = False
+[TRACK] updated selected_person to: [98, 2, 506, 510]
+[MAIN] target_center = (302, 256)
+[MAIN] before PID, target_center=(302, 256)
+[PID] target=(302,256), current_angle=(70.9,0.0)
+[PID] error_pixels=(-18,16), angle_error=(-1.83,1.60)
+[PID] control=(-8.89,2.25)
+[MAIN] after PID, pan=79.8, tilt=0.0
+[SERVO] set_target(79.82733331427875, 0), tracking_enabled=True
+[TRACK] bbox = (109,2,517,510), lost_this_frame = False
+[TRACK] updated selected_person to: [109, 2, 517, 510]
+[MAIN] target_center = (313, 256)
+[MAIN] before PID, target_center=(313, 256)
+[PID] target=(313,256), current_angle=(79.8,0.0)
+[PID] error_pixels=(0,16), angle_error=(0.00,1.60)
+[PID] control=(-5.82,2.31)
+[MAIN] after PID, pan=85.6, tilt=0.0
+[SERVO] set_target(85.6427959300807, 0), tracking_enabled=True
+[TRACK] bbox = (216,2,624,510), lost_this_frame = False
+[TRACK] updated selected_person to: [216, 2, 624, 510]
+[MAIN] target_center = (420, 256)
+[MAIN] before PID, target_center=(420, 256)
+[PID] target=(420,256), current_angle=(85.6,0.0)
+[PID] error_pixels=(100,16), angle_error=(10.16,1.60)
+[PID] control=(1.61,2.35)
+[MAIN] after PID, pan=84.0, tilt=0.0
+[SERVO] set_target(84.0284846056691, 0), tracking_enabled=True
+[TRACK] bbox = (248,-1,656,507), lost_this_frame = False
+[TRACK] updated selected_person to: [248, -1, 656, 507]
+[MAIN] target_center = (452, 253)
+[MAIN] before PID, target_center=(452, 253)
+[PID] target=(452,253), current_angle=(84.0,0.0)
+[PID] error_pixels=(132,13), angle_error=(13.41,1.30)
+[PID] control=(7.58,2.23)
+[MAIN] after PID, pan=76.5, tilt=0.0
+[SERVO] set_target(76.45098088740322, 0), tracking_enabled=True
+[TRACK] bbox = (407,-4,823,514), lost_this_frame = False
+[TRACK] updated selected_person to: [407, -4, 823, 514]
+[MAIN] target_center = (615, 255)
+[MAIN] before PID, target_center=(615, 255)
+[PID] target=(615,255), current_angle=(76.5,0.0)
+[PID] error_pixels=(295,15), angle_error=(29.96,1.50)
+[PID] control=(10.00,2.27)
+[MAIN] after PID, pan=66.5, tilt=0.0
+[SERVO] set_target(66.45098088740322, 0), tracking_enabled=True
+[TRACK] bbox = (405,-9,830,519), lost_this_frame = False
+[TRACK] updated selected_person to: [405, -9, 830, 519]
+[MAIN] target_center = (617, 255)
+[MAIN] before PID, target_center=(617, 255)
+[PID] target=(617,255), current_angle=(66.5,0.0)
+[PID] error_pixels=(297,15), angle_error=(30.16,1.50)
+[PID] control=(10.00,2.28)
+[MAIN] after PID, pan=56.5, tilt=0.0
+[SERVO] set_target(56.45098088740322, 0), tracking_enabled=True
+[TRACK] bbox = (346,-6,771,522), lost_this_frame = False
+[TRACK] updated selected_person to: [346, -6, 771, 522]
+[MAIN] target_center = (558, 258)
+[MAIN] before PID, target_center=(558, 258)
+[PID] target=(558,258), current_angle=(56.5,0.0)
+[PID] error_pixels=(238,18), angle_error=(24.17,1.80)
+[PID] control=(10.00,2.45)
+[MAIN] after PID, pan=46.5, tilt=0.0
+[SERVO] set_target(46.45098088740322, 0), tracking_enabled=True
+[TRACK] bbox = (226,0,642,518), lost_this_frame = False
+[TRACK] updated selected_person to: [226, 0, 642, 518]
+[MAIN] target_center = (434, 259)
+[MAIN] before PID, target_center=(434, 259)
+[PID] target=(434,259), current_angle=(46.5,0.0)
+[PID] error_pixels=(114,19), angle_error=(11.58,1.90)
+[PID] control=(10.00,2.59)
+[MAIN] after PID, pan=36.5, tilt=0.0
+[SERVO] set_target(36.45098088740322, 0), tracking_enabled=True
+[TRACK] bbox = (-29,-1,387,517), lost_this_frame = False
+[TRACK] updated selected_person to: [-29, -1, 387, 517]
+[MAIN] target_center = (179, 258)
+[MAIN] before PID, target_center=(179, 258)
+[PID] target=(179,258), current_angle=(36.5,0.0)
+[PID] error_pixels=(-141,18), angle_error=(-14.32,1.80)
+[PID] control=(4.98,2.64)
+[MAIN] after PID, pan=31.5, tilt=0.0
+[SERVO] set_target(31.47298197783722, 0), tracking_enabled=True
+[TRACK] bbox = (-32,-2,384,516), lost_this_frame = False
+[TRACK] updated selected_person to: [-32, -2, 384, 516]
+[MAIN] target_center = (176, 257)
+[MAIN] before PID, target_center=(176, 257)
+[PID] target=(176,257), current_angle=(31.5,0.0)
+[PID] error_pixels=(-144,17), angle_error=(-14.62,1.70)
+[PID] control=(-2.84,2.62)
+[MAIN] after PID, pan=34.3, tilt=0.0
+[SERVO] set_target(34.31047677542107, 0), tracking_enabled=True
+[TRACK] bbox = (-168,0,248,518), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=1
+[MAIN] target_center = (176, 257)
+[MAIN] before PID, target_center=(176, 257)
+[PID] target=(176,257), current_angle=(34.3,0.0)
+[PID] error_pixels=(-144,17), angle_error=(-14.62,1.70)
+[PID] control=(-8.29,2.62)
+[MAIN] after PID, pan=42.6, tilt=0.0
+[SERVO] set_target(42.6021291772183, 0), tracking_enabled=True
+[TRACK] bbox = (-208,-10,208,508), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=2
+[MAIN] target_center = (176, 257)
+[MAIN] before PID, target_center=(176, 257)
+[PID] target=(176,257), current_angle=(42.6,0.0)
+[PID] error_pixels=(-144,17), angle_error=(-14.62,1.70)
+[PID] control=(-10.00,2.63)
+[MAIN] after PID, pan=52.6, tilt=0.0
+[SERVO] set_target(52.6021291772183, 0), tracking_enabled=True
+[TRACK] bbox = (-179,-6,246,522), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=3
+[MAIN] target_center = (176, 257)
+[MAIN] before PID, target_center=(176, 257)
+[PID] target=(176,257), current_angle=(52.6,0.0)
+[PID] error_pixels=(-144,17), angle_error=(-14.62,1.70)
+[PID] control=(-10.00,2.63)
+[MAIN] after PID, pan=62.6, tilt=0.0
+[SERVO] set_target(62.6021291772183, 0), tracking_enabled=True
+[TRACK] bbox = (-142,-5,283,523), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=4
+[MAIN] target_center = (176, 257)
+[MAIN] before PID, target_center=(176, 257)
+[PID] target=(176,257), current_angle=(62.6,0.0)
+[PID] error_pixels=(-144,17), angle_error=(-14.62,1.70)
+[PID] control=(-10.00,2.63)
+[MAIN] after PID, pan=72.6, tilt=0.0
+[SERVO] set_target(72.6021291772183, 0), tracking_enabled=True
+[TRACK] bbox = (-4,-1,412,517), lost_this_frame = False
+[TRACK] updated selected_person to: [-4, -1, 412, 517]
+[MAIN] target_center = (204, 258)
+[MAIN] before PID, target_center=(204, 258)
+[PID] target=(204,258), current_angle=(72.6,0.0)
+[PID] error_pixels=(-116,18), angle_error=(-11.78,1.80)
+[PID] control=(-10.00,2.69)
+[MAIN] after PID, pan=82.6, tilt=0.0
+[SERVO] set_target(82.6021291772183, 0), tracking_enabled=True
+[TRACK] bbox = (130,3,538,511), lost_this_frame = False
+[TRACK] updated selected_person to: [130, 3, 538, 511]
+[MAIN] target_center = (334, 257)
+[MAIN] before PID, target_center=(334, 257)
+[PID] target=(334,257), current_angle=(82.6,0.0)
+[PID] error_pixels=(14,17), angle_error=(1.42,1.70)
+[PID] control=(-10.00,2.67)
+[MAIN] after PID, pan=92.6, tilt=0.0
+[SERVO] set_target(92.6021291772183, 0), tracking_enabled=True
+[TRACK] bbox = (348,6,756,514), lost_this_frame = False
+[TRACK] updated selected_person to: [348, 6, 756, 514]
+[MAIN] target_center = (552, 260)
+[MAIN] before PID, target_center=(552, 260)
+[PID] target=(552,260), current_angle=(92.6,0.0)
+[PID] error_pixels=(232,20), angle_error=(23.56,2.00)
+[PID] control=(5.61,2.82)
+[MAIN] after PID, pan=87.0, tilt=0.0
+[SERVO] set_target(86.99388432981597, 0), tracking_enabled=True
+[TRACK] bbox = (385,6,793,514), lost_this_frame = False
+[TRACK] updated selected_person to: [385, 6, 793, 514]
+[MAIN] target_center = (589, 260)
+[MAIN] before PID, target_center=(589, 260)
+[PID] target=(589,260), current_angle=(87.0,0.0)
+[PID] error_pixels=(269,20), angle_error=(27.32,2.00)
+[PID] control=(10.00,2.91)
+[MAIN] after PID, pan=77.0, tilt=0.0
+[SERVO] set_target(76.99388432981597, 0), tracking_enabled=True
+[TRACK] bbox = (435,-4,843,504), lost_this_frame = False
+[TRACK] updated selected_person to: [435, -4, 843, 504]
+[MAIN] target_center = (639, 250)
+[MAIN] before PID, target_center=(639, 250)
+[PID] target=(639,250), current_angle=(77.0,0.0)
+[PID] error_pixels=(319,10), angle_error=(32.40,1.00)
+[PID] control=(10.00,2.44)
+[MAIN] after PID, pan=67.0, tilt=0.0
+[SERVO] set_target(66.99388432981597, 0), tracking_enabled=True
+[TRACK] bbox = (322,-16,730,492), lost_this_frame = False
+[TRACK] updated selected_person to: [322, -16, 730, 492]
+[MAIN] target_center = (526, 238)
+[MAIN] before PID, target_center=(526, 238)
+[PID] target=(526,238), current_angle=(67.0,0.0)
+[PID] error_pixels=(206,0), angle_error=(20.92,0.00)
+[PID] control=(10.00,1.69)
+[MAIN] after PID, pan=57.0, tilt=0.0
+[SERVO] set_target(56.99388432981597, 0), tracking_enabled=True
+[TRACK] bbox = (301,-26,709,482), lost_this_frame = False
+[TRACK] updated selected_person to: [301, -26, 709, 482]
+[MAIN] target_center = (505, 228)
+[MAIN] before PID, target_center=(505, 228)
+[PID] target=(505,228), current_angle=(57.0,0.0)
+[PID] error_pixels=(185,-12), angle_error=(18.79,-1.20)
+[PID] control=(10.00,0.57)
+[MAIN] after PID, pan=47.0, tilt=0.0
+[SERVO] set_target(46.99388432981597, 0), tracking_enabled=True
+[TRACK] bbox = (267,-26,675,482), lost_this_frame = False
+[TRACK] updated selected_person to: [267, -26, 675, 482]
+[MAIN] target_center = (471, 228)
+[MAIN] before PID, target_center=(471, 228)
+[PID] target=(471,228), current_angle=(47.0,0.0)
+[PID] error_pixels=(151,-12), angle_error=(15.34,-1.20)
+[PID] control=(10.00,-0.11)
+[MAIN] after PID, pan=37.0, tilt=0.1
+[SERVO] set_target(36.99388432981597, 0.10760609963932982), tracking_enabled=True
+[TRACK] bbox = (155,-11,563,497), lost_this_frame = False
+[TRACK] updated selected_person to: [155, -11, 563, 497]
+[MAIN] target_center = (359, 243)
+[MAIN] before PID, target_center=(359, 243)
+[PID] target=(359,243), current_angle=(37.0,0.1)
+[PID] error_pixels=(39,0), angle_error=(3.96,0.00)
+[PID] control=(10.00,0.06)
+[MAIN] after PID, pan=27.0, tilt=0.0
+[SERVO] set_target(26.99388432981597, 0.04814115104328498), tracking_enabled=True
+[TRACK] bbox = (-55,17,353,525), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=1
+[MAIN] target_center = (359, 243)
+[MAIN] before PID, target_center=(359, 243)
+[PID] target=(359,243), current_angle=(27.0,0.0)
+[PID] error_pixels=(39,0), angle_error=(3.96,0.00)
+[PID] control=(10.00,0.07)
+[MAIN] after PID, pan=17.0, tilt=0.0
+[SERVO] set_target(16.99388432981597, 0), tracking_enabled=True
+[TRACK] bbox = (30,19,438,527), lost_this_frame = False
+[TRACK] updated selected_person to: [30, 19, 438, 527]
+[MAIN] target_center = (234, 273)
+[MAIN] before PID, target_center=(234, 273)
+[PID] target=(234,273), current_angle=(17.0,0.0)
+[PID] error_pixels=(-86,33), angle_error=(-8.73,3.30)
+[PID] control=(4.22,1.83)
+[MAIN] after PID, pan=12.8, tilt=0.0
+[SERVO] set_target(12.77864608867333, 0), tracking_enabled=True
+[TRACK] bbox = (110,-1,510,497), lost_this_frame = False
+[TRACK] updated selected_person to: [110, -1, 510, 497]
+[MAIN] target_center = (310, 248)
+[MAIN] before PID, target_center=(310, 248)
+[PID] target=(310,248), current_angle=(12.8,0.0)
+📊 角度计算 - 像素误差:(-10,+0)px → 角度误差:(-1.0°,+0.0°) 当前角度:(12.8°,0.0°)
+PID输出: control_x=+3.42, control_y=+1.04, angle_error=(-1.02,+0.00)
+[PID] error_pixels=(-10,0), angle_error=(-1.02,0.00)
+[PID] control=(3.42,1.04)
+[MAIN] after PID, pan=9.4, tilt=0.0
+[SERVO] set_target(9.355592738366926, 0), tracking_enabled=True
+[TRACK] bbox = (-5,-12,395,486), lost_this_frame = False
+[TRACK] updated selected_person to: [-5, -12, 395, 486]
+[MAIN] target_center = (195, 237)
+[MAIN] before PID, target_center=(195, 237)
+[PID] target=(195,237), current_angle=(9.4,0.0)
+[PID] error_pixels=(-125,0), angle_error=(-12.70,0.00)
+[PID] control=(-3.98,0.76)
+[MAIN] after PID, pan=13.3, tilt=0.0
+[SERVO] set_target(13.332945917894422, 0), tracking_enabled=True
+[TRACK] bbox = (-72,-4,320,484), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=1
+[MAIN] target_center = (195, 237)
+[MAIN] before PID, target_center=(195, 237)
+[PID] target=(195,237), current_angle=(13.3,0.0)
+[PID] error_pixels=(-125,0), angle_error=(-12.70,0.00)
+[PID] control=(-8.22,0.56)
+[MAIN] after PID, pan=21.6, tilt=0.0
+[SERVO] set_target(21.55550779856364, 0), tracking_enabled=True
+[TRACK] bbox = (-122,-1,270,487), lost_this_frame = False
+[TRACK] lost due to out of bounds
+[TRACK] predicting, lost_count=2
+[MAIN] target_center = (195, 237)
+[MAIN] before PID, target_center=(195, 237)
+[PID] target=(195,237), current_angle=(21.6,0.0)
+[PID] error_pixels=(-125,0), angle_error=(-12.70,0.00)
+[PID] control=(-10.00,0.43)
+[MAIN] after PID, pan=31.6, tilt=0.0
+[SERVO] set_target(31.55550779856364, 0), tracking_enabled=True

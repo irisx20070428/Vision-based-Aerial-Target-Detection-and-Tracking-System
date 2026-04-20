@@ -1,0 +1,10 @@
+Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
+Collecting gitpython
+  Downloading https://www.piwheels.org/simple/gitpython/gitpython-3.1.46-py3-none-any.whl (208 kB)
+Collecting gitdb<5,>=4.0.1 (from gitpython)
+  Downloading https://www.piwheels.org/simple/gitdb/gitdb-4.0.12-py3-none-any.whl (62 kB)
+Collecting smmap<6,>=3.0.1 (from gitdb<5,>=4.0.1->gitpython)
+  Downloading https://www.piwheels.org/simple/smmap/smmap-5.0.3-py3-none-any.whl (24 kB)
+Installing collected packages: smmap, gitdb, gitpython
+
+Successfully installed gitdb-4.0.12 gitpython-3.1.46 smmap-5.0.3
