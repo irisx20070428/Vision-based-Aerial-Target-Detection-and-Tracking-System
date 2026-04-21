@@ -276,7 +276,13 @@ class PersonDetectionApp:
         try:
             while self.running:
                 # 1. 获取摄像头画面
-                self.frame = self.camera.get_frame()
+                self.frame, capture_time = self.camera.get_frame()
+                if self.frame is None:
+                    time.sleep(0.001)
+                    continue
+
+                # 计算延迟（毫秒）
+                latency_ms = (time.time() - capture_time) * 1000
 
                 # 计算实时帧率
                 now = time.time()
@@ -285,10 +291,6 @@ class PersonDetectionApp:
                     instant_fps = 1.0 / dt
                     fps_smooth = fps_smooth * (1 - fps_alpha) + instant_fps * fps_alpha
                 last_frame_time = now
-
-                if self.frame is None:
-                    time.sleep(0.001)
-                    continue
 
                     # 2. 提交帧到异步检测（非阻塞）
                 # 2. 提交帧到异步检测（非阻塞），追踪模式下降低检测频率
@@ -417,6 +419,10 @@ class PersonDetectionApp:
 
                 # 10. 摄像头信息绘制
                 display_frame = self.camera.draw_info(display_frame, info_text, show_fps=True, display_fps=fps_smooth)
+                # 在绘制完摄像头信息后，单独绘制延迟
+                cv2.putText(display_frame, f"Latency: {latency_ms:.0f} ms", (180, 25),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+
                 display_frame = self.draw_dataset_info(display_frame)
 
                 # 11. 绘制舵机指令面板（新增）

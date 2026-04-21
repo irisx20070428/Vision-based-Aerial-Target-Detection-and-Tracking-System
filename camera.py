@@ -27,6 +27,8 @@ class CameraManager:
         self.prev_frame_time = 0
         self.fps = 0
 
+        self.last_frame_time = 0  # 新增：记录最新帧的采集时间
+
         self._init_camera()
 
     def _init_camera(self):
@@ -125,18 +127,19 @@ class CameraManager:
 
     def _usb_camera_capture_loop(self):
         """USB摄像头采集循环 - 控制帧率"""
-        frame_time = 1.0 / self.fps_target  # 目标帧率间隔（秒）
         while self.running:
             ret, frame = self.cap.read()
             if ret:
                 with self.frame_lock:
                     self.frame = frame
+                    self.last_frame_time = time.time()  # 记录采集时刻
+
     def get_frame(self):
         """获取最新帧"""
         with self.frame_lock:
             if self.frame is not None:
-                return self.frame.copy()
-        return None
+                return self.frame.copy(), self.last_frame_time
+        return None, 0
 
     def calculate_fps(self):
         """计算FPS"""
