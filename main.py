@@ -273,9 +273,17 @@ class PersonDetectionApp:
         fps_smooth = 0.0
         fps_alpha = 0.1  # 平滑系数，值越小越平滑
 
+        frame_counter = 0
+        latency_display = 0
+        fps_display = 0.0
+        last_fps_update_time = time.time()
+
         try:
             while self.running:
                 # 1. 获取摄像头画面
+
+                frame_counter+=1
+
                 self.frame, capture_time = self.camera.get_frame()
                 if self.frame is None:
                     time.sleep(0.001)
@@ -291,6 +299,12 @@ class PersonDetectionApp:
                     instant_fps = 1.0 / dt
                     fps_smooth = fps_smooth * (1 - fps_alpha) + instant_fps * fps_alpha
                 last_frame_time = now
+
+                if frame_counter % 2 == 0:
+                    latency_display = latency_ms
+                if now - last_fps_update_time >= 1.0:
+                    fps_display = fps_smooth
+                    last_fps_update_time = now
 
                     # 2. 提交帧到异步检测（非阻塞）
                 # 2. 提交帧到异步检测（非阻塞），追踪模式下降低检测频率
@@ -418,9 +432,8 @@ class PersonDetectionApp:
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
 
                 # 10. 摄像头信息绘制
-                display_frame = self.camera.draw_info(display_frame, info_text, show_fps=True, display_fps=fps_smooth)
-                # 在绘制完摄像头信息后，单独绘制延迟
-                cv2.putText(display_frame, f"Latency: {latency_ms:.0f} ms", (180, 25),
+                display_frame = self.camera.draw_info(display_frame, info_text, show_fps=True, display_fps=fps_display)
+                cv2.putText(display_frame, f"Latency: {latency_display:.0f} ms", (180, 25),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
 
                 display_frame = self.draw_dataset_info(display_frame)
