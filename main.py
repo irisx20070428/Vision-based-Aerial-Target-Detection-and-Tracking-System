@@ -274,6 +274,7 @@ class PersonDetectionApp:
 
         latency_records = []
         fps_records = []
+        conf_records = []  # 用于记录每帧最高置信度（或所有检测平均置信度）
 
         target_frame_interval = 1.0 / 15  # 15 FPS → 每帧约 66.7ms
 
@@ -334,6 +335,11 @@ class PersonDetectionApp:
                 else:
                     # 单线程模式：直接在当前线程执行检测
                     self.detections, _ = self.detector.detect(self.frame)
+
+                # 收集置信度（以当前帧所有检测的平均置信度为例）
+                if self.detections:
+                    avg_conf_frame = sum(d[4] for d in self.detections) / len(self.detections)
+                    conf_records.append(avg_conf_frame)
 
                 # 4. 绘制检测框
                 display_frame = self.frame.copy()
@@ -568,6 +574,10 @@ class PersonDetectionApp:
                 print(f"  FPS 标准差: {fps_std:.2f}")
                 print(f"  FPS 低于 15 的帧占比: {low_fps_ratio:.1f}%")
                 print("=" * 50)
+
+            if conf_records:
+                avg_conf = np.mean(conf_records)
+                print(f"  平均置信度: {avg_conf:.2f}")
 
             self.cleanup()
 
