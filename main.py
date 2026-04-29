@@ -275,6 +275,8 @@ class PersonDetectionApp:
         latency_records = []
         fps_records = []
 
+        target_frame_interval = 1.0 / 15  # 15 FPS → 每帧约 66.7ms
+
         start_time = time.time()
 
         if not self.camera or not self.detector:
@@ -293,6 +295,9 @@ class PersonDetectionApp:
         latency_display = 0
         fps_display = 0.0
         last_fps_update_time = time.time()
+
+        last_vsync_time = time.time()  # 记录上一帧结束时刻
+        target_frame_interval = 1.0 / 15  # 15 FPS 限制
 
         try:
             while self.running:
@@ -465,7 +470,18 @@ class PersonDetectionApp:
                 # 12. 显示画面
                 cv2.imshow(self.window_name, display_frame)
 
-                # time.sleep(0.005)  # 每帧休眠 5ms，释放 CPU
+                if 'last_vsync_time' not in locals():
+                    last_vsync_time = time.time()
+                now = time.time()
+                elapsed_frame = now - last_vsync_time
+                if elapsed_frame < target_frame_interval:
+                    time.sleep(target_frame_interval - elapsed_frame)
+                last_vsync_time = time.time()
+
+                this_frame_time = time.time()
+                elapsed = this_frame_time - last_frame_time  # 用现有的 last_frame_time（但需要提前保存）
+                if elapsed < target_frame_interval:
+                    time.sleep(target_frame_interval - elapsed)
 
                 # 13. 按键处理
                 key = cv2.waitKey(1) & 0xFF
