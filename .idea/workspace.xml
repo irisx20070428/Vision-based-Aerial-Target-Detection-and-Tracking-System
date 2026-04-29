@@ -5,29 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="test">
-      <change afterPath="$PROJECT_DIR$/pixel_calculation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130056.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130100.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130410.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130433.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130453.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130505.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130518.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130909.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130918.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130919.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130921.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131013.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131015.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131016.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131017.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131019.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131143.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131155.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131212.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131224.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131234.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -171,14 +150,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773758464264</updated>
-    </task>
-    <task id="LOCAL-00038" summary="1">
-      <option name="closed" value="true" />
-      <created>1776340680211</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1776340680211</updated>
     </task>
     <task id="LOCAL-00039" summary="更新pca测试">
       <option name="closed" value="true" />
@@ -564,7 +535,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776773568966</updated>
     </task>
-    <option name="localTasksCounter" value="87" />
+    <task id="LOCAL-00087" summary="test">
+      <option name="closed" value="true" />
+      <created>1777452255869</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1777452255869</updated>
+    </task>
+    <option name="localTasksCounter" value="88" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

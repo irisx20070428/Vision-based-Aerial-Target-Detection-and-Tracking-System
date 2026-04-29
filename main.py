@@ -9,7 +9,7 @@ import numpy as np
 
 TEST_MODEL = 'yolov5n'          # 可选 'yolov5n' 或 'yolov5s'
 TEST_RESOLUTION = (640, 480)    # 可选 (640,480) 或 (1920,1080)
-TEST_ASYNC = False              # True=异步多线程, False=单线程
+TEST_ASYNC = True             # True=异步多线程, False=单线程
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
