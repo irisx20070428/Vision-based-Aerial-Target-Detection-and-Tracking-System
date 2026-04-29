@@ -7,7 +7,7 @@ class Config:
 
     # 摄像头配置
     CAMERA_TYPE = "usb"
-    CAMERA_RESOLUTION = (720, 480)
+    CAMERA_RESOLUTION = (640, 480)
     CAMERA_FPS = 15
 
     # 摄像头视野角度（根据实际摄像头调整）

@@ -5,6 +5,11 @@ import sys
 import os
 import argparse
 from datetime import datetime
+import numpy as np
+
+TEST_MODEL = 'yolov5n'          # 可选 'yolov5n' 或 'yolov5s'
+TEST_RESOLUTION = (640, 480)    # 可选 (640,480) 或 (1920,1080)
+TEST_ASYNC = False              # True=异步多线程, False=单线程
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -59,6 +64,10 @@ class PersonDetectionApp:
         self.last_pan_target = 90  # 上次水平目标角度
         self.last_tilt_target = 90  # 上次垂直目标角度
 
+        # 动态覆盖配置（用于快速切换实验组）
+        Config.YOLO_MODEL = TEST_MODEL
+        Config.CAMERA_RESOLUTION = TEST_RESOLUTION
+
         # 初始化所有模块
         self._init_modules(conf_threshold)
 
@@ -75,7 +84,10 @@ class PersonDetectionApp:
                 conf_threshold = Config.YOLO_CONF_THRESHOLD
             self.detector = YOLOPersonDetector(conf_threshold=conf_threshold)
             # 启动异步检测线程
-            self.detector.start_async_detection()
+            if TEST_ASYNC:
+                self.detector.start_async_detection()
+            else:
+                print("⚡ 单线程模式（不使用异步检测）")
 
             # 3. 舵机和PID（如果未禁用）
             if not self.no_servo and SERVO_AVAILABLE:
@@ -259,6 +271,9 @@ class PersonDetectionApp:
     def run(self):
         """主循环"""
         frame_count = 0
+
+        latency_records = []
+
         start_time = time.time()
 
         if not self.camera or not self.detector:
@@ -291,6 +306,7 @@ class PersonDetectionApp:
 
                 # 计算延迟（毫秒）
                 latency_ms = (time.time() - capture_time) * 1000
+                latency_records.append(latency_ms)
 
                 # 计算实时帧率
                 now = time.time()
@@ -306,12 +322,12 @@ class PersonDetectionApp:
                     fps_display = fps_smooth
                     last_fps_update_time = now
 
-                    # 2. 提交帧到异步检测（非阻塞）
-                # 2. 提交帧到异步检测（非阻塞），追踪模式下降低检测频率
-                self.detector.update_frame_for_detection(self.frame, is_tracking=self.is_tracking)
-
-                # 3. 获取最新检测结果（非阻塞，立即返回）
-                self.detections = self.detector.get_latest_detections()
+                if TEST_ASYNC:
+                    self.detector.update_frame_for_detection(self.frame, is_tracking=self.is_tracking)
+                    self.detections = self.detector.get_latest_detections()
+                else:
+                    # 单线程模式：直接在当前线程执行检测
+                    self.detections, _ = self.detector.detect(self.frame)
 
                 # 4. 绘制检测框
                 display_frame = self.frame.copy()
@@ -512,6 +528,19 @@ class PersonDetectionApp:
             import traceback
             traceback.print_exc()
         finally:
+            if latency_records:
+                arr = np.array(latency_records)
+                avg = np.mean(arr)
+                p95 = np.percentile(arr, 95)
+                std = np.std(arr)
+                print("\n" + "=" * 50)
+                print(" 推理延迟统计")
+                print("=" * 50)
+                print(f" 总帧数: {len(arr)}")
+                print(f" 平均延迟: {avg:.2f} ms")
+                print(f" P95 延迟: {p95:.2f} ms")
+                print(f" 延迟标准差: {std:.2f} ms")
+                print("=" * 50)
             self.cleanup()
 
     def _save_frame(self, frame):
