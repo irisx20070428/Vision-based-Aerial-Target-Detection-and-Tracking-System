@@ -273,6 +273,7 @@ class PersonDetectionApp:
         frame_count = 0
 
         latency_records = []
+        fps_records = []
 
         start_time = time.time()
 
@@ -313,6 +314,7 @@ class PersonDetectionApp:
                 if dt > 0:
                     instant_fps = 1.0 / dt
                     fps_smooth = fps_smooth * (1 - fps_alpha) + instant_fps * fps_alpha
+                    fps_records.append(instant_fps)
                 last_frame_time = now
 
                 if frame_counter % 2 == 0:
@@ -536,6 +538,21 @@ class PersonDetectionApp:
                 print(f"  平均延迟: {np.mean(arr):.2f} ms")
                 print(f"  P95 延迟: {np.percentile(arr, 95):.2f} ms")
                 print(f" 延迟标准差: {np.std(arr):.2f} ms")
+
+            if fps_records:
+                fps_arr = np.array(fps_records)
+                avg_fps = np.mean(fps_arr)
+                min_fps = np.min(fps_arr)
+                fps_std = np.std(fps_arr)
+                low_fps_ratio = np.sum(fps_arr < 15) / len(fps_arr) * 100
+                print("\n📊 帧率统计")
+                print("=" * 50)
+                print(f"  平均 FPS: {avg_fps:.2f}")
+                print(f"  最低 FPS: {min_fps:.2f}")
+                print(f"  FPS 标准差: {fps_std:.2f}")
+                print(f"  FPS 低于 15 的帧占比: {low_fps_ratio:.1f}%")
+                print("=" * 50)
+
             self.cleanup()
 
     def _save_frame(self, frame):
