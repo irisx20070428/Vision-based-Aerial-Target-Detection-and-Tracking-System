@@ -306,7 +306,6 @@ class PersonDetectionApp:
 
                 # 计算延迟（毫秒）
                 latency_ms = (time.time() - capture_time) * 1000
-                latency_records.append(latency_ms)
 
                 # 计算实时帧率
                 now = time.time()
@@ -457,6 +456,10 @@ class PersonDetectionApp:
                 # 11. 绘制舵机指令面板（新增）
                 # display_frame = self.draw_servo_command_panel(display_frame)
 
+                # ---------- 端到端延迟计算 ----------
+                end_to_end_latency = (time.time() - capture_time) * 1000
+                latency_records.append(end_to_end_latency)
+
                 # 12. 显示画面
                 cv2.imshow(self.window_name, display_frame)
 
@@ -530,17 +533,9 @@ class PersonDetectionApp:
         finally:
             if latency_records:
                 arr = np.array(latency_records)
-                avg = np.mean(arr)
-                p95 = np.percentile(arr, 95)
-                std = np.std(arr)
-                print("\n" + "=" * 50)
-                print(" 推理延迟统计")
-                print("=" * 50)
-                print(f" 总帧数: {len(arr)}")
-                print(f" 平均延迟: {avg:.2f} ms")
-                print(f" P95 延迟: {p95:.2f} ms")
-                print(f" 延迟标准差: {std:.2f} ms")
-                print("=" * 50)
+                print(f"  平均延迟: {np.mean(arr):.2f} ms")
+                print(f"  P95 延迟: {np.percentile(arr, 95):.2f} ms")
+                print(f"  延迟标准差: {np.std(arr):.2f} ms")
             self.cleanup()
 
     def _save_frame(self, frame):

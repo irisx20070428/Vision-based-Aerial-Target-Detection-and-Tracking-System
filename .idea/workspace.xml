@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="test">
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -150,30 +150,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773758464264</updated>
-    </task>
-    <task id="LOCAL-00039" summary="更新pca测试">
-      <option name="closed" value="true" />
-      <created>1776412904715</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1776412904715</updated>
-    </task>
-    <task id="LOCAL-00040" summary="更新pca测试">
-      <option name="closed" value="true" />
-      <created>1776574459502</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1776574459502</updated>
-    </task>
-    <task id="LOCAL-00041" summary="更新pca测试">
-      <option name="closed" value="true" />
-      <created>1776576093299</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1776576093299</updated>
     </task>
     <task id="LOCAL-00042" summary="更新pca测试">
       <option name="closed" value="true" />
@@ -543,7 +519,31 @@
       <option name="project" value="LOCAL" />
       <updated>1777452255869</updated>
     </task>
-    <option name="localTasksCounter" value="88" />
+    <task id="LOCAL-00088" summary="test">
+      <option name="closed" value="true" />
+      <created>1777454453511</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1777454453511</updated>
+    </task>
+    <task id="LOCAL-00089" summary="test">
+      <option name="closed" value="true" />
+      <created>1777454648154</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1777454648154</updated>
+    </task>
+    <task id="LOCAL-00090" summary="test">
+      <option name="closed" value="true" />
+      <created>1777455018055</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1777455018055</updated>
+    </task>
+    <option name="localTasksCounter" value="91" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
