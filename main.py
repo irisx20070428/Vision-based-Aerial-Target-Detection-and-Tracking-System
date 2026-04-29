@@ -535,7 +535,7 @@ class PersonDetectionApp:
                 arr = np.array(latency_records)
                 print(f"  平均延迟: {np.mean(arr):.2f} ms")
                 print(f"  P95 延迟: {np.percentile(arr, 95):.2f} ms")
-                print(f"  延迟标准差: {np.std(arr):.2f} ms")
+                print(f" 延迟标准差: {np.std(arr):.2f} ms")
             self.cleanup()
 
     def _save_frame(self, frame):
