@@ -5,9 +5,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="16ac4487-8ec5-4d05-b8a0-663ca2d2d891" name="Changes" comment="test">
+      <change afterPath="$PROJECT_DIR$/pixel_calculation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/camera.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130056.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130100.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130410.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130433.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130453.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130505.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130518.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130909.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130918.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130919.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_130921.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131013.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131015.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131016.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131017.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131019.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131143.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131155.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131212.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131224.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_image/detection_tracking_20260429_131234.jpg" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,20 +64,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.camera.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;with-target-to-center&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Dp/OU/PYTHON/yolo_project/with-target-to-center&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;http.proxy&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.camera.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.pixel_calculation.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "with-target-to-center",
+    "last_opened_file_path": "D:/Dp/OU/PYTHON/yolo_project/with-target-to-center",
+    "settings.editor.selected.configurable": "http.proxy"
   }
-}</component>
-  <component name="RunManager" selected="Python.main">
+}]]></component>
+  <component name="RunManager" selected="Python.pixel_calculation">
     <configuration name="camera" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="PythonProject" />
       <option name="ENV_FILES" value="" />
@@ -102,8 +123,31 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="pixel_calculation" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="PythonProject" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pixel_calculation.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.pixel_calculation" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.camera" />
       </list>
@@ -127,14 +171,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1773758464264</updated>
-    </task>
-    <task id="LOCAL-00037" summary="1">
-      <option name="closed" value="true" />
-      <created>1776336491588</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1776336491588</updated>
     </task>
     <task id="LOCAL-00038" summary="1">
       <option name="closed" value="true" />
@@ -520,7 +556,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776763596072</updated>
     </task>
-    <option name="localTasksCounter" value="86" />
+    <task id="LOCAL-00086" summary="test">
+      <option name="closed" value="true" />
+      <created>1776773568966</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1776773568966</updated>
+    </task>
+    <option name="localTasksCounter" value="87" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
